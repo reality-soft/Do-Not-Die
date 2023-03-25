@@ -1,0 +1,14 @@
+﻿################################################################################
+# 이 .gitignore 파일은 Microsoft(R) Visual Studio에서 자동으로 만들어졌습니다.
+################################################################################
+
+/CharacterTool/.vs/CharacterTool/v17
+/.vs
+/CharacterTool/CharacterTool.vcxproj.filters
+/CharacterTool/CharacterTool.vcxproj.user
+/CharacterTool.vcxproj.filters
+/CharacterTool.vcxproj.user
+/CharacterTool/imgui.ini
+/vendor/premake
+/ProjectGenerator.bat
+/CharacterTool.sln
