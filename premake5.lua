@@ -111,7 +111,8 @@ project "Do-Not-Die"
 
 		prebuildcommands
 		{
-			"copy \"..\\..\\output\\bin\\Debug-windows-x86_64\\Engine\\*.dll\" \"..\\..\\output\\bin\\Debug-windows-x86_64\\Do-Not-Die\\*.dll\""
+			"copy \"..\\..\\output\\bin\\Debug-windows-x86_64\\Engine\\*.dll\" \"..\\..\\output\\bin\\Debug-windows-x86_64\\Do-Not-Die\\*.dll\"",
+			"copy \"..\\..\\SDK\\FMOD\\lib\\debug\\*.dll\" \"..\\..\\output\\bin\\Debug-windows-x86_64\\Do-Not-Die\\*.dll\""
 		}
 
 		postbuildcommands
@@ -132,7 +133,8 @@ project "Do-Not-Die"
 
 		prebuildcommands
 		{
-			"copy \"..\\..\\output\\bin\\Release-windows-x86_64\\Engine\\*.dll\" \"..\\..\\output\\bin\\Release-windows-x86_64\\Do-Not-Die\\*.dll\""
+			"copy \"..\\..\\output\\bin\\Release-windows-x86_64\\Engine\\*.dll\" \"..\\..\\output\\bin\\Release-windows-x86_64\\Do-Not-Die\\*.dll\"",
+			"copy \"..\\..\\SDK\\FBXSDK\\lib\\release\\*.dll\" \"..\\..\\output\\bin\\Release-windows-x86_64\\Do-Not-Die\\*.dll\""
 		}
 
 		postbuildcommands
@@ -153,7 +155,8 @@ project "Do-Not-Die"
 
 		prebuildcommands
 		{
-			"copy \"..\\..\\output\\bin\\Dist-windows-x86_64\\Engine\\*.dll\" \"..\\..\\output\\bin\\Dist-windows-x86_64\\Do-Not-Die\\*.dll\""
+			"copy \"..\\..\\output\\bin\\Dist-windows-x86_64\\Engine\\*.dll\" \"..\\..\\output\\bin\\Dist-windows-x86_64\\Do-Not-Die\\*.dll\"",
+			"copy \"..\\..\\SDK\\FBXSDK\\lib\\release\\*.dll\" \"..\\..\\output\\bin\\Release-windows-x86_64\\Do-Not-Die\\*.dll\""
 		}
 
 		postbuildcommands
