@@ -1,4 +1,4 @@
-workspace "CharacterTool"
+workspace "Do-Not-Die"
 	architecture "x86_64"
 	toolset "v143"
 	configurations
@@ -10,8 +10,8 @@ workspace "CharacterTool"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-project "CharacterTool"
-	location "CharacterTool"
+project "Do-Not-Die"
+	location "Do-Not-Die"
 	kind "WindowedApp"
 	language "C++"
 
@@ -57,8 +57,6 @@ project "CharacterTool"
 	{
 		"../output/bin/Debug-windows-x86_64/Engine/",
 		"../SDK/DirectXTK/lib",
-		"../SDK/FBXSDK/lib/debug",
-		"../SDK/FMOD/lib/debug",
 		"../SDK/IMGUI/lib",
 		"../SDK/RP3D/lib"
 	}
@@ -100,22 +98,68 @@ project "CharacterTool"
 			"PLATFORM_WINDOWS"
 		}
 
+	filter "configurations:Debug"
+		defines "_DEBUG"
+		symbols "On"
+
+		libdirs
+		{
+			"../SDK/FBXSDK/lib/debug",
+			"../SDK/FMOD/lib/debug",
+			"../output/bin/Debug-windows-x86_64/Engine/",
+		}
+
 		prebuildcommands
 		{
-			"copy \"..\\..\\output\\bin\\Debug-windows-x86_64\\Engine\\*.dll\" \"..\\..\\output\\bin\\Debug-windows-x86_64\\CharacterTool\\*.dll\""
+			"copy \"..\\..\\output\\bin\\Debug-windows-x86_64\\Engine\\*.dll\" \"..\\..\\output\\bin\\Debug-windows-x86_64\\Do-Not-Die\\*.dll\"",
+			"copy \"..\\..\\SDK\\FMOD\\lib\\debug\\*.dll\" \"..\\..\\output\\bin\\Debug-windows-x86_64\\Do-Not-Die\\*.dll\""
 		}
 
 		postbuildcommands
 		{
-			"copy \"..\\..\\output\\bin\\Debug-windows-x86_64\\CharacterTool\\*.cso\" \"..\\..\\Contents\\Shader\\*.cso\"",
+			"copy \"..\\..\\output\\bin\\Debug-windows-x86_64\\Do-Not-Die\\*.cso\" \"..\\..\\Contents\\Shader\\*.cso\"",
 		}
 
-	filter "configurations:Debug"
-		defines "_DEBUG"
-		symbols "On"
 	filter "configurations:Release"
 		defines "_RELEASE"
 		optimize "On"
+
+		libdirs
+		{
+			"../SDK/FBXSDK/lib/release",
+			"../SDK/FMOD/lib/release",
+			"../output/bin/Release-windows-x86_64/Engine/",
+		}
+
+		prebuildcommands
+		{
+			"copy \"..\\..\\output\\bin\\Release-windows-x86_64\\Engine\\*.dll\" \"..\\..\\output\\bin\\Release-windows-x86_64\\Do-Not-Die\\*.dll\"",
+			"copy \"..\\..\\SDK\\FBXSDK\\lib\\release\\*.dll\" \"..\\..\\output\\bin\\Release-windows-x86_64\\Do-Not-Die\\*.dll\""
+		}
+
+		postbuildcommands
+		{
+			"copy \"..\\..\\output\\bin\\Release-windows-x86_64\\Do-Not-Die\\*.cso\" \"..\\..\\Contents\\Shader\\*.cso\"",
+		}
+
 	filter "configurations:Dist"
 		defines "_DIST"
 		optimize "On"
+
+		libdirs
+		{
+			"../SDK/FBXSDK/lib/release",
+			"../SDK/FMOD/lib/release",
+			"../output/bin/Dist-windows-x86_64/Engine/",
+		}
+
+		prebuildcommands
+		{
+			"copy \"..\\..\\output\\bin\\Dist-windows-x86_64\\Engine\\*.dll\" \"..\\..\\output\\bin\\Dist-windows-x86_64\\Do-Not-Die\\*.dll\"",
+			"copy \"..\\..\\SDK\\FBXSDK\\lib\\release\\*.dll\" \"..\\..\\output\\bin\\Release-windows-x86_64\\Do-Not-Die\\*.dll\""
+		}
+
+		postbuildcommands
+		{
+			"copy \"..\\..\\output\\bin\\Dist-windows-x86_64\\Do-Not-Die\\*.cso\" \"..\\..\\Contents\\Shader\\*.cso\"",
+		}
