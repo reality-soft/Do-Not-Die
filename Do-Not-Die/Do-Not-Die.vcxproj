@@ -92,7 +92,8 @@
       <AdditionalLibraryDirectories>..\..\SDK\DirectXTK\lib;..\..\SDK\IMGUI\lib;..\..\SDK\RP3D\lib;..\..\SDK\FBXSDK\lib\debug;..\..\SDK\FMOD\lib\debug;..\..\output\bin\Debug-windows-x86_64\Engine;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>copy "..\..\output\bin\Debug-windows-x86_64\Engine\*.dll" "..\..\output\bin\Debug-windows-x86_64\Do-Not-Die\*.dll"</Command>
+      <Command>copy "..\..\output\bin\Debug-windows-x86_64\Engine\*.dll" "..\..\output\bin\Debug-windows-x86_64\Do-Not-Die\*.dll"
+copy "..\..\SDK\FMOD\lib\debug\*.dll" "..\..\output\bin\Debug-windows-x86_64\Do-Not-Die\*.dll"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>copy "..\..\output\bin\Debug-windows-x86_64\Do-Not-Die\*.cso" "..\..\Contents\Shader\*.cso"</Command>
@@ -121,7 +122,8 @@
       <AdditionalLibraryDirectories>..\..\output\bin\Debug-windows-x86_64\Engine;..\..\SDK\DirectXTK\lib;..\..\SDK\IMGUI\lib;..\..\SDK\RP3D\lib;..\..\SDK\FBXSDK\lib\release;..\..\SDK\FMOD\lib\release;..\..\output\bin\Release-windows-x86_64\Engine;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>copy "..\..\output\bin\Release-windows-x86_64\Engine\*.dll" "..\..\output\bin\Release-windows-x86_64\Do-Not-Die\*.dll"</Command>
+      <Command>copy "..\..\output\bin\Release-windows-x86_64\Engine\*.dll" "..\..\output\bin\Release-windows-x86_64\Do-Not-Die\*.dll"
+copy "..\..\SDK\FBXSDK\lib\release\*.dll" "..\..\output\bin\Release-windows-x86_64\Do-Not-Die\*.dll"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>copy "..\..\output\bin\Release-windows-x86_64\Do-Not-Die\*.cso" "..\..\Contents\Shader\*.cso"</Command>
@@ -150,12 +152,116 @@
       <AdditionalLibraryDirectories>..\..\output\bin\Debug-windows-x86_64\Engine;..\..\SDK\DirectXTK\lib;..\..\SDK\IMGUI\lib;..\..\SDK\RP3D\lib;..\..\SDK\FBXSDK\lib\release;..\..\SDK\FMOD\lib\release;..\..\output\bin\Dist-windows-x86_64\Engine;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>copy "..\..\output\bin\Dist-windows-x86_64\Engine\*.dll" "..\..\output\bin\Dist-windows-x86_64\Do-Not-Die\*.dll"</Command>
+      <Command>copy "..\..\output\bin\Dist-windows-x86_64\Engine\*.dll" "..\..\output\bin\Dist-windows-x86_64\Do-Not-Die\*.dll"
+copy "..\..\SDK\FBXSDK\lib\release\*.dll" "..\..\output\bin\Release-windows-x86_64\Do-Not-Die\*.dll"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>copy "..\..\output\bin\Dist-windows-x86_64\Do-Not-Die\*.cso" "..\..\Contents\Shader\*.cso"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Enemy.h" />
+    <ClInclude Include="src\FX_BloodImpact.h" />
+    <ClInclude Include="src\FX_ConcreteImpact.h" />
+    <ClInclude Include="src\Player.h" />
+    <ClInclude Include="src\TestGame.h" />
+    <ClInclude Include="src\TestWidget.h" />
+    <ClInclude Include="src\UI_Ingame_Actor.h" />
+    <ClInclude Include="src\Weapon.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Enemy.cpp" />
+    <ClCompile Include="src\FX_BloodImpact.cpp" />
+    <ClCompile Include="src\FX_ConcreteImpact.cpp" />
+    <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\TestGame.cpp" />
+    <ClCompile Include="src\TestWidget.cpp" />
+    <ClCompile Include="src\UI_Ingame_Actor.cpp" />
+    <ClCompile Include="src\Weapon.cpp" />
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="HLSL\EffectDefaultPS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>PS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\EffectDefaultVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>VS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\EffectParticleGS.hlsl">
+      <ShaderType>Geometry</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>GS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\EffectParticleGlowPS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>PS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\EffectParticleNoBillboardGS.hlsl">
+      <ShaderType>Geometry</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>GS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\LevelGS.hlsl">
+      <ShaderType>Geometry</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>GS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\LevelPS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>PS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\LevelVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>VS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\MeshSurfacePS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>PS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\SkinningPS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>PS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\SkinningVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>VS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\SkySpherePS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>PS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\SkySphereVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>VS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\StaticMeshVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>VS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\UIPS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>PS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="HLSL\UIVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+      <EntryPointName>VS</EntryPointName>
+    </FxCompile>
+  </ItemGroup>
   <ItemGroup>
     <None Include="..\premake5.lua" />
   </ItemGroup>
