@@ -88,10 +88,9 @@ project "Do-Not-Die"
 	    shadermodel "5.0"
 
 	filter "system:windows"
-		cppdialect "C++17"
+		cppdialect "C++20"
 		staticruntime "Off"
 		systemversion "latest"
-		runtime "Debug"
 
 		defines
 		{
@@ -101,6 +100,7 @@ project "Do-Not-Die"
 	filter "configurations:Debug"
 		defines "_DEBUG"
 		symbols "On"
+		runtime "Debug"
 
 		libdirs
 		{
@@ -123,6 +123,7 @@ project "Do-Not-Die"
 	filter "configurations:Release"
 		defines "_RELEASE"
 		optimize "On"
+		runtime "Release"
 
 		libdirs
 		{
@@ -145,6 +146,7 @@ project "Do-Not-Die"
 	filter "configurations:Dist"
 		defines "_DIST"
 		optimize "On"
+		runtime "Release"
 
 		libdirs
 		{

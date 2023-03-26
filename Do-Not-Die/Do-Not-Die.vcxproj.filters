@@ -30,6 +30,9 @@
     <ClInclude Include="src\UI_Ingame_Actor.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\UI_Minimap.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="src\Weapon.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -54,6 +57,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\UI_Ingame_Actor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI_Minimap.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Weapon.cpp">

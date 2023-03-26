@@ -30,13 +30,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
+    <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
+    <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
@@ -83,7 +83,8 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -103,7 +104,6 @@ copy "..\..\SDK\FMOD\lib\debug\*.dll" "..\..\output\bin\Debug-windows-x86_64\Do-
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <PreprocessorDefinitions>PLATFORM_WINDOWS;_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\Game-Engine\Engine\src\Actors;..\..\Game-Engine\Engine\src\Components;..\..\Game-Engine\Engine\src\Core;..\..\Game-Engine\Engine\src\DataTypes;..\..\Game-Engine\Engine\src\Headers;..\..\Game-Engine\Engine\src\Physics;..\..\Game-Engine\Engine\src\ResourceTypes;..\..\Game-Engine\Engine\src\Systems;..\..\Game-Engine\Engine\src\Tools;..\..\Game-Engine\Engine\src\UI;..\..\Game-Engine\Engine\src\World;..\..\Game-Engine\Engine\src\Event;..\..\Game-Engine\Engine\src\Scene;..\..\Game-Engine\Engine\src\Sound;..\..\Game-Engine\Engine\src\Input;..\..\Game-Engine\Engine\src\Managers;..\..\Game-Engine\Engine\src;..\..\Game-Engine\Engine\vendor\spdlog\include;..\..\SDK\DirectXTK\include;..\..\SDK\FBXSDK\include;..\..\SDK\FMOD\include;..\..\SDK\IMGUI\include;..\..\SDK\RP3D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
@@ -111,8 +111,9 @@ copy "..\..\SDK\FMOD\lib\debug\*.dll" "..\..\output\bin\Debug-windows-x86_64\Do-
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -133,7 +134,6 @@ copy "..\..\SDK\FBXSDK\lib\release\*.dll" "..\..\output\bin\Release-windows-x86_
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <PreprocessorDefinitions>PLATFORM_WINDOWS;_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\Game-Engine\Engine\src\Actors;..\..\Game-Engine\Engine\src\Components;..\..\Game-Engine\Engine\src\Core;..\..\Game-Engine\Engine\src\DataTypes;..\..\Game-Engine\Engine\src\Headers;..\..\Game-Engine\Engine\src\Physics;..\..\Game-Engine\Engine\src\ResourceTypes;..\..\Game-Engine\Engine\src\Systems;..\..\Game-Engine\Engine\src\Tools;..\..\Game-Engine\Engine\src\UI;..\..\Game-Engine\Engine\src\World;..\..\Game-Engine\Engine\src\Event;..\..\Game-Engine\Engine\src\Scene;..\..\Game-Engine\Engine\src\Sound;..\..\Game-Engine\Engine\src\Input;..\..\Game-Engine\Engine\src\Managers;..\..\Game-Engine\Engine\src;..\..\Game-Engine\Engine\vendor\spdlog\include;..\..\SDK\DirectXTK\include;..\..\SDK\FBXSDK\include;..\..\SDK\FMOD\include;..\..\SDK\IMGUI\include;..\..\SDK\RP3D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
@@ -141,8 +141,9 @@ copy "..\..\SDK\FBXSDK\lib\release\*.dll" "..\..\output\bin\Release-windows-x86_
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -167,6 +168,7 @@ copy "..\..\SDK\FBXSDK\lib\release\*.dll" "..\..\output\bin\Release-windows-x86_
     <ClInclude Include="src\TestGame.h" />
     <ClInclude Include="src\TestWidget.h" />
     <ClInclude Include="src\UI_Ingame_Actor.h" />
+    <ClInclude Include="src\UI_Minimap.h" />
     <ClInclude Include="src\Weapon.h" />
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +179,7 @@ copy "..\..\SDK\FBXSDK\lib\release\*.dll" "..\..\output\bin\Release-windows-x86_
     <ClCompile Include="src\TestGame.cpp" />
     <ClCompile Include="src\TestWidget.cpp" />
     <ClCompile Include="src\UI_Ingame_Actor.cpp" />
+    <ClCompile Include="src\UI_Minimap.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
