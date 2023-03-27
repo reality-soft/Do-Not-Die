@@ -105,7 +105,6 @@ void TestGame::OnUpdate()
 		cur_zombie_created++;
 	}
 
-
 	sys_light.UpdateSun(sky_sphere);
 	sys_camera.OnUpdate(reg_scene_);
 	sys_light.OnUpdate(reg_scene_);
@@ -176,7 +175,6 @@ void TestGame::CursorStateUpdate()
 
 	if (!b_show_cursor)
 		SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
-
 }
 
 
