@@ -68,10 +68,7 @@ void Player::SetCharacterAnimation(string anim_id)
 	C_Animation* prev_animation = reg_scene_->try_get<reality::C_Animation>(entity_id_);
 	if (prev_animation != nullptr && prev_animation->anim_id == anim_id) {
 		return;
-	} 
-
-	OutAnimData* animation_data = RESOURCE->UseResource<OutAnimData>(anim_id);
-
+	}
 	C_Animation animation;
 	animation.anim_id = anim_id;
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);

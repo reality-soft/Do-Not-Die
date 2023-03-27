@@ -19,7 +19,7 @@ public:
 	void Jump();
 	void Idle();
 	void Fire();
-	void ResetPos();	
+	void ResetPos();
 	void SetPos(const XMVECTOR& position = { 0.f, 100.f, 0.f, 0.f });
 public:
 	int GetMaxHp() const;
