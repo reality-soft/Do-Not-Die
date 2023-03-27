@@ -30,7 +30,7 @@ private:
 	int cur_node = 0;
 private:
 	vector<XMVECTOR> target_poses_;
-	int cur_target_pos_index_;
+	int cur_target_pos_index_ = 1;
 private:
 	reality::BehaviorTree behavior_tree_;
 };
@@ -41,7 +41,7 @@ public:
 	EnemyMoveToTargets(entt::entity enemy_id, std::vector<XMVECTOR> target_positions)
 		: target_positions_(target_positions), current_target_index_(0)
 	{
-		for (int i = 1;i < target_positions_.size();i++) 
+		for (int i = 1; i < target_positions_.size(); i++)
 		{
 			auto target_pos = target_positions_[i];
 			auto move_to_target = [&, target_pos]() {

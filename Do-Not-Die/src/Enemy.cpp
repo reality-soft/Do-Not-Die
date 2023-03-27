@@ -6,7 +6,7 @@ void Enemy::OnInit(entt::registry& registry)
 {
 	Character::OnInit(registry);
 
-	movement_component_->speed = 300;
+	movement_component_->speed = 100;
 	max_hp_ = cur_hp_ = 100;
 
 	SetCharacterAnimation("Zombie_Idle_1_v2_IPC_Anim_Unreal Take.anim");
@@ -53,10 +53,10 @@ void Enemy::OnUpdate()
 	SetCharacterAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim");
 
 	movement_component_->direction = XMVector3Normalize(target_poses_[cur_target_pos_index_] - GetPos());
-	
+
 	XMVECTOR scale, rotation, translation;
 	XMMatrixDecompose(&scale, &rotation, &translation, transform_matrix_);
-	
+
 	float dot_product = XMVectorGetX(XMVector3Dot(movement_component_->direction, { 0, 0, 1, 0 }));
 	float magnitude1 = XMVectorGetX(XMVector3Length(movement_component_->direction));
 	float magnitude2 = XMVectorGetX(XMVector3Length({ 0, 0, 1, 0 }));
@@ -137,7 +137,7 @@ XMVECTOR Enemy::GetPos() const
 
 void Enemy::SetRoute(const vector<XMVECTOR>& target_poses)
 {
-	SetPos(target_poses[0]);
+	SetPos(target_poses[cur_target_pos_index_]);
 
 	target_poses_ = target_poses;
 
@@ -146,7 +146,7 @@ void Enemy::SetRoute(const vector<XMVECTOR>& target_poses)
 
 void Enemy::SetMeshId(const string& mesh_id)
 {
-	C_SkeletalMesh *skm = reg_scene_->try_get< reality::C_SkeletalMesh>(entity_id_);
+	C_SkeletalMesh* skm = reg_scene_->try_get< reality::C_SkeletalMesh>(entity_id_);
 	skm->skeletal_mesh_id = mesh_id;
 }
 

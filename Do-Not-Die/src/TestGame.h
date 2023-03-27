@@ -22,7 +22,7 @@ private:
 		"Zombie_RiotCop_Male_01.skmesh",
 		"Zombie_SchoolGirl_Female_01.skmesh",
 	};
-  
+
 	SkySphere sky_sphere;
 	LightMeshLevel level;
 

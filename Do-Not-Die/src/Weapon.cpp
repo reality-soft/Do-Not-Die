@@ -14,8 +14,8 @@ void Weapon::OnInit(entt::registry& registry)
 	registry.emplace_or_replace<reality::C_StaticMesh>(entity_id_, stm);
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_StaticMesh));
-	
-	socket_offset_ = XMMatrixRotationY(XMConvertToRadians(90)) * XMMatrixTranslationFromVector({-20, 3, -5, 0});
+
+	socket_offset_ = XMMatrixRotationY(XMConvertToRadians(90)) * XMMatrixTranslationFromVector({ -20, 3, -5, 0 });
 
 	transform_matrix_ = XMMatrixTranslation(0, 100, 0);
 	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
@@ -35,7 +35,7 @@ void Weapon::OnUpdate()
 
 	if (animation_component != nullptr && socket_id_ != -1) {
 		OutAnimData* anim_data = RESOURCE->UseResource<OutAnimData>(animation_component->anim_id);
-		
+
 		if (animation_component->cur_frame < anim_data->end_frame) {
 			animation_matrix_ = anim_data->animations[socket_id_][animation_component->cur_frame];
 		}

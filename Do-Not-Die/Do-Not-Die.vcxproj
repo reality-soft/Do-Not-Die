@@ -167,6 +167,7 @@ copy "..\..\SDK\FBXSDK\lib\release\*.dll" "..\..\output\bin\Release-windows-x86_
     <ClInclude Include="src\TestGame.h" />
     <ClInclude Include="src\TestWidget.h" />
     <ClInclude Include="src\UI_Ingame_Actor.h" />
+    <ClInclude Include="src\UI_Minimap.h" />
     <ClInclude Include="src\Weapon.h" />
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +178,7 @@ copy "..\..\SDK\FBXSDK\lib\release\*.dll" "..\..\output\bin\Release-windows-x86_
     <ClCompile Include="src\TestGame.cpp" />
     <ClCompile Include="src\TestWidget.cpp" />
     <ClCompile Include="src\UI_Ingame_Actor.cpp" />
+    <ClCompile Include="src\UI_Minimap.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
