@@ -6,8 +6,7 @@
 /.vs
 /Do-Not-Die/Do-Not-Die.vcxproj.filters
 /Do-Not-Die/Do-Not-Die.vcxproj.user
-/Do-Not-Die.vcxproj.filters
-/Do-Not-Die.vcxproj.user
+/Do-Not-Die/Do-Not-Die.vcxproj
 /Do-Not-Die/imgui.ini
 /vendor/premake
 /ProjectGenerator.bat
