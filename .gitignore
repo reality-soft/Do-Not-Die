@@ -2,13 +2,12 @@
 # 이 .gitignore 파일은 Microsoft(R) Visual Studio에서 자동으로 만들어졌습니다.
 ################################################################################
 
-/CharacterTool/.vs/CharacterTool/v17
+/Do-Not-Die/.vs/Do-Not-Die/v17
 /.vs
-/CharacterTool/CharacterTool.vcxproj.filters
-/CharacterTool/CharacterTool.vcxproj.user
-/CharacterTool.vcxproj.filters
-/CharacterTool.vcxproj.user
-/CharacterTool/imgui.ini
+/Do-Not-Die/Do-Not-Die.vcxproj.filters
+/Do-Not-Die/Do-Not-Die.vcxproj.user
+/Do-Not-Die/Do-Not-Die.vcxproj
+/Do-Not-Die/imgui.ini
 /vendor/premake
 /ProjectGenerator.bat
-/CharacterTool.sln
+/Do-Not-Die.sln
