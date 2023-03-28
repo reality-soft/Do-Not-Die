@@ -16,7 +16,6 @@ struct VS_OUT
 {
     float4 p : SV_POSITION;
     float4 n : NORMAL;
-    float4 c : COLOR;
     float2 t : TEXCOORD;
     float3 origin : TEXCOORD1;
 };
@@ -35,7 +34,6 @@ VS_OUT VS(VS_IN input)
     
     output.p = projection;
     output.n = normal;
-    output.c = input.c;
     output.t = input.t;
 
     return output;
