@@ -56,8 +56,8 @@ void TestGame::OnInit()
 	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
 
 	sky_sphere.CreateSphere();
-	level.Create("DeadPoly_FullLevel_03.ltmesh", "LevelVS.cso", "LevelGS.cso", "DeadPoly_Level_Collision_03.ltmesh");
-	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_Blocking1.mapdat", GuideLine::GuideType::eBlocking);
+	level.Create("DeadPoly_FullLevel_03.stmesh", "LevelVS.cso", "DeadPoly_Level_Collision_03.stmesh");
+	//level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_Blocking1.mapdat", GuideLine::GuideType::eBlocking);
 	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_NpcTrack.mapdat", GuideLine::GuideType::eNpcTrack);
 
 	QUADTREE->Init(&level, 3);
