@@ -3,7 +3,9 @@ cbuffer CbGlobalLight : register(b0)
 {
     float4 position;
     float4 direction;
-    float4 ambient;
+    float4 ambient_up;
+    float4 ambient_down;
+    float4 ambient_range;
 }
 
 // White Basic color  
@@ -115,10 +117,15 @@ float4 ApplyDirectionalLight(float4 color, float3 normal)
     return saturate(color * intensity);
 }
 
-float4 ApplyAmbientLight(float4 color)
+float4 ApplyHemisphericAmbient(float3 normal, float4 color)
 {
-    
-    return max(color, ambient);
+    // Convert from [-1, 1] to [0, 1]
+    float up = normal * ambient_range.xyz + ambient_range.xyz;
+    // Calculate the ambient value
+    float3 ambient = ambient_down + up * ambient_up;
+
+    // Apply the ambient value to the color
+    return length(ambient) * color;
 }
 
 float4 ApplyCookTorrance(float4 diffuse, float roughness, float specular, float3 normal, float3 view_dir)
