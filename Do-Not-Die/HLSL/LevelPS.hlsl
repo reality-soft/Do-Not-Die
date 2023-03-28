@@ -14,10 +14,14 @@ struct PS_OUT
 Texture2D textures : register(t0);
 SamplerState samper_state : register(s0);
 
-float4 PS(PS_OUT output) : SV_Target
+float4 PS(PS_OUT input) : SV_Target
 {
-    float4 diffuse = textures.Sample(samper_state, output.t);
-    diffuse = ChangeSaturation(diffuse, 1.8f);
+    float4 albedo = textures.Sample(samper_state, input.t);
+    float4 final_color = WhiteColor();
     
-    return ApplyCookTorrance(diffuse, 0.6f, 0.2f, output.n, output.view_dir);
+    albedo = ChangeSaturation(albedo, 1.8f);
+    albedo = ApplyHemisphericAmbient(input.n, albedo);
+    
+    final_color = ApplyCookTorrance(albedo, 0.6f, 0.2f, input.n, input.view_dir);
+    return final_color;
 }
