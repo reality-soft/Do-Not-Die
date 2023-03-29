@@ -8,6 +8,37 @@ cbuffer CbGlobalLight : register(b0)
     float4 ambient_range;
 }
 
+// Point Lighting
+struct PointLight
+{
+    float4  light_color;
+    float3  position;
+    float   range;
+    float3  attenuation;
+    float   pad4;
+};
+
+cbuffer CbPointLights : register(b2)
+{
+    PointLight point_lights[64];
+}
+
+// Spot Lighting
+struct SpotLight
+{
+    float4  light_color;
+    float3  position;
+    float   range;
+    float4  attenuation;
+    float3  direction;
+    float   spot;
+};
+
+cbuffer CbSpotLights : register(b3)
+{
+    SpotLight spot_lights[64];
+}
+
 // White Basic color  
 float4 WhiteColor()
 {
@@ -126,6 +157,71 @@ float4 ApplyHemisphericAmbient(float3 normal, float4 color)
 
     // Apply the ambient value to the color
     return length(ambient) * color;
+}
+
+float4 ApplyHemisphericAmbient2(float3 normal)
+{
+    // Convert from [-1, 1] to [0, 1]
+    float up = normal * ambient_range.xyz + ambient_range.xyz;
+    // Calculate the ambient value
+    float3 ambient = ambient_down + up * ambient_up;
+
+    // Apply the ambient value to the color
+    return float4(length(ambient), length(ambient), length(ambient), 1.0f);
+}
+
+float4 ApplyPointLight(float3 normal, float3 pixel_pos)
+{
+    float4 total_light = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    for (int i = 0; i < 64; i++)
+    {
+        float distance = length(point_lights[i].position - pixel_pos);
+
+        if (point_lights[i].range == 0.0f)
+            continue;
+
+        if (distance > point_lights[i].range)
+            continue;
+        else
+        {
+            float3 light_dir = normalize(point_lights[i].position - pixel_pos);
+
+            float attenuation = 1.0 / (point_lights[i].attenuation.x + point_lights[i].attenuation.y * distance + point_lights[i].attenuation.z * distance * distance);
+            float intensity = max(dot(normalize(normal), light_dir), 0.0f);
+            total_light += point_lights[i].light_color * intensity * attenuation;
+        }
+
+    }
+
+    return total_light;
+}
+
+float4 ApplySpotLight(float3 normal, float3 pixel_pos)
+{
+    float4 total_light = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    for (int i = 0; i < 64; i++)
+    {
+        float distance = length(spot_lights[i].position - pixel_pos);
+
+        if (spot_lights[i].range == 0.0f)
+            continue;
+
+        if (distance > spot_lights[i].range)
+            continue;
+
+        float3 spot_direction_norm = normalize(spot_lights[i].direction);
+        float3 light_dir = normalize(spot_lights[i].position - pixel_pos);
+        float3 half_vector = normalize(spot_direction_norm + light_dir);
+
+        float intensity = max(dot(normalize(normal), light_dir), 0.0f);
+        float spot_attenuation = max(dot(half_vector, -spot_direction_norm), 0.0f);
+        float angle_attenuation = saturate((1.0 - max(dot(light_dir, normalize(-spot_direction_norm)), 0.0)) * 1.0 / (1.0 - cos(1.0f * 0.5)));
+
+        total_light += spot_lights[i].light_color * intensity * spot_attenuation * angle_attenuation;
+    }
+    return total_light;
 }
 
 float4 ApplyCookTorrance(float4 diffuse, float roughness, float specular, float3 normal, float3 view_dir)
