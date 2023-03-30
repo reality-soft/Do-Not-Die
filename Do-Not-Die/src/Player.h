@@ -27,6 +27,9 @@ public:
 	void TakeDamage(int damage);
 	int GetCurHp() const;
 private:
+	void AddFlashLight();
+	void UpdateFlashLight();
+private:
 	int max_hp_;
 	int cur_hp_;
 };

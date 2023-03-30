@@ -73,6 +73,9 @@ void TestGame::OnInit()
 	gw_property_.AddProperty<XMVECTOR>("floor pos", &QUADTREE->player_capsule_pos);
 	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);
 	gw_property_.AddProperty<int>("num of zombie", &cur_zombie_created);
+
+
+	test_point_light.OnInit(reg_scene_);
 }
 
 void TestGame::OnUpdate()
