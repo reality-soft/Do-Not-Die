@@ -90,7 +90,7 @@ void Enemy::SetDirection(const XMVECTOR& direction)
 
 void Enemy::SetRoute(const vector<XMVECTOR>& target_poses)
 {
-	SetPos(target_poses[0] + XMVECTOR{ 0, 1000.0f, 0, 0 });
+	SetPos(target_poses[0] + XMVECTOR{ 0, 50.0f, 0, 0 });
 	// setting behavior tree
 	behavior_tree_.SetRootNode<SequenceNode>();
 
