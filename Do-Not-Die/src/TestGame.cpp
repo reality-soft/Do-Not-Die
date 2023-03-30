@@ -177,7 +177,6 @@ void TestGame::CursorStateUpdate()
 
 	if (!b_show_cursor)
 		SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
-
 }
 
 
