@@ -50,6 +50,9 @@ void Player::OnInit(entt::registry& registry)
 	Weapon* weapon = SCENE_MGR->GetActor<Weapon>(weapon_id);
 	weapon->SetSocket(skeleton_id);
 	weapon->SetOwnerTransform(skm_ptr->local);
+
+	// FlashLight
+	AddFlashLight();
 }
 
 void Player::OnUpdate()
@@ -61,6 +64,9 @@ void Player::OnUpdate()
 	transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, translation, rotation_matrix);
 	front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
 	right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
+
+	// FlashLight Update
+	UpdateFlashLight();
 }
 
 void Player::SetCharacterAnimation(string anim_id)
@@ -172,4 +178,64 @@ void Player::TakeDamage(int damage)
 int Player::GetCurHp() const
 {
 	return cur_hp_;
+}
+
+void Player::AddFlashLight()
+{
+	auto& spot_light_comp = reg_scene_->emplace<C_SpotLight>(entity_id_);
+	spot_light_comp.light_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	spot_light_comp.lifetime = -1.0f;
+	spot_light_comp.timer = 0.0f;
+	spot_light_comp.attenuation = { 1.0f, 0.0f, 0.0f };
+	spot_light_comp.specular = 0.2f;
+	spot_light_comp.range = 1000000.0f;
+	spot_light_comp.spot = 8.0f;
+
+	auto& camera = reg_scene_->get<C_Camera>(entity_id_);
+	XMVECTOR S, R, T;
+	XMMatrixDecompose(&S, &R, &T, camera.world);
+	XMStoreFloat3(&spot_light_comp.position, T);
+	XMStoreFloat3(&spot_light_comp.direction, camera.look);
+
+	transform_tree_.AddNodeToNode(TYPE_ID(C_Camera), TYPE_ID(C_SpotLight));
+
+	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, transform_matrix_);
+}
+
+void Player::UpdateFlashLight()
+{
+	static bool flash_onoff = false;
+
+	if (DINPUT->GetKeyState(DIK_F) == KEY_PUSH)
+		flash_onoff = !flash_onoff;
+
+	auto& spot_light_comp = reg_scene_->get<C_SpotLight>(entity_id_);
+
+	static float range = spot_light_comp.range;
+
+	if (flash_onoff)
+	{
+		auto& camera = reg_scene_->get<C_Camera>(entity_id_);
+		XMVECTOR S, R, T;
+		XMMatrixDecompose(&S, &R, &T, camera.world);
+		XMStoreFloat3(&spot_light_comp.position, T);
+		spot_light_comp.position.y += 40.0f;
+		//XMStoreFloat3(&spot_light_comp.direction, XMVector3Transform(camera.look, rotation_vec));
+
+		auto rotation_quaternion = DirectX::XMQuaternionRotationRollPitchYaw(camera.pitch_yaw.x, camera.pitch_yaw.y, 0);
+		auto rotate_mat = XMMatrixRotationQuaternion(rotation_quaternion);
+		XMFLOAT3 direction = { 0.0f, 0.0f, 1.0f };
+		XMStoreFloat3(&direction, XMVector3Transform(XMLoadFloat3(&direction), rotate_mat));
+
+		//XMStoreFloat3(&direction, camera.look);
+		//direction.x *= -1.0f;
+		//XMStoreFloat3(&spot_light_comp.direction, camera.look);
+		spot_light_comp.direction = direction;
+		spot_light_comp.range = range;
+	}
+	else
+	{
+		spot_light_comp.range = 0.0f;
+	}
+	
 }

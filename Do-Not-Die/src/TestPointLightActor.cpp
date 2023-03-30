@@ -14,7 +14,7 @@ void TestPointLightActor::OnInit(entt::registry& registry)
 	pointlight_comp.lifetime = -1.0f;
 	pointlight_comp.timer = 0.0f;
 	pointlight_comp.attenuation = { 2.0f, 0.0f, 0.0f };
-	pointlight_comp.range = 300.0f;
+	pointlight_comp.range = 100.0f;
 	pointlight_comp.position = { 100.0f, 10.0f, 100.0f };
 }
 
