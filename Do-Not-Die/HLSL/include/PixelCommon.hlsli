@@ -15,7 +15,7 @@ struct PointLight
     float3  position;
     float   range;
     float3  attenuation;
-    float   pad4;
+    float   specular;
 };
 
 cbuffer CbPointLights : register(b2)
@@ -29,7 +29,8 @@ struct SpotLight
     float4  light_color;
     float3  position;
     float   range;
-    float4  attenuation;
+    float3  attenuation;
+    float   specular;
     float3  direction;
     float   spot;
 };
@@ -170,60 +171,6 @@ float4 ApplyHemisphericAmbient2(float3 normal)
     return float4(length(ambient), length(ambient), length(ambient), 1.0f);
 }
 
-float4 ApplyPointLight(float3 normal, float3 pixel_pos)
-{
-    float4 total_light = float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-    for (int i = 0; i < 64; i++)
-    {
-        float distance = length(point_lights[i].position - pixel_pos);
-
-        if (point_lights[i].range == 0.0f)
-            continue;
-
-        if (distance > point_lights[i].range)
-            continue;
-        else
-        {
-            float3 light_dir = normalize(point_lights[i].position - pixel_pos);
-
-            float attenuation = 1.0 / (point_lights[i].attenuation.x + point_lights[i].attenuation.y * distance + point_lights[i].attenuation.z * distance * distance);
-            float intensity = max(dot(normalize(normal), light_dir), 0.0f);
-            total_light += point_lights[i].light_color * intensity * attenuation;
-        }
-
-    }
-
-    return total_light;
-}
-
-float4 ApplySpotLight(float3 normal, float3 pixel_pos)
-{
-    float4 total_light = float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-    for (int i = 0; i < 64; i++)
-    {
-        float distance = length(spot_lights[i].position - pixel_pos);
-
-        if (spot_lights[i].range == 0.0f)
-            continue;
-
-        if (distance > spot_lights[i].range)
-            continue;
-
-        float3 spot_direction_norm = normalize(spot_lights[i].direction);
-        float3 light_dir = normalize(spot_lights[i].position - pixel_pos);
-        float3 half_vector = normalize(spot_direction_norm + light_dir);
-
-        float intensity = max(dot(normalize(normal), light_dir), 0.0f);
-        float spot_attenuation = max(dot(half_vector, -spot_direction_norm), 0.0f);
-        float angle_attenuation = saturate((1.0 - max(dot(light_dir, normalize(-spot_direction_norm)), 0.0)) * 1.0 / (1.0 - cos(1.0f * 0.5)));
-
-        total_light += spot_lights[i].light_color * intensity * spot_attenuation * angle_attenuation;
-    }
-    return total_light;
-}
-
 float4 ApplyCookTorrance(float4 diffuse, float roughness, float specular, float3 normal, float3 view_dir)
 {
     // Correct the input and compute aliases
@@ -234,24 +181,101 @@ float4 ApplyCookTorrance(float4 diffuse, float roughness, float specular, float3
     float view_dot_half = dot(half_vec, view_dir);
     float normal_dot_view = dot(normal, view_dir);
     float normal_dot_light = dot(normal, light_dir);
-    
+
     // Compute the geometric term  
     float G1 = (2.0f * normal_dot_half * normal_dot_view) / view_dot_half;
     float G2 = (2.0f * normal_dot_half * normal_dot_light) / view_dot_half;
     float G = min(1.0f, max(0.0f, min(G1, G2)));
-    
+
     // Compute the fresnel term
     float F = roughness + (1.0f - roughness) * pow(1.0f - normal_dot_view, 5.0f);
-    
+
     // Compute the roughness term  
     float R_2 = roughness * roughness;
     float NDotH_2 = normal_dot_half * normal_dot_half;
     float A = 1.0f / (4.0f * R_2 * NDotH_2 * NDotH_2);
     float B = exp(-(1.0f - NDotH_2) / (R_2 * NDotH_2));
     float R = A * B;
-    
+
     // Compute the final term  
     float3 S = specular * ((G * F * R) / (normal_dot_light * normal_dot_view));
     float3 flinal_color = WhiteColor().xyz * max(0.2f, normal_dot_light) * (diffuse.xyz + S);
     return float4(flinal_color, 1.0f);
 }
+
+float4 ApplyPointLight(float4 color, float3 normal, float3 world_pos, float3 view_dir)
+{
+    float4 diffuse = float4(0.0f, 0.0f, 0.0f, 1.0f);
+    float4 specular = float4(0.0f, 0.0f, 0.0f, 1.0f);
+
+    for (int i = 0; i < 64; i++)
+    {
+        if (point_lights[i].range == 0.0f)
+            continue;
+
+        float3 lightVec = point_lights[i].position - world_pos;
+        float distance = length(lightVec);
+
+        if (distance > point_lights[i].range)
+            continue;
+        else
+        {
+            lightVec = normalize(lightVec);
+
+            float intensity = max(dot(lightVec, normalize(normal)), 0.0f);
+            float att = 1.0f / dot(point_lights[i].attenuation, float3(1.0f, distance, distance * distance));
+
+            diffuse += point_lights[i].light_color * intensity * att;
+
+            float3 v = reflect(-lightVec, normal);
+            float specFactor = pow(max(dot(v, view_dir), 0.0f), 0.1f);
+            float4 spec = specFactor * spot_lights[i].specular * att;
+
+            specular += spec;
+        }
+
+    }
+
+    return ApplyCookTorrance(color * diffuse, 0.6f, specular, normal, view_dir);
+
+}
+
+float4 ApplySpotLight(float4 color, float3 normal, float3 world_pos, float3 view_dir)
+{
+    float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    for (int i = 0; i < 64; i++)
+    {
+        if (spot_lights[i].range == 0.0f)
+            continue;
+
+        float3 lightVec = spot_lights[i].position - world_pos;
+
+        float distance = length(lightVec);
+
+        if (distance > spot_lights[i].range)
+            continue;
+
+        lightVec = normalize(lightVec);
+
+        float intensity = max(dot(lightVec, normalize(normal)), 0.0f);
+
+        float spot = pow(max(dot(-lightVec, spot_lights[i].direction), 0.0f), spot_lights[i].spot);
+
+        float att = spot / dot(spot_lights[i].attenuation, float3(1.0f, distance, distance * distance));
+
+        diffuse += spot_lights[i].light_color * intensity * att;
+
+        float3 v = reflect(-lightVec, normal);
+        float specFactor = pow(max(dot(v, view_dir), 0.0f), 0.1f);
+        float4 spec = specFactor * spot_lights[i].specular * att;
+
+        specular += spec;
+    }
+
+    return ApplyCookTorrance(color * diffuse, 0.6f, specular, normal, view_dir);
+}
+
+
+
