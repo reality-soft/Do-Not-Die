@@ -20,10 +20,13 @@ float4 PS(PS_OUT input) : SV_Target
     float4 final_color = WhiteColor();
     
     albedo = ChangeSaturation(albedo, 1.3f);
+    float4 middle_albedo = albedo;
     albedo = ChangeValue(albedo, 0.5f);
     albedo = ApplyHemisphericAmbient(input.n, albedo);
     
-    final_color = ApplyCookTorrance(albedo, 0.6f, input.n, input.view_dir);
+    final_color = ApplyCookTorrance(albedo, 0.6f, specular_strength, input.n, input.view_dir);
+    final_color += ApplyPointLight(middle_albedo, input.n, input.origin, input.view_dir);
+    final_color += ApplySpotLight(middle_albedo, input.n, input.origin, input.view_dir);
     final_color = ApplyDistanceFog(final_color, input.origin);
     return final_color;
 }
