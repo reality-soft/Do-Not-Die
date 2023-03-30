@@ -110,7 +110,6 @@ void TestGame::OnUpdate()
 
 
 	sys_camera.OnUpdate(reg_scene_);
-	sys_light.UpdateSun(sky_sphere);
 	sys_light.OnUpdate(reg_scene_);
 	sys_movement.OnUpdate(reg_scene_);
 	sys_effect.OnUpdate(reg_scene_);
