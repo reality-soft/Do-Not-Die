@@ -1,11 +1,68 @@
+#define e 2.71828182846
+
 // Global Directional Lighting
 cbuffer CbGlobalLight : register(b0)
 {
-    float4 position;
-    float4 direction;
+    float3 position;
+    float brightness;
+    
+    float3 direction;
+    float specular_strength;
+    
     float4 ambient_up;
     float4 ambient_down;
     float4 ambient_range;
+}
+
+// Point Lighting
+struct PointLight
+{
+    float3 diffuse;
+    float pad1;
+    float3 specular;
+    float pad2;
+    float3 ambient;
+    float pad3;
+
+    float3 position;
+    float range;
+    float3 attenuation;
+    float pad4;
+};
+
+cbuffer CbPointLights : register(b1)
+{
+    PointLight point_lights[64];
+}
+
+// Spot Lighting
+struct SpotLight
+{
+    float3 diffuse;
+    float pad1;
+    float3 specular;
+    float pad2;
+    float3 ambient;
+    float pad3;
+
+    float3 position;
+    float range;
+    float3 attenuation;
+    float pad4;
+    float3 direction;
+    float spot;
+};
+
+cbuffer CbSpotLights : register(b2)
+{
+    SpotLight spot_lights[64];
+}
+
+cbuffer CbDistanceFog : register(b3)
+{
+    float4 fog_color;
+    float3 eye_position;
+    float distance;
 }
 
 // White Basic color  
@@ -111,12 +168,6 @@ float4 ChangeValue(float4 color, float amount)
     return float4(HSVtoRGB(hsv), 1.0f);
 }
 
-float4 ApplyDirectionalLight(float4 color, float3 normal)
-{
-    float intensity = saturate(dot(normal, -direction.xyz));
-    return saturate(color * intensity);
-}
-
 float4 ApplyHemisphericAmbient(float3 normal, float4 color)
 {
     // Convert from [-1, 1] to [0, 1]
@@ -128,7 +179,7 @@ float4 ApplyHemisphericAmbient(float3 normal, float4 color)
     return length(ambient) * color;
 }
 
-float4 ApplyCookTorrance(float4 diffuse, float roughness, float specular, float3 normal, float3 view_dir)
+float4 ApplyCookTorrance(float4 albedo, float roughness, float3 normal, float3 view_dir)
 {
     // Correct the input and compute aliases
     view_dir = normalize(view_dir);
@@ -155,7 +206,70 @@ float4 ApplyCookTorrance(float4 diffuse, float roughness, float specular, float3
     float R = A * B;
     
     // Compute the final term  
-    float3 S = specular * ((G * F * R) / (normal_dot_light * normal_dot_view));
-    float3 flinal_color = WhiteColor().xyz * max(0.2f, normal_dot_light) * (diffuse.xyz + S);
+    float3 S = ((G * F * R) / (normal_dot_light * normal_dot_view)) * specular_strength;
+    float3 flinal_color = float3(brightness, brightness, brightness) * max(0.2f, normal_dot_light) * (albedo.xyz + S);
     return float4(flinal_color, 1.0f);
+}
+
+float4 ApplyPointLights(float4 color, float3 origin, float3 normal)
+{
+    float3 diffuse = float3(0.0f, 0.0f, 0.0f);
+    float3 spec = float3(0.0f, 0.0f, 0.0f);
+    float3 ambient = float3(0.0f, 0.0f, 0.0f);
+
+    for (int i = 0; i < 64; i++)
+    {
+        if (point_lights[i].range == 0)
+            continue;
+
+        float3 light_vector = point_lights[i].position - origin;
+
+        float d = length(light_vector);
+
+        if (d > point_lights[i].range)
+            continue;
+
+        float3 D = float3(0.0f, 0.0f, 0.0f);
+        float3 S = float3(0.0f, 0.0f, 0.0f);
+
+        light_vector /= d;
+
+        float diffuse_factor = dot(light_vector, normal);
+
+        if (diffuse_factor > 0.0f)
+        {
+            float3 v = reflect(-light_vector, normal);
+
+            float spec_factor;
+
+            D = diffuse_factor * point_lights[i].diffuse;
+            S = spec_factor * point_lights[i].diffuse;
+        }
+
+        float att = 1.0f / dot(point_lights[i].attenuation, float3(1.0f, d, d * d));
+
+        D *= att;
+        S *= att;
+        
+        diffuse += D;
+        spec += S;
+        ambient += point_lights[i].ambient;
+    }
+
+    return color * float4(diffuse + spec + ambient, 1.0f);
+}
+
+float4 ApplySpotLights(float4 color, float3 normal)
+{
+    return float4(0, 0, 0, 1);
+}
+
+float4 ApplyDistanceFog(float4 color, float3 pixel_world)
+{
+    float3 fog_start = eye_position;
+    float3 fog_end = normalize(pixel_world - fog_start) * distance;
+    
+    float f = 1 / pow(e, pow(length(pixel_world - fog_start) / distance, 2));
+    
+    return f * color + (1.0f - f) * fog_color;
 }
