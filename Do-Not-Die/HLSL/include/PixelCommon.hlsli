@@ -46,6 +46,13 @@ cbuffer CbSpotLights : register(b3)
     SpotLight spot_lights[64];
 }
 
+cbuffer CbDistanceFog : register(b4)
+{
+    float4 fog_color;
+    float3 eye_position;
+    float distance;
+}
+
 // White Basic color  
 float4 WhiteColor()
 {
@@ -160,7 +167,7 @@ float4 ApplyHemisphericAmbient(float3 normal, float4 color)
     return length(ambient) * color;
 }
 
-float4 ApplyCookTorrance(float4 albedo, float roughness, float3 normal, float3 view_dir)
+float4 ApplyCookTorrance(float4 albedo, float roughness, float3 specular, float3 normal, float3 view_dir)
 {
     // Correct the input and compute aliases
     view_dir = normalize(view_dir);
@@ -187,7 +194,7 @@ float4 ApplyCookTorrance(float4 albedo, float roughness, float3 normal, float3 v
     float R = A * B;
 
     // Compute the final term  
-    float3 S = ((G * F * R) / (normal_dot_light * normal_dot_view)) * specular_strength;
+    float3 S = ((G * F * R) / (normal_dot_light * normal_dot_view)) * specular;
     float3 flinal_color = float3(brightness, brightness, brightness) * max(0.2f, normal_dot_light) * (albedo.xyz + S);
     return float4(flinal_color, 1.0f);
 }
@@ -226,7 +233,6 @@ float4 ApplyPointLight(float4 color, float3 normal, float3 world_pos, float3 vie
     }
 
     return ApplyCookTorrance(color * diffuse, 0.6f, specular, normal, view_dir);
-
 }
 
 float4 ApplySpotLight(float4 color, float3 normal, float3 world_pos, float3 view_dir)
@@ -266,5 +272,12 @@ float4 ApplySpotLight(float4 color, float3 normal, float3 world_pos, float3 view
     return ApplyCookTorrance(color * diffuse, 0.6f, specular, normal, view_dir);
 }
 
+float4 ApplyDistanceFog(float4 color, float3 pixel_world)
+{
+    float3 fog_start = eye_position;
+    float3 fog_end = normalize(pixel_world - fog_start) * distance;
 
+    float f = 1 / pow(e, pow(length(pixel_world - fog_start) / distance, 2));
 
+    return f * color + (1.0f - f) * fog_color;
+}
