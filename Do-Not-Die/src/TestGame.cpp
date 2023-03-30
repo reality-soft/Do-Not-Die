@@ -102,9 +102,9 @@ void TestGame::OnUpdate()
 
 		cur_time = 0.0f;
 
-		cur_zombie_created++;
 	}
-
+	
+	cur_zombie_created = SCENE_MGR->GetNumOfActor() - 1;
 
 	sys_camera.OnUpdate(reg_scene_);
 	sys_light.OnUpdate(reg_scene_);
