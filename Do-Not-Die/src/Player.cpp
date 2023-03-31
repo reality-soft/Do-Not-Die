@@ -187,6 +187,7 @@ void Player::AddFlashLight()
 	spot_light_comp.lifetime = -1.0f;
 	spot_light_comp.timer = 0.0f;
 	spot_light_comp.attenuation = { 1.0f, 0.0f, 0.0f };
+	spot_light_comp.attenuation_level = { 1.0f, 0.0f, 0.0f };
 	spot_light_comp.specular = 0.2f;
 	spot_light_comp.range = 1000000.0f;
 	spot_light_comp.spot = 8.0f;
