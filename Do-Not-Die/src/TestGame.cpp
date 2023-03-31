@@ -26,6 +26,7 @@ void TestGame::OnInit()
 	sys_ui.OnCreate(reg_scene_);
 
 	sys_camera.SetSpeed(1000);
+	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
 	sys_light.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
 	sys_sound.OnCreate(reg_scene_);
@@ -59,9 +60,11 @@ void TestGame::OnInit()
 	level.Create("DeadPoly_FullLevel_04.stmesh", "LevelVS.cso", "DeadPoly_Level_Collision_04.stmesh");
 	//level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_Blocking1.mapdat", GuideLine::GuideType::eBlocking);
 	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_NpcTrack_01.mapdat", GuideLine::GuideType::eNpcTrack);
+	
+	ssm.Create(sys_light.GetGlobalLightData().position, "StaticShadowMapVS.cso", "StaticShadowMapPS.cso");
 
 	QUADTREE->Init(&level, 3);
-
+	
 	environment_.CreateEnvironment();
 	environment_.SetWorldTime(60, 60, true);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
@@ -131,7 +134,10 @@ void TestGame::OnRender()
 {
 	environment_.Render();
 	level.Update();
+	ssm.RenderLevelShadowMap(&level);
+	level.SetShadowMap(RENDER_TARGET->LoadRT("ssm_rt").get()->depth_stencil_view_srv_.Get(), ssm.GetShadowCb());
 	level.Render();
+
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
 

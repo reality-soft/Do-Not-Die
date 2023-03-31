@@ -11,3 +11,4 @@
 /vendor/premake
 /ProjectGenerator.bat
 /Do-Not-Die.sln
+/Do-Not-Die/imgui.ini
