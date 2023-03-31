@@ -3,6 +3,7 @@
 #include "TestWidget.h"
 #include "UI_Ingame_Actor.h"
 #include "TestPointLightActor.h"
+#include "StaticShadowMap.h"
 
 using namespace reality;
 
@@ -25,6 +26,7 @@ private:
 	};
 
 	Environment environment_;
+	StaticShadowMap ssm;
 	StaticMeshLevel level;
 
 	reality::LightingSystem sys_light;
