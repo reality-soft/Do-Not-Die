@@ -2,7 +2,6 @@
 #include "Engine_Include.h"
 #include "TestWidget.h"
 #include "UI_Ingame_Actor.h"
-#include "TestPointLightActor.h"
 
 using namespace reality;
 
@@ -41,7 +40,6 @@ private:
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
 	UI_Ingame_Actor ingame_ui;
-	TestPointLightActor test_point_light;
 	void CreateEffectFromRay();
 	void CursorStateUpdate();
 

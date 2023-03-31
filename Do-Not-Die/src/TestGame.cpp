@@ -3,6 +3,7 @@
 #include "Enemy.h"
 #include "FX_BloodImpact.h"
 #include "FX_ConcreteImpact.h"
+#include "FX_Flame.h"
 #include "FbxMgr.h"
 
 void TestGame::OnInit()
@@ -75,7 +76,7 @@ void TestGame::OnInit()
 	gw_property_.AddProperty<int>("num of zombie", &cur_zombie_created);
 
 
-	test_point_light.OnInit(reg_scene_);
+	EFFECT_MGR->SpawnEffect<FX_Flame>(XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 }
 
 void TestGame::OnUpdate()
@@ -154,18 +155,18 @@ void TestGame::CreateEffectFromRay()
 		if (raycallback_pair.first.distance < raycallback_node.distance)
 		{
 			// TODO : have to subtract zombie hp
-			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal, 1.0f);
+			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
 		}
 		else
-			EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal, 1.0f);
+			EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
 	}
 	else if (raycallback_pair.first.success)
 	{
 		// TODO : have to subtract zombie hp
-		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal, 1.0f);
+		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
 	}
 	else if (raycallback_node.success)
-		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal, 1.0f);
+		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
 }
 
 
