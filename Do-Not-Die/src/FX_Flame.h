@@ -7,7 +7,6 @@ namespace reality
 	{
 	public:
 		virtual void OnInit(entt::registry& registry);
-		virtual void OnUpdate();
 	};
 }
 

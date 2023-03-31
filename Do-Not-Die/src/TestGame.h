@@ -43,7 +43,6 @@ private:
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
 	UI_Ingame_Actor ingame_ui;
-	TestPointLightActor test_point_light;
 	void CreateEffectFromRay();
 	void CursorStateUpdate();
 

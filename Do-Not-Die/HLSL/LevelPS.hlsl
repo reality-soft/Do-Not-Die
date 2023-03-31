@@ -24,9 +24,9 @@ float4 PS(PS_OUT input) : SV_Target
     float4 roughness = textures[3].Sample(samper_state, input.t);
     
     float4 final_color = WhiteColor();
-    
-    albedo = ChangeSaturation(albedo, 1.3f);
+
     float4 middle_albedo = albedo;
+    albedo = ChangeSaturation(albedo, 1.3f);
     albedo = ChangeValue(albedo, 0.5f);
     albedo = ApplyHemisphericAmbient(input.n, albedo);
     
@@ -50,7 +50,8 @@ float4 PS(PS_OUT input) : SV_Target
             final_color.w = 1.0f;
         }
     }
-    
+
     final_color = ApplyDistanceFog(final_color, input.origin);
+
     return final_color;
 }
