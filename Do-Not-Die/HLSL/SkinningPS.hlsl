@@ -1,33 +1,33 @@
 #include "include/PixelCommon.hlsli"
 
-struct PS_IN
-{
-	float3 p : POSITION;
-	float3 n : NORMAL;
-	float4 c : COLOR;
-	float2 t : TEXTURE;
-	float lod : TEXCOORD1;
-};
 struct PS_OUT
 {
 	float4 p : SV_POSITION;
-	float4 n : NORMAL;
-	float4 c : COLOR0;
-	float2 t : TEXCOORD0;
+	float3 n : NORMAL0;
+	float2 t : TEXCOORD;
+
 	float lod : TEXCOORD1;
+	float3 view_dir : TEXCOORD2;
+	float3 origin : NORMAL1;
 };
 
-Texture2D    g_txTex			: register(t0);
-SamplerState g_SampleWrap		: register(s0);
+Texture2D    textures[7]		: register(t0);
+SamplerState samper_state		: register(s0);
 
 float4 PS(PS_OUT input) : SV_Target
 {
-	//float4 vColor = g_txTex.Sample(g_SampleWrap , input.t);
+	float4 albedo = textures[0].Sample(samper_state, input.t);
+	float4 final_color = WhiteColor();
+	float4 roughness = textures[3].Sample(samper_state, input.t);
 
-	float4 base_color = g_txTex.SampleLevel(g_SampleWrap, input.t, input.lod);
-	// Light 
-	float bright = max(0.2f, dot(input.n, -direction));
-	float4 light_color = float4(bright, bright, bright, 1);
+	albedo = ChangeSaturation(albedo, 1.3f);
+	float4 middle_albedo = albedo;
+	albedo = ChangeValue(albedo, 0.5f);
+	albedo = ApplyHemisphericAmbient(input.n, albedo);
 
-	return base_color * light_color * input.c;
+	final_color = ApplyCookTorrance(albedo, 0.2f, specular_strength, input.n, input.view_dir);
+	final_color += ApplyPointLight(middle_albedo, input.n, input.origin, input.view_dir);
+	final_color += ApplySpotLight(middle_albedo, input.n, input.origin, input.view_dir);
+	final_color = ApplyDistanceFog(final_color, input.origin);
+	return final_color;
 }

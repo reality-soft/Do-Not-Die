@@ -73,6 +73,9 @@ void TestGame::OnInit()
 	gw_property_.AddProperty<XMVECTOR>("floor pos", &QUADTREE->player_capsule_pos);
 	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);
 	gw_property_.AddProperty<int>("num of zombie", &cur_zombie_created);
+
+
+	test_point_light.OnInit(reg_scene_);
 }
 
 void TestGame::OnUpdate()
@@ -177,7 +180,6 @@ void TestGame::CursorStateUpdate()
 
 	if (!b_show_cursor)
 		SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
-
 }
 
 
