@@ -4,6 +4,8 @@
 #include "FX_BloodImpact.h"
 #include "FX_ConcreteImpact.h"
 #include "FX_Flame.h"
+#include "FX_Muzzle.h"
+#include "FX_Explosion.h"
 #include "FbxMgr.h"
 
 void TestGame::OnInit()
@@ -119,7 +121,10 @@ void TestGame::OnUpdate()
 	ingame_ui.OnUpdate();
 
 	if (DINPUT->GetMouseState(L_BUTTON) == KeyState::KEY_PUSH)
-		CreateEffectFromRay();
+		CreateImpactEffectFromRay();
+
+	if (DINPUT->GetKeyState(DIK_G) == KeyState::KEY_PUSH)
+		CreateExplosionEffectFromRay();
 
 	CursorStateUpdate();
 }
@@ -143,7 +148,36 @@ void TestGame::OnRelease()
 	reality::RESOURCE->Release();
 }
 
-void TestGame::CreateEffectFromRay()
+void TestGame::CreateImpactEffectFromRay()
+{
+	// Make Muzzle when Shot
+	auto player_transform = SCENE_MGR->GetPlayer<Player>(0)->GetTransformMatrix();
+	XMVECTOR s, r, t;
+	XMMatrixDecompose(&s, &r, &t, player_transform);
+	EFFECT_MGR->SpawnEffect<FX_Muzzle>(t);
+
+	RayShape ray = sys_camera.CreateFrontRay();
+
+	RayCallback raycallback_node = QUADTREE->RaycastAdjustLevel(ray, 10000.0f);
+	auto raycallback_pair = QUADTREE->RaycastAdjustActor(ray);
+	if (raycallback_pair.first.success && raycallback_node.success)
+	{
+		if (raycallback_pair.first.distance < raycallback_node.distance)
+		{
+			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
+		}
+		else
+			EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
+	}
+	else if (raycallback_pair.first.success)
+	{
+		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
+	}
+	else if (raycallback_node.success)
+		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
+}
+
+void TestGame::CreateExplosionEffectFromRay()
 {
 	RayShape ray = sys_camera.CreateFrontRay();
 
@@ -153,19 +187,17 @@ void TestGame::CreateEffectFromRay()
 	{
 		if (raycallback_pair.first.distance < raycallback_node.distance)
 		{
-			// TODO : have to subtract zombie hp
-			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
+			EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_pair.first.point);
 		}
 		else
-			EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
+			EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_node.point);
 	}
 	else if (raycallback_pair.first.success)
 	{
-		// TODO : have to subtract zombie hp
-		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
+		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_pair.first.point);
 	}
 	else if (raycallback_node.success)
-		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
+		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_node.point);
 }
 
 
