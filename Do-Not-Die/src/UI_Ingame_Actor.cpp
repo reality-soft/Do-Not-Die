@@ -25,6 +25,9 @@ void UI_Ingame_Actor::CreateUI()
 	weapon_ui_ = make_shared<UI_Image>();
 	weapon_ui_->InitImage("T_Handgun_01.png");
 	weapon_ui_->SetLocalRectByMin({ 100.0f, ENGINE->GetWindowSize().y - 200.0f }, 512.0f, 179.0f);
+	auto ammo_text = make_shared<UI_Text>();
+	weapon_ui_->AddChildUI(ammo_text);
+	ammo_text->InitText("30", BASIC, { 320.0f, 72.0f }, 2.0f);
 	ui_comp.ui_list.insert({ "Weapon UI", weapon_ui_ });
 
 	// 상태 + 아이템 UI
