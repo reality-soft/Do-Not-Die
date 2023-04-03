@@ -22,7 +22,7 @@ void Enemy::OnInit(entt::registry& registry)
 
 	reality::C_CapsuleCollision capsule;
 	capsule.tag = "Enemy";
-	capsule.SetCapsuleData(XMVectorZero(), 50, 10);
+	capsule.SetCapsuleData(_XMFLOAT3(XMVectorZero()), 50, 10);
 	registry.emplace<reality::C_CapsuleCollision>(entity_id_, capsule);
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(reality::C_CapsuleCollision));
