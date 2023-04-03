@@ -8,7 +8,6 @@
 
 void TestGame::OnInit()
 {
-
 	ShowCursor(false);
 	//SetCapture(ENGINE->GetWindowHandle());
 
@@ -18,7 +17,7 @@ void TestGame::OnInit()
 
 	WRITER->Init();
 	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
-
+	
 	sys_render.OnCreate(reg_scene_);
 	sys_camera.OnCreate(reg_scene_);
 
@@ -60,10 +59,9 @@ void TestGame::OnInit()
 	level.Create("DeadPoly_FullLevel_04.stmesh", "LevelVS.cso", "DeadPoly_Level_Collision_04.stmesh");
 	//level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_Blocking1.mapdat", GuideLine::GuideType::eBlocking);
 	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_NpcTrack_01.mapdat", GuideLine::GuideType::eNpcTrack);
-	
-	ssm.Create(sys_light.GetGlobalLightData().position, "StaticShadowMapVS.cso", "StaticShadowMapPS.cso");
 
 	QUADTREE->Init(&level, 3);
+	QUADTREE->CreatePhysicsCS();
 	
 	environment_.CreateEnvironment();
 	environment_.SetWorldTime(60, 60, true);
@@ -72,12 +70,7 @@ void TestGame::OnInit()
 	environment_.SetLightProperty(0.2f, 0.2f);
 
 	gw_property_.AddProperty<float>("FPS", &TIMER->fps);
-	gw_property_.AddProperty<int>("raycasted nodes", &QUADTREE->ray_casted_nodes);
-	gw_property_.AddProperty<set<UINT>>("including nodes", &QUADTREE->including_nodes_num);
-	gw_property_.AddProperty<XMVECTOR>("floor pos", &QUADTREE->player_capsule_pos);
-	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);
-	gw_property_.AddProperty<int>("num of zombie", &cur_zombie_created);
-
+	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);	
 
 	EFFECT_MGR->SpawnEffect<FX_Flame>(XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 }
@@ -106,7 +99,7 @@ void TestGame::OnUpdate()
 
 		//auto player = SCENE_MGR->GetPlayer<Player>(0);
 		//player->SetPos(level.GetGuideLines()->at(guidline_index).line_nodes[0]);
-
+		
 		cur_time = 0.0f;
 
 		cur_zombie_created++;
@@ -119,6 +112,7 @@ void TestGame::OnUpdate()
 	sys_effect.OnUpdate(reg_scene_);
 	sys_sound.OnUpdate(reg_scene_);
 	QUADTREE->Frame(&sys_camera);
+	QUADTREE->RunPhysicsCS("CollisionDetectCS.cso");
 
 	environment_.Update(&sys_camera, &sys_light);
 
@@ -133,9 +127,8 @@ void TestGame::OnUpdate()
 void TestGame::OnRender()
 {
 	environment_.Render();
+	
 	level.Update();
-	ssm.RenderLevelShadowMap(&level);
-	level.SetShadowMap(RENDER_TARGET->LoadRT("ssm_rt").get()->depth_stencil_view_srv_.Get(), ssm.GetShadowCb());
 	level.Render();
 
 	sys_render.OnUpdate(reg_scene_);
