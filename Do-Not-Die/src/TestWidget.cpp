@@ -89,8 +89,5 @@ void reality::PropertyWidget::Render()
 		}
 	}
 
-	ImTextureID im_tex = (ImTextureID)RENDER_TARGET->LoadRT("ssm_rt").get()->depth_stencil_view_srv_.Get();
-	ImGui::Image(im_tex, ImVec2(200, 200));
-
 	ImGui::End();
 }

@@ -20,7 +20,7 @@ void Player::OnInit(entt::registry& registry)
 	registry.emplace_or_replace<reality::C_SkeletalMesh>(entity_id_, skm);
 
 	reality::C_CapsuleCollision capsule;
-	capsule.SetCapsuleData(XMVectorZero(), 50, 15);
+	capsule.SetCapsuleData(XMFLOAT3(0, 0, 0), 50, 15);
 	registry.emplace<reality::C_CapsuleCollision>(entity_id_, capsule);
 
 	C_Camera camera;
@@ -44,12 +44,12 @@ void Player::OnInit(entt::registry& registry)
 	skm_ptr->local = XMMatrixRotationY(XMConvertToRadians(180)) * XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 });
 
 	// weapon
-	entt::entity weapon_id = SCENE_MGR->AddActor<Weapon>(entity_id_);
-	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
-	int skeleton_id = skeletal_mesh->skeleton.skeleton_id_map["Hand_R"];
-	Weapon* weapon = SCENE_MGR->GetActor<Weapon>(weapon_id);
-	weapon->SetSocket(skeleton_id);
-	weapon->SetOwnerTransform(skm_ptr->local);
+	//entt::entity weapon_id = SCENE_MGR->AddActor<Weapon>(entity_id_);
+	//SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
+	//int skeleton_id = skeletal_mesh->skeleton.skeleton_id_map["Hand_R"].;
+	//Weapon* weapon = SCENE_MGR->GetActor<Weapon>(weapon_id);
+	//weapon->SetSocket(skeleton_id);
+	//weapon->SetOwnerTransform(skm_ptr->local);
 
 	// FlashLight
 	AddFlashLight();
