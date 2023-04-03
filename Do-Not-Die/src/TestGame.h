@@ -2,7 +2,6 @@
 #include "Engine_Include.h"
 #include "TestWidget.h"
 #include "UI_Ingame_Actor.h"
-#include "TestPointLightActor.h"
 #include "StaticShadowMap.h"
 
 using namespace reality;
@@ -43,7 +42,8 @@ private:
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
 	UI_Ingame_Actor ingame_ui;
-	void CreateEffectFromRay();
+	void CreateImpactEffectFromRay();
+	void CreateExplosionEffectFromRay();
 	void CursorStateUpdate();
 
 private:
