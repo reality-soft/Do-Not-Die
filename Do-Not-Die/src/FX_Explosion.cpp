@@ -13,4 +13,8 @@ void FX_Explosion::OnInit(entt::registry& registry)
 	AddEffectComponent("explosion_effect", 5.0f);
 
 	AddPointLightComponent("PL_Explosion", 1.0f);
+
+	AddSoundGeneratorComponent();
+
+	AddSoundQueue("S_Explosion_01.wav", SFX, false, 30.0f);
 }
