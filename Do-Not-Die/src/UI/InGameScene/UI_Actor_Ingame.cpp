@@ -56,6 +56,14 @@ void UI_Actor_Ingame::CreateUI()
 	time_ui_ = make_shared<UI_Image>();
 	time_ui_->InitImage("T_TimeUI.png");
 	time_ui_->SetLocalRectByMin({ 0, 0 }, 300.0f, 100.0f);
+
+	auto time_text = make_shared<UI_Text>();
+	time_text->InitText("10", E_Font::ROTUNDA, { 200.0f, 30.0f });
+	time_ui_->AddChildUI(time_text);
+	auto kill_text = make_shared<UI_Text>();
+	kill_text->InitText("300", E_Font::ROTUNDA, { 120.0f, 70.0f });
+	time_ui_->AddChildUI(kill_text);
+
 	ui_comp.ui_list.insert({ "time UI", time_ui_ });
 
 
