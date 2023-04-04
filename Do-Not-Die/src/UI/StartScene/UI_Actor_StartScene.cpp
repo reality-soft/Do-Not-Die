@@ -62,5 +62,6 @@ void UI_Actor_StartScene::CreateUI()
 
 void UI_Actor_StartScene::UpdateUI()
 {
+
 }
 

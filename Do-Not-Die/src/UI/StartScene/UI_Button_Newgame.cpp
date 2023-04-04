@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UI_Button_Newgame.h"
 #include "SceneMgr.h"
-#include "InGameScene.h"
+#include "LoadingScene.h"
 
 using namespace reality;
 
@@ -10,5 +10,5 @@ void UI_Button_Newgame::Update()
 	UI_Button::Update();
 
 	if (current_state_ == E_UIState::UI_SELECT)
-		SCENE_MGR->SetScene<InGameScene>();
+		SCENE_MGR->SetScene<LoadingScene>();
 }
