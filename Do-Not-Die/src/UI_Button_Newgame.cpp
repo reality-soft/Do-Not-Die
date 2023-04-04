@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#include "UI_Newgame_Button.h"
+#include "UI_Button_Newgame.h"
 #include "SceneMgr.h"
 #include "TestGame.h"
 
 using namespace reality;
 
-void UI_Newgame_Button::Update()
+void UI_Button_Newgame::Update()
 {
 	UI_Button::Update();
 
