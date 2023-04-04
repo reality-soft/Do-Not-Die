@@ -10,8 +10,6 @@ void Player::OnInit(entt::registry& registry)
 	movement_component_->speed = 150;
 	max_hp_ = cur_hp_ = 100;
 
-	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
-
 	reality::C_SkeletalMesh skm;
 	skm.local = XMMatrixIdentity();
 	skm.world = XMMatrixIdentity();
@@ -56,6 +54,8 @@ void Player::OnInit(entt::registry& registry)
 	animation.AddNewAnimSlot("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+
+	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
 
 	// FlashLight
 	AddFlashLight();
