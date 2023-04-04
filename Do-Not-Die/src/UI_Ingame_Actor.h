@@ -1,8 +1,5 @@
 #pragma once
 #include "UIActor.h"
-#include "UI_Image.h"
-#include "UI_Text.h"
-#include "UI_Button.h"
 #include "UI_Minimap.h"
 #include "Player.h"
 
