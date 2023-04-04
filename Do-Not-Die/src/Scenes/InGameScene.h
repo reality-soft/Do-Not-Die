@@ -6,7 +6,7 @@
 
 using namespace reality;
 
-class TestGame : public reality::Scene
+class InGameScene : public reality::Scene
 {
 public:
 	virtual void OnInit();

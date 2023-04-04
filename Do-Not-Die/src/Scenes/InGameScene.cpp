@@ -1,4 +1,4 @@
-#include "TestGame.h"
+#include "InGameScene.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "FX_BloodImpact.h"
@@ -8,7 +8,7 @@
 #include "FX_Explosion.h"
 #include "FbxMgr.h"
 
-void TestGame::OnInit()
+void InGameScene::OnInit()
 {
 	ShowCursor(false);
 	//SetCapture(ENGINE->GetWindowHandle());
@@ -77,7 +77,7 @@ void TestGame::OnInit()
 	EFFECT_MGR->SpawnEffect<FX_Flame>(XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 }
 
-void TestGame::OnUpdate()
+void InGameScene::OnUpdate()
 {
 	static float cur_time = 0.0f;
 
@@ -129,7 +129,7 @@ void TestGame::OnUpdate()
 	CursorStateUpdate();
 }
 
-void TestGame::OnRender()
+void InGameScene::OnRender()
 {
 	environment_.Render();
 	
@@ -142,13 +142,13 @@ void TestGame::OnRender()
 	GUI->RenderWidgets();
 }
 
-void TestGame::OnRelease()
+void InGameScene::OnRelease()
 {
 	QUADTREE->Release();
 	reality::RESOURCE->Release();
 }
 
-void TestGame::CreateImpactEffectFromRay()
+void InGameScene::CreateImpactEffectFromRay()
 {
 	// Make Muzzle when Shot
 	auto player_transform = SCENE_MGR->GetPlayer<Player>(0)->GetTransformMatrix();
@@ -177,7 +177,7 @@ void TestGame::CreateImpactEffectFromRay()
 		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
 }
 
-void TestGame::CreateExplosionEffectFromRay()
+void InGameScene::CreateExplosionEffectFromRay()
 {
 	RayShape ray = sys_camera.CreateFrontRay();
 
@@ -201,7 +201,7 @@ void TestGame::CreateExplosionEffectFromRay()
 }
 
 
-void TestGame::CursorStateUpdate()
+void InGameScene::CursorStateUpdate()
 {
 	static bool b_show_cursor = false;
 	if (DINPUT->GetKeyState(DIK_T) == KeyState::KEY_PUSH)
