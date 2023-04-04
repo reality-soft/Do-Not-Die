@@ -22,6 +22,7 @@ private:
 		"Zombie_Police_Male_01.skmesh",
 		"Zombie_RiotCop_Male_01.skmesh",
 		"Zombie_SchoolGirl_Female_01.skmesh",
+		"Zombie_Bellboy_Male_01.skmesh",
 	};
 
 	Environment environment_;

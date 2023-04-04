@@ -44,12 +44,18 @@ void Player::OnInit(entt::registry& registry)
 	skm_ptr->local = XMMatrixRotationY(XMConvertToRadians(180)) * XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 });
 
 	// weapon
-	//entt::entity weapon_id = SCENE_MGR->AddActor<Weapon>(entity_id_);
-	//SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
-	//int skeleton_id = skeletal_mesh->skeleton.skeleton_id_map["Hand_R"].;
-	//Weapon* weapon = SCENE_MGR->GetActor<Weapon>(weapon_id);
-	//weapon->SetSocket(skeleton_id);
-	//weapon->SetOwnerTransform(skm_ptr->local);
+	entt::entity weapon_id = SCENE_MGR->AddActor<Weapon>(entity_id_);
+	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
+	int skeleton_id = skeletal_mesh->skeleton.bone_name_id_map["Hand_R"];
+	Weapon* weapon = SCENE_MGR->GetActor<Weapon>(weapon_id);
+	weapon->SetSocket(skeleton_id);
+	weapon->SetOwnerTransform(skm_ptr->local);
+
+	// create anim slot
+	C_Animation animation;
+	animation.AddNewAnimSlot("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6);
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
 
 	// FlashLight
 	AddFlashLight();
@@ -69,15 +75,30 @@ void Player::OnUpdate()
 	UpdateFlashLight();
 }
 
-void Player::SetCharacterAnimation(string anim_id)
+void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
 {
-	C_Animation* prev_animation = reg_scene_->try_get<reality::C_Animation>(entity_id_);
-	if (prev_animation != nullptr && prev_animation->anim_id == anim_id) {
-		return;
+	if (anim_slot_id == "") {
+		C_Animation* animation_component = reg_scene_->try_get<reality::C_Animation>(entity_id_);
+		if (animation_component == nullptr || animation_component->anim_id == anim_id) {
+			return;
+		}
+
+		animation_component->anim_id = anim_id;
 	}
-	C_Animation animation;
-	animation.anim_id = anim_id;
-	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+	else {
+		C_Animation* animation_component = reg_scene_->try_get<reality::C_Animation>(entity_id_);
+		if (animation_component == nullptr) {
+			return;
+		}
+
+		int anim_slot_index = animation_component->name_to_anim_slot_index[anim_slot_id];
+		AnimSlot& anim_slot = animation_component->anim_slots[anim_slot_index].second;
+		if (anim_slot.anim_id == anim_id) {
+			return;
+		}
+
+		anim_slot.anim_id = anim_id;
+	}
 }
 
 void Player::MoveRight()
@@ -145,7 +166,7 @@ void Player::Idle()
 
 void Player::Fire()
 {
-	SetCharacterAnimation("A_TP_CH_Handgun_Fire_Anim_Retargeted_Unreal Take.anim");
+	SetCharacterAnimation("A_TP_CH_Handgun_Fire_Anim_Retargeted_Unreal Take.anim", "UpperBody");
 }
 
 void Player::ResetPos()
