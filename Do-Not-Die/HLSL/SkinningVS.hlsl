@@ -20,15 +20,14 @@ struct VS_OUT
 	float3 origin : NORMAL1;
 };
 
-cbuffer cb_transform_data : register(b1)
+cbuffer cb_skeletal_mesh : register(b1)
 {
-	matrix world;
-};
-
-cbuffer cb_bone_data : register(b2)
-{
+	matrix world_matrix;
+	matrix local_matrix;
 	matrix bind_pose[128];
 	matrix animation[128];
+	matrix slot_animation[128];
+	float4 weights[32];
 }
 
 VS_OUT VS(VS_IN input)
@@ -44,11 +43,15 @@ VS_OUT VS(VS_IN input)
 		uint skeleton_index = input.i[s];
 		float weight = input.w[s];
 
-		matrix animation_matrix = mul(bind_pose[skeleton_index], animation[skeleton_index]);
+		float animation_weight = ((float[4])(weights[skeleton_index / 4]))[skeleton_index % 4];
+		matrix animation_matrix = mul(animation[skeleton_index], 1.0f - animation_weight) + mul(slot_animation[skeleton_index], animation_weight);
+		matrix bind_pose_animation_matrix = mul(bind_pose[skeleton_index], animation_matrix);
 
-		animation_vector += mul(local_vector, animation_matrix) * weight;
-		anim_normal += mul(input.n, animation_matrix) * weight;
+		animation_vector += mul(local_vector, bind_pose_animation_matrix) * weight;
+		anim_normal += mul(input.n, bind_pose_animation_matrix) * weight;
 	}
+
+	matrix world = mul(local_matrix, world_matrix);
 
 	float4 world_vector = mul(animation_vector, world);
 	float4 view_vector = mul(world_vector, view_matrix);

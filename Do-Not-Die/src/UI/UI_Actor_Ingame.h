@@ -1,14 +1,11 @@
 #pragma once
 #include "UIActor.h"
-#include "UI_Image.h"
-#include "UI_Text.h"
-#include "UI_Button.h"
 #include "UI_Minimap.h"
 #include "Player.h"
 
 namespace reality
 {
-	class UI_Ingame_Actor : public UIActor
+	class UI_Actor_Ingame : public UIActor
 	{
 	public:
 		virtual void OnInit(entt::registry& registry);

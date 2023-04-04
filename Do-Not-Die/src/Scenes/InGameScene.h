@@ -1,11 +1,12 @@
 #pragma once
 #include "Engine_Include.h"
 #include "TestWidget.h"
-#include "UI_Ingame_Actor.h"
+#include "UI_Actor_Ingame.h"
+#include "StaticShadowMap.h"
 
 using namespace reality;
 
-class TestGame : public reality::Scene
+class InGameScene : public reality::Scene
 {
 public:
 	virtual void OnInit();
@@ -21,9 +22,11 @@ private:
 		"Zombie_Police_Male_01.skmesh",
 		"Zombie_RiotCop_Male_01.skmesh",
 		"Zombie_SchoolGirl_Female_01.skmesh",
+		"Zombie_Bellboy_Male_01.skmesh",
 	};
 
 	Environment environment_;
+	StaticShadowMap ssm;
 	StaticMeshLevel level;
 
 	reality::LightingSystem sys_light;
@@ -39,8 +42,9 @@ private:
 private:
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
-	UI_Ingame_Actor ingame_ui;
-	void CreateEffectFromRay();
+	UI_Actor_Ingame ingame_ui;
+	void CreateImpactEffectFromRay();
+	void CreateExplosionEffectFromRay();
 	void CursorStateUpdate();
 
 private:

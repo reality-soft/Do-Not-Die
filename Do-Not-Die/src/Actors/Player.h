@@ -6,7 +6,7 @@ class Player : public reality::Character
 public:
 	virtual void OnInit(entt::registry& registry) override;
 	virtual void OnUpdate() override;
-	void SetCharacterAnimation(string anim_id);
+	void SetCharacterAnimation(string anim_id, string anim_slot = "");
 public:
 	void MoveRight();
 	void MoveRightForward();
@@ -26,6 +26,9 @@ public:
 	void SetCurHp(int hp);
 	void TakeDamage(int damage);
 	int GetCurHp() const;
+private:
+	void AddFlashLight();
+	void UpdateFlashLight();
 private:
 	int max_hp_;
 	int cur_hp_;

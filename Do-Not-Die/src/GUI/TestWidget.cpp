@@ -89,6 +89,5 @@ void reality::PropertyWidget::Render()
 		}
 	}
 
-
 	ImGui::End();
 }

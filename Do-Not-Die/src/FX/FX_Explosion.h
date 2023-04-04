@@ -3,11 +3,10 @@
 
 namespace reality
 {
-	class FX_ConcreteImpact : public FX_BaseEffectActor
+	class FX_Explosion : public FX_BaseEffectActor
 	{
 	public:
 		virtual void OnInit(entt::registry& registry);
-		virtual void OnUpdate();
 	};
 }
 

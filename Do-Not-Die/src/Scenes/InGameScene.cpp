@@ -1,13 +1,15 @@
-#include "TestGame.h"
+#include "InGameScene.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "FX_BloodImpact.h"
 #include "FX_ConcreteImpact.h"
+#include "FX_Flame.h"
+#include "FX_Muzzle.h"
+#include "FX_Explosion.h"
 #include "FbxMgr.h"
 
-void TestGame::OnInit()
+void InGameScene::OnInit()
 {
-
 	ShowCursor(false);
 	//SetCapture(ENGINE->GetWindowHandle());
 
@@ -17,7 +19,7 @@ void TestGame::OnInit()
 
 	WRITER->Init();
 	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
-
+	
 	sys_render.OnCreate(reg_scene_);
 	sys_camera.OnCreate(reg_scene_);
 
@@ -25,6 +27,7 @@ void TestGame::OnInit()
 	sys_ui.OnCreate(reg_scene_);
 
 	sys_camera.SetSpeed(1000);
+	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
 	sys_light.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
 	sys_sound.OnCreate(reg_scene_);
@@ -60,7 +63,8 @@ void TestGame::OnInit()
 	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_NpcTrack_01.mapdat", GuideLine::GuideType::eNpcTrack);
 
 	QUADTREE->Init(&level, 3);
-
+	QUADTREE->CreatePhysicsCS();
+	
 	environment_.CreateEnvironment();
 	environment_.SetWorldTime(60, 60, true);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
@@ -68,14 +72,12 @@ void TestGame::OnInit()
 	environment_.SetLightProperty(0.2f, 0.2f);
 
 	gw_property_.AddProperty<float>("FPS", &TIMER->fps);
-	gw_property_.AddProperty<int>("raycasted nodes", &QUADTREE->ray_casted_nodes);
-	gw_property_.AddProperty<set<UINT>>("including nodes", &QUADTREE->including_nodes_num);
-	gw_property_.AddProperty<XMVECTOR>("floor pos", &QUADTREE->player_capsule_pos);
-	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);
-	gw_property_.AddProperty<int>("num of zombie", &cur_zombie_created);
+	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);	
+
+	EFFECT_MGR->SpawnEffect<FX_Flame>(XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 }
 
-void TestGame::OnUpdate()
+void InGameScene::OnUpdate()
 {
 	static float cur_time = 0.0f;
 
@@ -99,7 +101,7 @@ void TestGame::OnUpdate()
 
 		//auto player = SCENE_MGR->GetPlayer<Player>(0);
 		//player->SetPos(level.GetGuideLines()->at(guidline_index).line_nodes[0]);
-
+		
 		cur_time = 0.0f;
 
 	}
@@ -112,35 +114,70 @@ void TestGame::OnUpdate()
 	sys_effect.OnUpdate(reg_scene_);
 	sys_sound.OnUpdate(reg_scene_);
 	QUADTREE->Frame(&sys_camera);
+	QUADTREE->RunPhysicsCS("CollisionDetectCS.cso");
 
 	environment_.Update(&sys_camera, &sys_light);
 
 	ingame_ui.OnUpdate();
 
 	if (DINPUT->GetMouseState(L_BUTTON) == KeyState::KEY_PUSH)
-		CreateEffectFromRay();
+		CreateImpactEffectFromRay();
+
+	if (DINPUT->GetKeyState(DIK_G) == KeyState::KEY_PUSH)
+		CreateExplosionEffectFromRay();
 
 	CursorStateUpdate();
 }
 
-void TestGame::OnRender()
+void InGameScene::OnRender()
 {
 	environment_.Render();
+	
 	level.Update();
 	level.Render();
+
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
 
 	GUI->RenderWidgets();
 }
 
-void TestGame::OnRelease()
+void InGameScene::OnRelease()
 {
 	QUADTREE->Release();
 	reality::RESOURCE->Release();
 }
 
-void TestGame::CreateEffectFromRay()
+void InGameScene::CreateImpactEffectFromRay()
+{
+	// Make Muzzle when Shot
+	auto player_transform = SCENE_MGR->GetPlayer<Player>(0)->GetTransformMatrix();
+	XMVECTOR s, r, t;
+	XMMatrixDecompose(&s, &r, &t, player_transform);
+	EFFECT_MGR->SpawnEffect<FX_Muzzle>(t);
+
+	RayShape ray = sys_camera.CreateFrontRay();
+
+	RayCallback raycallback_node = QUADTREE->RaycastAdjustLevel(ray, 10000.0f);
+	auto raycallback_pair = QUADTREE->RaycastAdjustActor(ray);
+	if (raycallback_pair.first.success && raycallback_node.success)
+	{
+		if (raycallback_pair.first.distance < raycallback_node.distance)
+		{
+			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
+		}
+		else
+			EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
+	}
+	else if (raycallback_pair.first.success)
+	{
+		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
+	}
+	else if (raycallback_node.success)
+		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
+}
+
+void InGameScene::CreateExplosionEffectFromRay()
 {
 	RayShape ray = sys_camera.CreateFrontRay();
 
@@ -150,23 +187,21 @@ void TestGame::CreateEffectFromRay()
 	{
 		if (raycallback_pair.first.distance < raycallback_node.distance)
 		{
-			// TODO : have to subtract zombie hp
-			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal, 1.0f);
+			EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_pair.first.point);
 		}
 		else
-			EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal, 1.0f);
+			EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_node.point);
 	}
 	else if (raycallback_pair.first.success)
 	{
-		// TODO : have to subtract zombie hp
-		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal, 1.0f);
+		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_pair.first.point);
 	}
 	else if (raycallback_node.success)
-		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal, 1.0f);
+		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_node.point);
 }
 
 
-void TestGame::CursorStateUpdate()
+void InGameScene::CursorStateUpdate()
 {
 	static bool b_show_cursor = false;
 	if (DINPUT->GetKeyState(DIK_T) == KeyState::KEY_PUSH)

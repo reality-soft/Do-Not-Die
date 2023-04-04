@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "UI_Ingame_Actor.h"
+#include "UI_Actor_Ingame.h"
 #include "SceneMgr.h"
 
 using namespace reality;
 
-void UI_Ingame_Actor::OnInit(entt::registry& registry)
+void UI_Actor_Ingame::OnInit(entt::registry& registry)
 {
 	UIActor::OnInit(registry);
 
@@ -12,12 +12,12 @@ void UI_Ingame_Actor::OnInit(entt::registry& registry)
 
 }
 
-void UI_Ingame_Actor::OnUpdate()
+void UI_Actor_Ingame::OnUpdate()
 {
 	UpdateUI();
 }
 
-void UI_Ingame_Actor::CreateUI()
+void UI_Actor_Ingame::CreateUI()
 {
 	C_UI& ui_comp = reg_scene_->get<C_UI>(GetEntityId());
 
@@ -25,6 +25,9 @@ void UI_Ingame_Actor::CreateUI()
 	weapon_ui_ = make_shared<UI_Image>();
 	weapon_ui_->InitImage("T_Handgun_01.png");
 	weapon_ui_->SetLocalRectByMin({ 100.0f, ENGINE->GetWindowSize().y - 200.0f }, 512.0f, 179.0f);
+	auto ammo_text = make_shared<UI_Text>();
+	weapon_ui_->AddChildUI(ammo_text);
+	ammo_text->InitText("30", BASIC, { 320.0f, 72.0f }, 2.0f);
 	ui_comp.ui_list.insert({ "Weapon UI", weapon_ui_ });
 
 	// 상태 + 아이템 UI
@@ -69,7 +72,7 @@ void UI_Ingame_Actor::CreateUI()
 	ui_comp.ui_list.insert({ "CrossHair UI", crosshair_ui_ });
 }
 
-void UI_Ingame_Actor::UpdateUI()
+void UI_Actor_Ingame::UpdateUI()
 {
 	// HP Update
 	player_ = SCENE_MGR->GetPlayer<Player>(0);

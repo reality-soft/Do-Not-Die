@@ -46,6 +46,11 @@ project "Do-Not-Die"
 		"../Game-Engine/Engine/src/Managers",
 		"../Game-Engine/Engine/src",
 		"../Game-Engine/Engine/vendor/spdlog/include",
+		"Do-Not-Die/src/Actors",
+		"Do-Not-Die/src/FX",
+		"Do-Not-Die/src/GUI",
+		"Do-Not-Die/src/Scenes",
+		"Do-Not-Die/src/UI",
 		"../SDK/DirectXTK/include",
 		"../SDK/FBXSDK/include",
 		"../SDK/FMOD/include",
@@ -85,6 +90,11 @@ project "Do-Not-Die"
 	filter "files:**GS.hlsl"
 	    shadertype "Geometry"
 		shaderentry "GS"
+	    shadermodel "5.0"
+
+	filter "files:**CS.hlsl"
+	    shadertype "Compute"
+		shaderentry "CS"
 	    shadermodel "5.0"
 
 	filter "system:windows"

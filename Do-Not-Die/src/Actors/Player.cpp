@@ -10,8 +10,6 @@ void Player::OnInit(entt::registry& registry)
 	movement_component_->speed = 150;
 	max_hp_ = cur_hp_ = 100;
 
-	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
-
 	reality::C_SkeletalMesh skm;
 	skm.local = XMMatrixIdentity();
 	skm.world = XMMatrixIdentity();
@@ -20,7 +18,7 @@ void Player::OnInit(entt::registry& registry)
 	registry.emplace_or_replace<reality::C_SkeletalMesh>(entity_id_, skm);
 
 	reality::C_CapsuleCollision capsule;
-	capsule.SetCapsuleData(XMVectorZero(), 50, 15);
+	capsule.SetCapsuleData(XMFLOAT3(0, 0, 0), 50, 15);
 	registry.emplace<reality::C_CapsuleCollision>(entity_id_, capsule);
 
 	C_Camera camera;
@@ -46,10 +44,21 @@ void Player::OnInit(entt::registry& registry)
 	// weapon
 	entt::entity weapon_id = SCENE_MGR->AddActor<Weapon>(entity_id_);
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
-	int skeleton_id = skeletal_mesh->skeleton.skeleton_id_map["Hand_R"];
+	int skeleton_id = skeletal_mesh->skeleton.bone_name_id_map["Hand_R"];
 	Weapon* weapon = SCENE_MGR->GetActor<Weapon>(weapon_id);
 	weapon->SetSocket(skeleton_id);
 	weapon->SetOwnerTransform(skm_ptr->local);
+
+	// create anim slot
+	C_Animation animation;
+	animation.AddNewAnimSlot("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6);
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+
+	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
+
+	// FlashLight
+	AddFlashLight();
 }
 
 void Player::OnUpdate()
@@ -61,17 +70,35 @@ void Player::OnUpdate()
 	transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, translation, rotation_matrix);
 	front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
 	right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
+
+	// FlashLight Update
+	UpdateFlashLight();
 }
 
-void Player::SetCharacterAnimation(string anim_id)
+void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
 {
-	C_Animation* prev_animation = reg_scene_->try_get<reality::C_Animation>(entity_id_);
-	if (prev_animation != nullptr && prev_animation->anim_id == anim_id) {
-		return;
+	if (anim_slot_id == "") {
+		C_Animation* animation_component = reg_scene_->try_get<reality::C_Animation>(entity_id_);
+		if (animation_component == nullptr || animation_component->anim_id == anim_id) {
+			return;
+		}
+
+		animation_component->anim_id = anim_id;
 	}
-	C_Animation animation;
-	animation.anim_id = anim_id;
-	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+	else {
+		C_Animation* animation_component = reg_scene_->try_get<reality::C_Animation>(entity_id_);
+		if (animation_component == nullptr) {
+			return;
+		}
+
+		int anim_slot_index = animation_component->name_to_anim_slot_index[anim_slot_id];
+		AnimSlot& anim_slot = animation_component->anim_slots[anim_slot_index].second;
+		if (anim_slot.anim_id == anim_id) {
+			return;
+		}
+
+		anim_slot.anim_id = anim_id;
+	}
 }
 
 void Player::MoveRight()
@@ -139,7 +166,7 @@ void Player::Idle()
 
 void Player::Fire()
 {
-	SetCharacterAnimation("A_TP_CH_Handgun_Fire_Anim_Retargeted_Unreal Take.anim");
+	SetCharacterAnimation("A_TP_CH_Handgun_Fire_Anim_Retargeted_Unreal Take.anim", "UpperBody");
 }
 
 void Player::ResetPos()
@@ -172,4 +199,71 @@ void Player::TakeDamage(int damage)
 int Player::GetCurHp() const
 {
 	return cur_hp_;
+}
+
+void Player::AddFlashLight()
+{
+	auto& spot_light_comp = reg_scene_->emplace<C_SpotLight>(entity_id_);
+
+	spot_light_comp.world = XMMatrixIdentity();
+	spot_light_comp.local = XMMatrixIdentity();
+
+	spot_light_comp.spot_light_id = "SL_FlashLight";
+	spot_light_comp.spot_light = *(SpotLight*)RESOURCE->UseResource<BaseLight>("SL_FlashLight");
+
+	/*spot_light_comp.light_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	spot_light_comp.lifetime = -1.0f;
+	spot_light_comp.timer = 0.0f;
+	spot_light_comp.attenuation = { 1.0f, 0.0f, 0.0f };
+	spot_light_comp.attenuation_level = { 1.0f, 0.0f, 0.0f };
+	spot_light_comp.specular = 0.2f;
+	spot_light_comp.range = 1000000.0f;
+	spot_light_comp.spot = 8.0f;*/
+
+	//auto& camera = reg_scene_->get<C_Camera>(entity_id_);
+	//XMVECTOR S, R, T;
+	//XMMatrixDecompose(&S, &R, &T, camera.world);
+	//XMStoreFloat3(&spot_light_comp.position, T);
+	//XMStoreFloat3(&spot_light_comp.direction, camera.look);
+
+	transform_tree_.AddNodeToNode(TYPE_ID(C_Camera), TYPE_ID(C_SpotLight));
+
+	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, transform_matrix_);
+}
+
+void Player::UpdateFlashLight()
+{
+	static bool flash_onoff = false;
+
+	if (DINPUT->GetKeyState(DIK_F) == KEY_PUSH)
+		flash_onoff = !flash_onoff;
+
+	auto& spot_light_comp = reg_scene_->get<C_SpotLight>(entity_id_);
+
+	static float range = spot_light_comp.spot_light.range;
+
+	if (flash_onoff)
+	{
+		auto& capsule = reg_scene_->get<C_CapsuleCollision>(entity_id_);
+		auto& camera = reg_scene_->get<C_Camera>(entity_id_);
+		XMVECTOR s, r, t;
+		XMMatrixDecompose(&s, &r, &t, capsule.world);
+
+		XMVECTOR light_scale, light_rot_q, light_translate;
+		XMMatrixDecompose(&light_scale, &light_rot_q, &light_translate, spot_light_comp.world);
+		auto rotation_quaternion = DirectX::XMQuaternionRotationRollPitchYaw(camera.pitch_yaw.x, camera.pitch_yaw.y, 0);
+		auto rotate_mat = XMMatrixRotationQuaternion(rotation_quaternion);
+		XMFLOAT3 direction = { 0.0f, 0.0f, 1.0f };
+
+		t = XMVectorAdd(t, XMVectorSet(0.0f, 40.0f, 0.0f, 0.0f));
+		spot_light_comp.world = XMMatrixScalingFromVector(light_scale) 
+			* rotate_mat 
+			* XMMatrixTranslationFromVector(t);
+		spot_light_comp.spot_light.range = range;
+	}
+	else
+	{
+		spot_light_comp.spot_light.range = 0.0f;
+	}
+	
 }
