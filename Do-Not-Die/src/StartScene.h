@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine_Include.h"
-#include "UI_StartScene_Actor.h"
+#include "UI_Actor_StartScene.h"
 
 using namespace reality;
 
@@ -18,6 +18,6 @@ private:
 	reality::UISystem		sys_ui;
 
 private:
-	UI_StartScene_Actor start_scene_ui;
+	UI_Actor_StartScene start_scene_ui;
 };
 

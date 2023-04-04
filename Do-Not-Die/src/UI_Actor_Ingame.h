@@ -5,7 +5,7 @@
 
 namespace reality
 {
-	class UI_Ingame_Actor : public UIActor
+	class UI_Actor_Ingame : public UIActor
 	{
 	public:
 		virtual void OnInit(entt::registry& registry);

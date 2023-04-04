@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine_Include.h"
 #include "TestWidget.h"
-#include "UI_Ingame_Actor.h"
+#include "UI_Actor_Ingame.h"
 #include "StaticShadowMap.h"
 
 using namespace reality;
@@ -41,7 +41,7 @@ private:
 private:
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
-	UI_Ingame_Actor ingame_ui;
+	UI_Actor_Ingame ingame_ui;
 	void CreateImpactEffectFromRay();
 	void CreateExplosionEffectFromRay();
 	void CursorStateUpdate();

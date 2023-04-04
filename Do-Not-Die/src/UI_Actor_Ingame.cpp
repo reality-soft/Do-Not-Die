@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "UI_Ingame_Actor.h"
+#include "UI_Actor_Ingame.h"
 #include "SceneMgr.h"
 
 using namespace reality;
 
-void UI_Ingame_Actor::OnInit(entt::registry& registry)
+void UI_Actor_Ingame::OnInit(entt::registry& registry)
 {
 	UIActor::OnInit(registry);
 
@@ -12,12 +12,12 @@ void UI_Ingame_Actor::OnInit(entt::registry& registry)
 
 }
 
-void UI_Ingame_Actor::OnUpdate()
+void UI_Actor_Ingame::OnUpdate()
 {
 	UpdateUI();
 }
 
-void UI_Ingame_Actor::CreateUI()
+void UI_Actor_Ingame::CreateUI()
 {
 	C_UI& ui_comp = reg_scene_->get<C_UI>(GetEntityId());
 
@@ -72,7 +72,7 @@ void UI_Ingame_Actor::CreateUI()
 	ui_comp.ui_list.insert({ "CrossHair UI", crosshair_ui_ });
 }
 
-void UI_Ingame_Actor::UpdateUI()
+void UI_Actor_Ingame::UpdateUI()
 {
 	// HP Update
 	player_ = SCENE_MGR->GetPlayer<Player>(0);
