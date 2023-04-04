@@ -44,19 +44,19 @@ void UI_Actor_StartScene::CreateUI()
 	// Load Game Button
 	loadinggame_button = make_shared<UI_Button_Loadgame>();
 	loadinggame_button->InitButton("T_Button_LoadGame_Normal.png", "T_Button_LoadGame_Hover.png", "T_Button_LoadGame_Pushed.png");
-	loadinggame_button->SetLocalRectByMin({ window_size_width * 3.0f / 4.0f, window_size_height * 3.0f / 5.0f + 100.0f }, 200.0f, 70.0f);
+	loadinggame_button->SetLocalRectByMin({ window_size_width * 3.0f / 4.0f, window_size_height * 3.0f / 5.0f + 70.0f * 1.0f }, 200.0f, 70.0f);
 	ui_comp.ui_list.insert({ "Load Game Button", loadinggame_button });
 
 	// Option Button
 	option_button_ = make_shared<UI_Button_Option>();
 	option_button_->InitButton("T_Button_Option_Normal.png", "T_Button_Option_Hover.png", "T_Button_Option_Pushed.png");
-	option_button_->SetLocalRectByMin({ window_size_width * 3.0f / 4.0f, window_size_height * 3.0f / 5.0f + 200.0f }, 200.0f, 70.0f);
+	option_button_->SetLocalRectByMin({ window_size_width * 3.0f / 4.0f, window_size_height * 3.0f / 5.0f + 70.0f * 2.0f }, 200.0f, 70.0f);
 	ui_comp.ui_list.insert({ "Option Button", option_button_ });
 
 	// Exit Button
 	exit_button_ = make_shared<UI_Button_Exit>();
 	exit_button_->InitButton("T_Button_Exit_Normal.png", "T_Button_Exit_Hover.png", "T_Button_Exit_Pushed.png");
-	exit_button_->SetLocalRectByMin({ window_size_width * 3.0f / 4.0f, window_size_height * 3.0f / 5.0f + 300.0f }, 200.0f, 70.0f);
+	exit_button_->SetLocalRectByMin({ window_size_width * 3.0f / 4.0f, window_size_height * 3.0f / 5.0f + 70.0f * 3.0f }, 200.0f, 70.0f);
 	ui_comp.ui_list.insert({ "Exit Button", exit_button_ });
 }
 
