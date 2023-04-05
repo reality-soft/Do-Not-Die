@@ -26,5 +26,4 @@ void FX_Explosion::OnUpdate()
 	auto& point_light_comp = reg_scene_->get<C_PointLight>(GetEntityId());
 	float temp = 4.0f;
 	point_light_comp.point_light.attenuation.x += point_light_comp.point_light.attenuation.x * TIMER->GetDeltaTime() * temp;
-	point_light_comp.point_light.attenuation_level.y += point_light_comp.point_light.attenuation_level.y * TIMER->GetDeltaTime() * temp;
 }
