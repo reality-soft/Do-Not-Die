@@ -6,7 +6,8 @@ namespace reality
 	class FX_Explosion : public FX_BaseEffectActor
 	{
 	public:
-		virtual void OnInit(entt::registry& registry);
+		virtual void OnInit(entt::registry& registry) override;
+		virtual void OnUpdate() override;
 	};
 }
 
