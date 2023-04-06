@@ -18,6 +18,10 @@ void LoadingScene::OnUpdate()
 {
 	sys_sound.OnUpdate(reg_scene_);
 
+	static float init_width = loading_scene_ui.progress_bar_->rect_transform_.local_rect.width;
+	static float percentage = 0;
+	static float speed = 10.0f;
+
 	if (ingame_scene == nullptr)
 	{
 		if(SCENE_MGR->GetScene(INGAME) != NULL)
@@ -27,25 +31,49 @@ void LoadingScene::OnUpdate()
 	{
 		switch (ingame_scene->GetLoadingProgress())
 		{
+			
 		case E_IngameLoading::LOADING_START:
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, 100.0f, loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			if (percentage < 10.0f)
+				percentage += speed * TIMER->GetDeltaTime();
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, 
+				init_width * percentage / 100.0f, loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
 			break; 
 		case E_IngameLoading::LOADING_MANAGER:
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, 200.0f, loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			if (percentage < 20.0f)
+				percentage += speed * TIMER->GetDeltaTime();
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, init_width * percentage / 100.0f, 
+				loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
 			break; 
 		case E_IngameLoading::LOADING_SYSTEM:
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, 400.0f, loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			if (percentage < 40.0f)
+				percentage += speed * TIMER->GetDeltaTime();
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, init_width * percentage / 100.0f, 
+				loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
 			break;
 		case E_IngameLoading::LOADING_MAP:
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, 600.0f, loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			if (percentage < 80.0f)
+				percentage += speed * TIMER->GetDeltaTime();
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, init_width * percentage / 100.0f, 
+				loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
 			break;
 		case E_IngameLoading::LOADING_ACTOR:
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, 800.0f, loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			if (percentage < 90.0f)
+				percentage += speed * TIMER->GetDeltaTime();
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, init_width * percentage / 100.0f, 
+				loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
 			break;
 		case E_IngameLoading::LOADING_FINISHED:
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, 1000.0f, loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
-			SCENE_MGR->ChangeScene(INGAME);
-			ShowCursor(false);
+			if (percentage <= 100.0f)
+				percentage += speed * TIMER->GetDeltaTime();
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, init_width * percentage / 100.0f, 
+				loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			if (percentage > 100.0f)
+			{
+				Sleep(200);
+				SCENE_MGR->ChangeScene(INGAME);
+				ShowCursor(false);
+			}
+			
 			break;
 		}
 	}
