@@ -1,5 +1,6 @@
 #pragma once
 #include "UIActor.h"
+#include "UI_OptionWindow.h"
 
 namespace reality
 {
@@ -17,9 +18,7 @@ namespace reality
 		shared_ptr<UI_Button>	option_button_;
 		shared_ptr<UI_Button>	exit_button_;
 
-		shared_ptr<UI_Image>	option_opaque_;
-		shared_ptr<UI_Image>	option_window_;
-		shared_ptr<UI_Button>	option_close_button_;
+		shared_ptr<UI_OptionWindow>	option_opaque_;
 	private:
 		void CreateUI();
 		void UpdateUI();
