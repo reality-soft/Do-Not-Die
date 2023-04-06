@@ -11,15 +11,19 @@
 void InGameScene::OnInit()
 {
 	ShowCursor(false);
-	//SetCapture(ENGINE->GetWindowHandle());
+
+	// LOADING : MANAGER_LOADING
+	loading_progress = LOADING_MANAGER;
 
 	GUI->AddWidget("property", &gw_property_);
 
-	reality::RESOURCE->Init("../../Contents/");
-
 	WRITER->Init();
-	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
-	
+	//reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
+
+
+	// LOADING : LOADING_SYSTEM
+	loading_progress = LOADING_SYSTEM;
+
 	sys_render.OnCreate(reg_scene_);
 	sys_camera.OnCreate(reg_scene_);
 
@@ -32,10 +36,13 @@ void InGameScene::OnInit()
 	sys_effect.OnCreate(reg_scene_);
 	sys_sound.OnCreate(reg_scene_);
 
-	auto player_entity = SCENE_MGR->AddPlayer<Player>();
+	// LOADING : LOADING_MAP
+	loading_progress = LOADING_MAP;
+
+	auto player_entity = Scene::AddPlayer<Player>();
 	sys_camera.TargetTag(reg_scene_, "Player");
 
-	auto character_actor = SCENE_MGR->GetPlayer<Player>(0);
+	auto character_actor = Scene::GetPlayer<Player>(0);
 	// Key Settings
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_D }, std::bind(&Player::MoveRight, character_actor), KEY_HOLD);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_W, DIK_D }, std::bind(&Player::MoveRightForward, character_actor), KEY_HOLD);
@@ -62,9 +69,12 @@ void InGameScene::OnInit()
 	//level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_Blocking1.mapdat", GuideLine::GuideType::eBlocking);
 	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_NpcTrack_01.mapdat", GuideLine::GuideType::eNpcTrack);
 
-	QUADTREE->Init(&level, 3);
+	QUADTREE->Init(&level, 3, reg_scene_);
 	QUADTREE->CreatePhysicsCS();
-	
+
+	// LOADING : LOADING_ACTOR
+	loading_progress = LOADING_ACTOR;
+
 	environment_.CreateEnvironment();
 	environment_.SetWorldTime(60, 60, true);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
@@ -74,7 +84,11 @@ void InGameScene::OnInit()
 	gw_property_.AddProperty<float>("FPS", &TIMER->fps);
 	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);	
 
-	EFFECT_MGR->SpawnEffect<FX_Flame>(XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
+	EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
+
+
+	// LOADING FINISH
+	loading_progress = LOADING_FINISHED;
 }
 
 void InGameScene::OnUpdate()
