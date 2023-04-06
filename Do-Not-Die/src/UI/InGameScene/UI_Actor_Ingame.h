@@ -1,6 +1,7 @@
 #pragma once
 #include "UIActor.h"
 #include "UI_Minimap.h"
+#include "UI_OptionWindow.h"
 #include "Player.h"
 
 namespace reality
@@ -35,8 +36,11 @@ namespace reality
 
 		shared_ptr<UI_Image>	menu_window_;
 			shared_ptr<UI_Image>	menu_title_;
+			shared_ptr<UI_Button>	menu_resume_button_;
 			shared_ptr<UI_Button>	menu_option_button_;
 			shared_ptr<UI_Button>	menu_exit_button_;
+
+		shared_ptr<UI_OptionWindow> menu_option_window_;
 	
 	private:
 		void CreateIngameUI();
@@ -47,6 +51,8 @@ namespace reality
 	private:
 		void OpenMenu();
 		void CloseMenu();
+		void OpenOptionWindow();
+		void CloseOptionWindow();
 	};
 
 }

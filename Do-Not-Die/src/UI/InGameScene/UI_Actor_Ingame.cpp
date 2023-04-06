@@ -115,17 +115,29 @@ void UI_Actor_Ingame::CreateMenuUI()
 	menu_window_->AddChildUI(menu_title_);
 	menu_title_->SetLocalRectByCenter({ window_size_width / 2.0f, window_size_height / 3.0f }, 897.0f, 141.0f);
 
+	menu_resume_button_;
+
+	// Menu Resume Button
+	menu_resume_button_ = make_shared<UI_Button>();
+	menu_resume_button_->InitButton("T_Ingame_But_Resume_Normal.png", "T_Ingame_But_Resume_Hover.png");
+	menu_window_->AddChildUI(menu_resume_button_);
+	menu_resume_button_->SetLocalRectByCenter({ window_size_width / 2.0f, window_size_height / 2.0f + 54.0f * 0.0f }, 269.0f, 54.0f);
+
 	// Menu Option Button
 	menu_option_button_ = make_shared<UI_Button>();
 	menu_option_button_->InitButton("T_Ingame_But_Option_Normal.png", "T_Ingame_But_Option_Hover.png");
 	menu_window_->AddChildUI(menu_option_button_);
-	menu_option_button_->SetLocalRectByCenter({ window_size_width / 2.0f, window_size_height / 2.0f + 100.0f * 0.0f}, 269.0f, 54.0f);
+	menu_option_button_->SetLocalRectByCenter({ window_size_width / 2.0f, window_size_height / 2.0f + 54.0f * 1.0f}, 269.0f, 54.0f);
+
+	// Menu Option Window
+	menu_option_window_ = make_shared<UI_OptionWindow>();
+	menu_option_window_->InitOptionWindow();
 
 	// Menu Exit Button
 	menu_exit_button_ = make_shared<UI_Button>();
 	menu_exit_button_->InitButton("T_Ingame_But_Exit_Normal.png", "T_Ingame_But_Exit_Hover.png");
 	menu_window_->AddChildUI(menu_exit_button_);
-	menu_exit_button_->SetLocalRectByCenter({ window_size_width / 2.0f, window_size_height / 2.0f + 100.0f * 1.0f }, 269.0f, 54.0f);
+	menu_exit_button_->SetLocalRectByCenter({ window_size_width / 2.0f, window_size_height / 2.0f + 54.0f * 2.0f }, 269.0f, 54.0f);
 }
 
 void UI_Actor_Ingame::UpdateIngameUI()
@@ -179,9 +191,33 @@ void UI_Actor_Ingame::UpdateMenuUI()
 	if (!menu)
 		return;
 
+	// When Resume Button Selected
+	if (menu_resume_button_->GetCurrentState() == E_UIState::UI_SELECT)
+	{
+		menu_resume_button_->SetCurrentState(E_UIState::UI_NORMAL);
+		menu = false;
+		CloseMenu();
+	}
+
+	// When Resume Button Selected
+	if (menu_option_button_->GetCurrentState() == E_UIState::UI_SELECT)
+	{
+		menu_option_button_->SetCurrentState(E_UIState::UI_NORMAL);
+		OpenOptionWindow();
+	}
+
+	// If MenuOption Window Opened
+	if (ui_comp_->ui_list.find("Menu Option Window") != ui_comp_->ui_list.end())
+	{
+		if (menu_option_window_->GetCloseButtonState() == E_UIState::UI_SELECT || DINPUT->GetKeyState(DIK_ESCAPE) == KEY_PUSH)
+			CloseOptionWindow();
+	}
+
+
 	// When exit Button Selected
 	if (menu_exit_button_->GetCurrentState() == E_UIState::UI_SELECT)
 	{
+		menu_exit_button_->SetCurrentState(E_UIState::UI_NORMAL);
 		DestroyWindow(ENGINE->GetWindowHandle());
 	}
 }
@@ -215,5 +251,29 @@ void UI_Actor_Ingame::CloseMenu()
 
 	auto game_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 	game_scene->SetCursorInvisible();
+}
+
+void UI_Actor_Ingame::OpenOptionWindow()
+{
+	//menu_resume_button_->Off();
+	//menu_option_button_->Off();
+	//menu_exit_button_->Off();
+
+	menu_option_button_->SetCurrentState(E_UIState::UI_NORMAL);
+
+	ui_comp_->ui_list.erase("Menu UI");
+	ui_comp_->ui_list.insert({ "Menu Option Window", menu_option_window_ });
+}
+
+void UI_Actor_Ingame::CloseOptionWindow()
+{
+	//menu_resume_button_->On();
+	//menu_option_button_->On();
+	//menu_exit_button_->On();
+
+	menu_option_window_->SetCloseButtonState(E_UIState::UI_NORMAL);
+
+	ui_comp_->ui_list.erase("Menu Option Window");
+	ui_comp_->ui_list.insert({ "Menu UI", menu_window_ });
 }
 
