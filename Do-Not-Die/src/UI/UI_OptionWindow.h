@@ -1,6 +1,7 @@
 #pragma once
 #include "UI_Image.h"
 #include "UI_Button.h"
+#include "UI_Slider.h"
 
 namespace reality
 {
@@ -8,9 +9,12 @@ namespace reality
 	{
 	public:
 		void InitOptionWindow();
+	protected:
+		void UpdateThisUI() override;
 	private:
 		shared_ptr<UI_Image>	option_window_;
 		shared_ptr<UI_Button>	option_close_button_;
+		shared_ptr<UI_Slider>	option_volume_slider_;
 	public:
 		E_UIState	GetCloseButtonState();
 		void		SetCloseButtonState(E_UIState state);
