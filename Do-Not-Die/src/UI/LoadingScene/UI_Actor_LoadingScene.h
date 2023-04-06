@@ -12,6 +12,7 @@ namespace reality
 		shared_ptr<UI_Image>	background_;
 	public:
 		shared_ptr<UI_Image>	progress_bar_;
+		shared_ptr<UI_Image>	progress_bar_back_;
 	private:
 		void CreateUI();
 		void UpdateUI();
