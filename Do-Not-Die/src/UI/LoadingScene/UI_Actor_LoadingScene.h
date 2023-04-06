@@ -10,6 +10,8 @@ namespace reality
 		virtual void OnUpdate();
 	private:
 		shared_ptr<UI_Image>	background_;
+	public:
+		shared_ptr<UI_Image>	progress_bar_;
 	private:
 		void CreateUI();
 		void UpdateUI();

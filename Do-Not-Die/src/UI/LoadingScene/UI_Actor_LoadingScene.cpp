@@ -27,8 +27,12 @@ void UI_Actor_LoadingScene::CreateUI()
 
 	// Background UI
 	background_ = make_shared<UI_Image>();
-	background_->InitImage("T_StartScene_background.png");
+	background_->InitImage("T_Background_Loading.png");
 	background_->SetLocalRectByMin({ 0, 0 }, window_size_width, window_size_height);
+	progress_bar_ = make_shared<UI_Image>();
+	progress_bar_->InitImage("T_Progressbar_Loading.png");
+	background_->AddChildUI(progress_bar_);
+	progress_bar_->SetLocalRectByMin({469.0f, 872.0f}, 1000.0f, 100.0f);
 	ui_comp.ui_list.insert({ "Background", background_ });
 }
 
