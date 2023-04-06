@@ -38,7 +38,7 @@ void UI_Minimap::UpdateThisUI()
 	// 2. Render Actor Icon
 	auto player = SCENE_MGR->GetPlayer<Player>(0);
 
-	auto view_of_capsule = SCENE_MGR->GetRegistry().view<C_CapsuleCollision>();
+	auto view_of_capsule = reg_->view<C_CapsuleCollision>();
 	for (auto& entity : view_of_capsule)
 	{
 		// if player, continue;
@@ -159,7 +159,7 @@ void UI_Minimap::RenderPlayerIcon(XMMATRIX world)
 	XMVECTOR scale = XMVectorSet(0.032f, 0.032f, 0.0f, 1.0f);
 	S = XMMatrixScalingFromVector(scale);
 	// Rotation
-	C_Camera& player_camera = SCENE_MGR->GetRegistry().get<C_Camera>(SCENE_MGR->GetPlayer<Character>(0)->GetEntityId());
+	C_Camera& player_camera = reg_->get<C_Camera>(SCENE_MGR->GetPlayer<Character>(0)->GetEntityId());
 	R = XMMatrixRotationZ(-player_camera.pitch_yaw.y);
 	// Translation
 	XMVECTOR pos = ConvertWorldToScreenXZ(world_pos);

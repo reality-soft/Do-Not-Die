@@ -42,10 +42,10 @@ void Player::OnInit(entt::registry& registry)
 	skm_ptr->local = XMMatrixRotationY(XMConvertToRadians(180)) * XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 });
 
 	// weapon
-	entt::entity weapon_id = SCENE_MGR->AddActor<Weapon>(entity_id_);
+	entt::entity weapon_id = SCENE_MGR->GetScene(INGAME)->AddActor<Weapon>(entity_id_);
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
 	int skeleton_id = skeletal_mesh->skeleton.bone_name_id_map["Hand_R"];
-	Weapon* weapon = SCENE_MGR->GetActor<Weapon>(weapon_id);
+	Weapon* weapon = SCENE_MGR->GetScene(INGAME)->GetActor<Weapon>(weapon_id);
 	weapon->SetSocket(skeleton_id);
 	weapon->SetOwnerTransform(skm_ptr->local);
 
@@ -172,13 +172,13 @@ void Player::Fire()
 void Player::ResetPos()
 {
 	transform_matrix_ = XMMatrixTranslationFromVector({ 0.f, 100.f, 0.f, 0.f });
-	transform_tree_.root_node->OnUpdate(SCENE_MGR->GetRegistry(), entity_id_, transform_matrix_);
+	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, transform_matrix_);
 }
 
 void Player::SetPos(const XMVECTOR& position)
 {
 	transform_matrix_ = XMMatrixTranslationFromVector(position);
-	transform_tree_.root_node->Translate(SCENE_MGR->GetRegistry(), entity_id_, transform_matrix_);
+	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, transform_matrix_);
 }
 
 int Player::GetMaxHp() const
