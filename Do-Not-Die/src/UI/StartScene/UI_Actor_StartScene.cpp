@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "UI_Actor_StartScene.h"
 #include "SceneMgr.h"
+#include "LoadingScene.h"
 #include "InGameScene.h"
 
 using namespace reality;
@@ -81,6 +82,7 @@ void UI_Actor_StartScene::UpdateUI()
 	{
 		thread loading_thread = thread(&UI_Actor_StartScene::LoadingIngameScene, this);
 		loading_thread.detach();
+		SCENE_MGR->AddScene<LoadingScene>(E_SceneType::LOADING);
 		SCENE_MGR->ChangeScene(E_SceneType::LOADING);
 	}
 
