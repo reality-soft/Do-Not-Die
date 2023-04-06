@@ -12,7 +12,7 @@ void UI_Minimap::InitMinimap(string minimap_id)
 {
 	UIBase::Init();
 
-	reg_ = &SCENE_MGR->GetRegistry();
+	reg_ = &SCENE_MGR->GetScene(INGAME)->GetRegistryRef();
 
 	minimap_tex_id_ = minimap_id;
 	auto texture = RESOURCE->UseResource<Texture>(minimap_tex_id_);
