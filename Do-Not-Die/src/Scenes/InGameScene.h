@@ -60,7 +60,11 @@ private:
 
 private:
 	int cur_zombie_created = 0;
-
+private:
+	bool b_show_cursor = false;
+public:
+	void SetCursorVisible();
+	void SetCursorInvisible();
 private:
 	E_IngameLoading loading_progress = LOADING_START;
 public:

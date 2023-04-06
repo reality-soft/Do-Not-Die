@@ -214,18 +214,28 @@ void InGameScene::CreateExplosionEffectFromRay()
 		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_node.point);
 }
 
-
 void InGameScene::CursorStateUpdate()
 {
-	static bool b_show_cursor = false;
 	if (DINPUT->GetKeyState(DIK_T) == KeyState::KEY_PUSH)
 	{
-		b_show_cursor = !b_show_cursor;
-		ShowCursor(b_show_cursor);
+		if (b_show_cursor)
+			SetCursorInvisible();
+		else
+			SetCursorVisible();
 	}
+}
 
-	if (!b_show_cursor)
-		SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
+void InGameScene::SetCursorVisible()
+{
+	b_show_cursor = true;
+	ShowCursor(b_show_cursor);
+}
+
+void InGameScene::SetCursorInvisible()
+{
+	b_show_cursor = false;
+	ShowCursor(b_show_cursor);
+	SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
 }
 
 
