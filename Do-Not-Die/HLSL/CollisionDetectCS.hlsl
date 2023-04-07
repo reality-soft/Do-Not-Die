@@ -1,5 +1,4 @@
-
-#define EPSILON 0.001f
+#define EPSILON 0.01f
 #define PI 3.14159265359f
 
 struct RayShape
@@ -36,14 +35,20 @@ struct CapsuleCallback
     float3 blocking_vector;
 };
 
-
-float2x3 GetTipBase(CapsuleShape capsule)
+float3 GetCapsuleTip(CapsuleShape capsule)
 {
     float3 tip = capsule.point_b;
-    float3 base = capsule.point_a;
     tip.y += capsule.radius;
+    
+    return tip;
+}
+
+float3 GetCapsuleBase(CapsuleShape capsule)
+{
+    float3 base = capsule.point_a;
     base.y -= capsule.radius;
-    return float2x3(tip, base);
+    
+    return base;
 }
 
 float3 GetRayVector(RayShape ray)
@@ -71,8 +76,8 @@ bool SameSide(float3 p1, float3 p2, float3 a, float3 b)
 bool ParallelVector(float3 vec1, float3 vec2)
 {
     float dot_ = dot(normalize(vec1), normalize(vec2));
-
-    return abs(dot_ - 1.0f) < EPSILON || abs(dot_ + 1.0f) < EPSILON;
+    bool is_parallel = abs(dot_ - 1.0f) < EPSILON || abs(dot_ + 1.0f) < EPSILON;
+    return is_parallel;
 }
 
 bool PointInTriangle(float3 p, TriangleShape tri)
@@ -89,43 +94,57 @@ bool PointInTriangle(float3 p, TriangleShape tri)
     return false;
 }
 
-float3 PlaneIntersectLine(float4 plane, RayShape ray)
+float4 PlaneIntersectLine(float4 plane, RayShape ray)
 {
+    float4 intersect;
     float3 line_dir = normalize(GetRayVector(ray));
-    float denom = dot(line_dir, plane.xyz);
 
-    if (abs(denom) < EPSILON)
-        return ray.start;
+    if (abs(dot(plane.xyz, line_dir)) < EPSILON)
+    {
+        intersect.xyz = ray.end;
+        intersect.w = false;
+    }
+    else
+    {            
+        float t = (plane.w - dot(plane.xyz, ray.start)) / dot(plane.xyz, line_dir);
+        intersect.xyz = ray.start + t * line_dir;
+        intersect.w = true;
+    }
     
-    float3 plane_pos = -plane.w / plane.xyz;
-    
-    float t = dot(plane_pos - ray.start, plane.xyz) / denom;
-    return ray.start + t * line_dir;
+    return intersect;
 }
 
 float4 RayToTriangle(RayShape ray, TriangleShape tri)
 {
-    float4 plane = { tri.normal.x, tri.normal.y, tri.normal.z, -dot(tri.normal, tri.vertex0) };
-
-    float3 intersect_point = PlaneIntersectLine(plane, ray);
-    if (PointInTriangle(intersect_point, tri))
+    float3 e1 = tri.vertex1 - tri.vertex0;
+    float3 e2 = tri.vertex2 - tri.vertex0;
+    float3 n = normalize(cross(e1, e2));
+    float d = n.x * tri.vertex0.x + n.y * tri.vertex0.y + n.z * tri.vertex0.z;
+    
+    float4 plane = float4(n, d);
+    float4 intersect_point = PlaneIntersectLine(plane, ray);
+    
+    if (intersect_point.w == true)
     {
-        float distance = length(intersect_point - ray.start);
-        float ray_length = length(GetRayVector(ray));
+        if (PointInTriangle(intersect_point.xyz, tri))
+        {            
+            float distance = length(intersect_point.xyz - ray.start);
+            float ray_length = length(GetRayVector(ray));
         
-        if (distance <= ray_length)
-        {
-            float4(intersect_point, true);
+            if (distance <= ray_length)
+            {
+                return float4(intersect_point.xyz, true);
+            }
         }
     }
     
-    return float4(intersect_point, false);;
+    return float4(intersect_point.xyz, false);    
 }
 
 CapsuleCallback CapsuleToTriangle(CapsuleShape cap, TriangleShape tri)
 {    
-    float3 tip = GetTipBase(cap)[0];
-    float3 base = GetTipBase(cap)[1];
+    float3 tip = GetCapsuleTip(cap);
+    float3 base = GetCapsuleBase(cap);
     
     CapsuleCallback callback;
     callback.collide_type = 0;
@@ -152,9 +171,7 @@ CapsuleCallback CapsuleToTriangle(CapsuleShape cap, TriangleShape tri)
         if (angle <= 80.0f)
         {
             callback.collide_type = 1; // floor
-            
-            if (length(cap.point_a - callback.floor_position) > length(cap.point_a - a_tri_intersect.xyz))
-                callback.floor_position = a_tri_intersect;
+            callback.floor_position = a_tri_intersect;
         }
         else
         {
@@ -205,29 +222,37 @@ uint GI   : SV_GroupIndex)
     
     CollisionResult result;
     result.is_collide = false;
-    result.floor_position = GetTipBase(capsule)[1];
+    result.floor_position = GetCapsuleBase(capsule);
     result.blocking_vectors[0] = float3(0, 0, 0);
     result.blocking_vectors[1] = float3(0, 0, 0);
     result.blocking_vectors[2] = float3(0, 0, 0);
     result.blocking_vectors[3] = float3(0, 0, 0);
     
     int blocking_vector_index = 0;
-    
+    //triangle_count = 11102;
     for (int i = 0; i < triangle_count; ++i)
     {
         TriangleShape tri = level_triangles[i];
         
         CapsuleCallback callback = CapsuleToTriangle(capsule, tri);
-        if (callback.collide_type == 0)
-            break;
-        else if (callback.collide_type == 1) // floor
+        if (callback.collide_type == 1) // floor
         {
             result.is_collide = true;
-            result.floor_position = callback.floor_position;
+            if (length(capsule.point_a - result.floor_position) > length(capsule.point_a - callback.floor_position))
+                result.floor_position = callback.floor_position;
+            
         }
-        else if (callback.collide_type == 2) // wall
+        else if (callback.collide_type == 2 && blocking_vector_index < 4) // wall
         {
-            result.blocking_vectors[blocking_vector_index++] = callback.blocking_vector;
+            result.is_collide = true;
+            
+            for (int j = 0; j < 4; ++j)
+            {
+                if (length(result.blocking_vectors[j]) < EPSILON)
+                {
+                    result.blocking_vectors[j] = callback.blocking_vector;
+                }
+            }
         }
     }
         
