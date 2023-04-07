@@ -115,6 +115,7 @@ void TestGame::OnUpdate()
 	sys_sound.OnUpdate(reg_scene_);
 	QUADTREE->Frame(&sys_camera);
 	QUADTREE->RunPhysicsCS("CollisionDetectCS.cso");
+	QUADTREE->MovementByPhysicsCS();
 
 	environment_.Update(&sys_camera, &sys_light);
 
