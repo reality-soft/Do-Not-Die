@@ -1,12 +1,23 @@
 #pragma once
 #include "Engine_Include.h"
 #include "TestWidget.h"
-#include "UI_Ingame_Actor.h"
+#include "UI_Actor_Ingame.h"
 #include "StaticShadowMap.h"
 
 using namespace reality;
 
-class TestGame : public reality::Scene
+enum E_IngameLoading
+{
+	LOADING_START = 0,
+	LOADING_MANAGER = 1,
+	LOADING_SYSTEM = 2,
+	LOADING_MAP = 3,
+	LOADING_ACTOR = 4,
+
+	LOADING_FINISHED = 999,
+};
+
+class InGameScene : public reality::Scene
 {
 public:
 	virtual void OnInit();
@@ -22,6 +33,7 @@ private:
 		"Zombie_Police_Male_01.skmesh",
 		"Zombie_RiotCop_Male_01.skmesh",
 		"Zombie_SchoolGirl_Female_01.skmesh",
+		"Zombie_Bellboy_Male_01.skmesh",
 	};
 
 	Environment environment_;
@@ -41,12 +53,21 @@ private:
 private:
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
-	UI_Ingame_Actor ingame_ui;
+	UI_Actor_Ingame ingame_ui;
 	void CreateImpactEffectFromRay();
 	void CreateExplosionEffectFromRay();
 	void CursorStateUpdate();
 
 private:
 	int cur_zombie_created = 0;
+private:
+	bool b_show_cursor = false;
+public:
+	void SetCursorVisible();
+	void SetCursorInvisible();
+private:
+	E_IngameLoading loading_progress = LOADING_START;
+public:
+	E_IngameLoading GetLoadingProgress() { return loading_progress; }
 };
 

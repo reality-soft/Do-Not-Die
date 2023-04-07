@@ -1,4 +1,4 @@
-#include "TestGame.h"
+#include "InGameScene.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "FX_BloodImpact.h"
@@ -8,18 +8,22 @@
 #include "FX_Explosion.h"
 #include "FbxMgr.h"
 
-void TestGame::OnInit()
+void InGameScene::OnInit()
 {
 	ShowCursor(false);
-	//SetCapture(ENGINE->GetWindowHandle());
+
+	// LOADING : MANAGER_LOADING
+	loading_progress = LOADING_MANAGER;
 
 	GUI->AddWidget("property", &gw_property_);
 
-	reality::RESOURCE->Init("../../Contents/");
-
 	WRITER->Init();
-	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
-	
+	//reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
+
+
+	// LOADING : LOADING_SYSTEM
+	loading_progress = LOADING_SYSTEM;
+
 	sys_render.OnCreate(reg_scene_);
 	sys_camera.OnCreate(reg_scene_);
 
@@ -32,10 +36,13 @@ void TestGame::OnInit()
 	sys_effect.OnCreate(reg_scene_);
 	sys_sound.OnCreate(reg_scene_);
 
-	auto player_entity = SCENE_MGR->AddPlayer<Player>();
+	// LOADING : LOADING_MAP
+	loading_progress = LOADING_MAP;
+
+	auto player_entity = Scene::AddPlayer<Player>();
 	sys_camera.TargetTag(reg_scene_, "Player");
 
-	auto character_actor = SCENE_MGR->GetPlayer<Player>(0);
+	auto character_actor = Scene::GetPlayer<Player>(0);
 	// Key Settings
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_D }, std::bind(&Player::MoveRight, character_actor), KEY_HOLD);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_W, DIK_D }, std::bind(&Player::MoveRightForward, character_actor), KEY_HOLD);
@@ -62,9 +69,12 @@ void TestGame::OnInit()
 	//level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_Blocking1.mapdat", GuideLine::GuideType::eBlocking);
 	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_NpcTrack_01.mapdat", GuideLine::GuideType::eNpcTrack);
 
-	QUADTREE->Init(&level, 3);
+	QUADTREE->Init(&level, 3, reg_scene_);
 	QUADTREE->CreatePhysicsCS();
-	
+
+	// LOADING : LOADING_ACTOR
+	loading_progress = LOADING_ACTOR;
+
 	environment_.CreateEnvironment();
 	environment_.SetWorldTime(60, 60, true);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
@@ -74,10 +84,14 @@ void TestGame::OnInit()
 	gw_property_.AddProperty<float>("FPS", &TIMER->fps);
 	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);	
 
-	EFFECT_MGR->SpawnEffect<FX_Flame>(XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
+	EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
+
+
+	// LOADING FINISH
+	loading_progress = LOADING_FINISHED;
 }
 
-void TestGame::OnUpdate()
+void InGameScene::OnUpdate()
 {
 	static float cur_time = 0.0f;
 
@@ -130,7 +144,7 @@ void TestGame::OnUpdate()
 	CursorStateUpdate();
 }
 
-void TestGame::OnRender()
+void InGameScene::OnRender()
 {
 	environment_.Render();
 	
@@ -143,13 +157,13 @@ void TestGame::OnRender()
 	GUI->RenderWidgets();
 }
 
-void TestGame::OnRelease()
+void InGameScene::OnRelease()
 {
 	QUADTREE->Release();
 	reality::RESOURCE->Release();
 }
 
-void TestGame::CreateImpactEffectFromRay()
+void InGameScene::CreateImpactEffectFromRay()
 {
 	// Make Muzzle when Shot
 	auto player_transform = SCENE_MGR->GetPlayer<Player>(0)->GetTransformMatrix();
@@ -178,7 +192,7 @@ void TestGame::CreateImpactEffectFromRay()
 		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
 }
 
-void TestGame::CreateExplosionEffectFromRay()
+void InGameScene::CreateExplosionEffectFromRay()
 {
 	RayShape ray = sys_camera.CreateFrontRay();
 
@@ -201,18 +215,28 @@ void TestGame::CreateExplosionEffectFromRay()
 		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_node.point);
 }
 
-
-void TestGame::CursorStateUpdate()
+void InGameScene::CursorStateUpdate()
 {
-	static bool b_show_cursor = false;
 	if (DINPUT->GetKeyState(DIK_T) == KeyState::KEY_PUSH)
 	{
-		b_show_cursor = !b_show_cursor;
-		ShowCursor(b_show_cursor);
+		if (b_show_cursor)
+			SetCursorInvisible();
+		else
+			SetCursorVisible();
 	}
+}
 
-	if (!b_show_cursor)
-		SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
+void InGameScene::SetCursorVisible()
+{
+	b_show_cursor = true;
+	ShowCursor(b_show_cursor);
+}
+
+void InGameScene::SetCursorInvisible()
+{
+	b_show_cursor = false;
+	ShowCursor(b_show_cursor);
+	SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
 }
 
 
