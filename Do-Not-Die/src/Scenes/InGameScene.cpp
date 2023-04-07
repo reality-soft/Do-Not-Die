@@ -82,7 +82,8 @@ void InGameScene::OnInit()
 	environment_.SetLightProperty(0.2f, 0.2f);
 
 	gw_property_.AddProperty<float>("FPS", &TIMER->fps);
-	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);	
+	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);
+	gw_property_.AddProperty<bool>("character collision", &QUADTREE->collision_result_pool_[0].is_collide);
 
 	EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 
@@ -129,6 +130,7 @@ void InGameScene::OnUpdate()
 	sys_sound.OnUpdate(reg_scene_);
 	QUADTREE->Frame(&sys_camera);
 	QUADTREE->RunPhysicsCS("CollisionDetectCS.cso");
+	QUADTREE->MovementByPhysicsCS();
 
 	environment_.Update(&sys_camera, &sys_light);
 
