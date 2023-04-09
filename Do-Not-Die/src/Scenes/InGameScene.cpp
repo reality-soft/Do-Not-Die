@@ -70,7 +70,6 @@ void InGameScene::OnInit()
 	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_NpcTrack_01.mapdat", GuideLine::GuideType::eNpcTrack);
 
 	QUADTREE->Init(&level, 3, reg_scene_);
-	QUADTREE->CreatePhysicsCS();
 
 	// LOADING : LOADING_ACTOR
 	loading_progress = LOADING_ACTOR;
@@ -83,7 +82,7 @@ void InGameScene::OnInit()
 
 	gw_property_.AddProperty<float>("FPS", &TIMER->fps);
 	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);
-	gw_property_.AddProperty<bool>("character collision", &QUADTREE->collision_result_pool_[0].is_collide);
+	gw_property_.AddProperty<int>("character collision", &QUADTREE->collision_result_pool_[0].collide_type);
 
 	EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 
@@ -115,7 +114,7 @@ void InGameScene::OnUpdate()
 		enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
 
 		//auto player = SCENE_MGR->GetPlayer<Player>(0);
-		//player->SetPos(level.GetGuideLines()->at(guidline_index).line_nodes[0]);
+		//player->SetPos(level.GetGuideLines()->at(guidlwwwwwwwwwwwww ine_index).line_nodes[0]);
 		
 		cur_time = 0.0f;
 
@@ -129,8 +128,6 @@ void InGameScene::OnUpdate()
 	sys_effect.OnUpdate(reg_scene_);
 	sys_sound.OnUpdate(reg_scene_);
 	QUADTREE->Frame(&sys_camera);
-	QUADTREE->RunPhysicsCS("CollisionDetectCS.cso");
-	QUADTREE->MovementByPhysicsCS();
 
 	environment_.Update(&sys_camera, &sys_light);
 
