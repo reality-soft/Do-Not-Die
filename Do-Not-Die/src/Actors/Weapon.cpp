@@ -37,7 +37,7 @@ void Weapon::OnUpdate()
 	C_Camera* camera_component = reg_scene_->try_get<C_Camera>(owner_character->GetEntityId());
 
 	if (animation_component != nullptr && socket_id_ != -1) {
-		animation_matrix_ = animation_component->GetCurAnimMatrix(socket_id_);
+		animation_matrix_ = animation_component->GetCurAnimMatirixOfBone(socket_id_);
 	}
 
 	XMMATRIX rotation_matrix = XMMatrixRotationY(camera_component->pitch_yaw.y);

@@ -50,9 +50,9 @@ void Player::OnInit(entt::registry& registry)
 	weapon->SetOwnerTransform(skm_ptr->local);
 
 	// create anim slot
-	C_Animation animation;
-	animation.AddNewAnimSlot("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6);
-	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+	AnimationBase animation_base;
+	C_Animation animation(&animation_base);
+	animation.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6, entity_id_);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
 
 	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
@@ -77,28 +77,12 @@ void Player::OnUpdate()
 
 void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
 {
-	if (anim_slot_id == "") {
-		C_Animation* animation_component = reg_scene_->try_get<reality::C_Animation>(entity_id_);
-		if (animation_component == nullptr || animation_component->anim_id == anim_id) {
-			return;
-		}
-
-		animation_component->anim_id = anim_id;
+	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
+	int slot_index = animation_component_ptr->name_to_anim_slot_index[anim_slot_id];
+	if (animation_component_ptr->anim_slots[slot_index].second.anim_object_->GetCurAnimationId() != anim_id) {
+		animation_component_ptr->anim_slots[slot_index].second.anim_object_->SetAnimation(anim_id, 0.2);
 	}
-	else {
-		C_Animation* animation_component = reg_scene_->try_get<reality::C_Animation>(entity_id_);
-		if (animation_component == nullptr) {
-			return;
-		}
-
-		int anim_slot_index = animation_component->name_to_anim_slot_index[anim_slot_id];
-		AnimSlot& anim_slot = animation_component->anim_slots[anim_slot_index].second;
-		if (anim_slot.anim_id == anim_id) {
-			return;
-		}
-
-		anim_slot.anim_id = anim_id;
-	}
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
 }
 
 void Player::MoveRight()
@@ -166,7 +150,29 @@ void Player::Idle()
 
 void Player::Fire()
 {
-	SetCharacterAnimation("A_TP_CH_Handgun_Fire_Anim_Retargeted_Unreal Take.anim", "UpperBody");
+	if (is_aiming_) {
+		fire_ = true;
+	}
+}
+
+void Player::Aim()
+{
+	C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
+	if (is_aiming_ == false) {
+		is_aiming_ = true;
+		camera->target_rotation = 20;
+		reg_scene_->emplace_or_replace<C_Camera>(entity_id_, *camera);
+	}
+	else {
+		is_aiming_ = false;
+		camera->target_rotation = 0;
+		reg_scene_->emplace_or_replace<C_Camera>(entity_id_, *camera);
+	}
+}
+
+bool Player::IsAiming()
+{
+	return is_aiming_;
 }
 
 void Player::ResetPos()
