@@ -6,6 +6,17 @@
 
 using namespace reality;
 
+enum E_IngameLoading
+{
+	LOADING_START = 0,
+	LOADING_MANAGER = 1,
+	LOADING_SYSTEM = 2,
+	LOADING_MAP = 3,
+	LOADING_ACTOR = 4,
+
+	LOADING_FINISHED = 999,
+};
+
 class InGameScene : public reality::Scene
 {
 public:
@@ -30,6 +41,7 @@ private:
 	StaticMeshLevel level;
 
 	reality::LightingSystem sys_light;
+	reality::AnimationSystem sys_animation;
 	reality::RenderSystem sys_render;
 	reality::CameraSystem sys_camera;
 	reality::SoundSystem sys_sound;
@@ -49,5 +61,14 @@ private:
 
 private:
 	int cur_zombie_created = 0;
+private:
+	bool b_show_cursor = false;
+public:
+	void SetCursorVisible();
+	void SetCursorInvisible();
+private:
+	E_IngameLoading loading_progress = LOADING_START;
+public:
+	E_IngameLoading GetLoadingProgress() { return loading_progress; }
 };
 

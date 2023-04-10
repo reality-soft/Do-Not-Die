@@ -29,6 +29,7 @@ project "Do-Not-Die"
 	includedirs
 	{
 		"../Game-Engine/Engine/src/Actors",
+		"../Game-Engine/Engine/src/Animation",
 		"../Game-Engine/Engine/src/Components",
 		"../Game-Engine/Engine/src/Core",
 		"../Game-Engine/Engine/src/DataTypes",
@@ -51,6 +52,9 @@ project "Do-Not-Die"
 		"Do-Not-Die/src/GUI",
 		"Do-Not-Die/src/Scenes",
 		"Do-Not-Die/src/UI",
+		"Do-Not-Die/src/UI/InGameScene",
+		"Do-Not-Die/src/UI/LoadingScene",
+		"Do-Not-Die/src/UI/StartScene",
 		"../SDK/DirectXTK/include",
 		"../SDK/FBXSDK/include",
 		"../SDK/FMOD/include",

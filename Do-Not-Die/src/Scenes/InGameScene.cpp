@@ -11,15 +11,19 @@
 void InGameScene::OnInit()
 {
 	ShowCursor(false);
-	//SetCapture(ENGINE->GetWindowHandle());
+
+	// LOADING : MANAGER_LOADING
+	loading_progress = LOADING_MANAGER;
 
 	GUI->AddWidget("property", &gw_property_);
 
-	reality::RESOURCE->Init("../../Contents/");
-
 	WRITER->Init();
-	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
-	
+	//reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
+
+
+	// LOADING : LOADING_SYSTEM
+	loading_progress = LOADING_SYSTEM;
+
 	sys_render.OnCreate(reg_scene_);
 	sys_camera.OnCreate(reg_scene_);
 
@@ -32,10 +36,13 @@ void InGameScene::OnInit()
 	sys_effect.OnCreate(reg_scene_);
 	sys_sound.OnCreate(reg_scene_);
 
-	auto player_entity = SCENE_MGR->AddPlayer<Player>();
+	// LOADING : LOADING_MAP
+	loading_progress = LOADING_MAP;
+
+	auto player_entity = Scene::AddPlayer<Player>();
 	sys_camera.TargetTag(reg_scene_, "Player");
 
-	auto character_actor = SCENE_MGR->GetPlayer<Player>(0);
+	auto character_actor = Scene::GetPlayer<Player>(0);
 	// Key Settings
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_D }, std::bind(&Player::MoveRight, character_actor), KEY_HOLD);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_W, DIK_D }, std::bind(&Player::MoveRightForward, character_actor), KEY_HOLD);
@@ -48,6 +55,8 @@ void InGameScene::OnInit()
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_RETURN }, std::bind(&Player::ResetPos, character_actor), KEY_PUSH);
 
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_SPACE }, std::bind(&Player::Jump, character_actor), KEY_PUSH);
+	
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_Q }, std::bind(&Player::Aim, character_actor), KEY_PUSH);
 
 	std::function<void()> idle = std::bind(&Player::Idle, character_actor);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_D }, idle, KEY_UP);
@@ -56,15 +65,17 @@ void InGameScene::OnInit()
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_A }, idle, KEY_UP);
 
 	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, std::bind(&Player::Fire, character_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
+	//INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
 
 	level.Create("DeadPoly_FullLevel_04.stmesh", "LevelVS.cso", "DeadPoly_Level_Collision_04.stmesh");
 	//level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_Blocking1.mapdat", GuideLine::GuideType::eBlocking);
 	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_NpcTrack_01.mapdat", GuideLine::GuideType::eNpcTrack);
 
-	QUADTREE->Init(&level, 3);
-	QUADTREE->CreatePhysicsCS();
-	
+	QUADTREE->Init(&level, 3, reg_scene_);
+
+	// LOADING : LOADING_ACTOR
+	loading_progress = LOADING_ACTOR;
+
 	environment_.CreateEnvironment();
 	environment_.SetWorldTime(60, 60, true);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
@@ -72,9 +83,14 @@ void InGameScene::OnInit()
 	environment_.SetLightProperty(0.2f, 0.2f);
 
 	gw_property_.AddProperty<float>("FPS", &TIMER->fps);
-	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);	
+	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);
+	gw_property_.AddProperty<int>("character collision", &QUADTREE->collision_result_pool_[0].collide_type);
 
-	EFFECT_MGR->SpawnEffect<FX_Flame>(XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
+	EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
+
+
+	// LOADING FINISH
+	loading_progress = LOADING_FINISHED;
 }
 
 void InGameScene::OnUpdate()
@@ -100,7 +116,7 @@ void InGameScene::OnUpdate()
 		enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
 
 		//auto player = SCENE_MGR->GetPlayer<Player>(0);
-		//player->SetPos(level.GetGuideLines()->at(guidline_index).line_nodes[0]);
+		//player->SetPos(level.GetGuideLines()->at(guidlwwwwwwwwwwwww ine_index).line_nodes[0]);
 		
 		cur_time = 0.0f;
 
@@ -109,12 +125,12 @@ void InGameScene::OnUpdate()
 	cur_zombie_created = SCENE_MGR->GetNumOfActor() - 1;
 
 	sys_camera.OnUpdate(reg_scene_);
+	sys_animation.OnUpdate(reg_scene_);
 	sys_light.OnUpdate(reg_scene_);
 	sys_movement.OnUpdate(reg_scene_);
 	sys_effect.OnUpdate(reg_scene_);
 	sys_sound.OnUpdate(reg_scene_);
 	QUADTREE->Frame(&sys_camera);
-	QUADTREE->RunPhysicsCS("CollisionDetectCS.cso");
 
 	environment_.Update(&sys_camera, &sys_light);
 
@@ -200,18 +216,28 @@ void InGameScene::CreateExplosionEffectFromRay()
 		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_node.point);
 }
 
-
 void InGameScene::CursorStateUpdate()
 {
-	static bool b_show_cursor = false;
 	if (DINPUT->GetKeyState(DIK_T) == KeyState::KEY_PUSH)
 	{
-		b_show_cursor = !b_show_cursor;
-		ShowCursor(b_show_cursor);
+		if (b_show_cursor)
+			SetCursorInvisible();
+		else
+			SetCursorVisible();
 	}
+}
 
-	if (!b_show_cursor)
-		SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
+void InGameScene::SetCursorVisible()
+{
+	b_show_cursor = true;
+	ShowCursor(b_show_cursor);
+}
+
+void InGameScene::SetCursorInvisible()
+{
+	b_show_cursor = false;
+	ShowCursor(b_show_cursor);
+	SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
 }
 
 

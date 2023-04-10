@@ -17,6 +17,7 @@ void StartScene::OnInit()
 
 void StartScene::OnUpdate()
 {
+	start_scene_ui.OnUpdate();
 	sys_sound.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
 }

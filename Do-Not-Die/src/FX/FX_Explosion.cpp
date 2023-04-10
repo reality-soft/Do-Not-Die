@@ -18,3 +18,12 @@ void FX_Explosion::OnInit(entt::registry& registry)
 
 	AddSoundQueue("S_Explosion_01.wav", SFX, false, 30.0f);
 }
+
+void FX_Explosion::OnUpdate()
+{
+	Actor::OnUpdate();
+
+	auto& point_light_comp = reg_scene_->get<C_PointLight>(GetEntityId());
+	float temp = 4.0f;
+	point_light_comp.point_light.attenuation.x += point_light_comp.point_light.attenuation.x * TIMER->GetDeltaTime() * temp;
+}

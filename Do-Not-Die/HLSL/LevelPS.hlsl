@@ -25,7 +25,6 @@ float4 PS(PS_OUT input) : SV_Target
     
     float4 final_color = WhiteColor();
 
-    float4 middle_albedo = albedo;
     albedo = ChangeSaturation(albedo, 1.3f);
     albedo = ChangeValue(albedo, 0.5f);
     albedo = ApplyHemisphericAmbient(input.n, albedo);
