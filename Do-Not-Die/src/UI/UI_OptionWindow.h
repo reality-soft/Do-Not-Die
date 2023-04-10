@@ -17,6 +17,8 @@ namespace reality
 		shared_ptr<UI_Button>	option_close_button_;
 		shared_ptr<UI_Listbox>  option_resolution_list_box_;
 		shared_ptr<UI_Slider>	option_volume_slider_;
+	private:
+		string					resolution_value;
 	public:
 		E_UIState	GetCloseButtonState();
 		void		SetCloseButtonState(E_UIState state);

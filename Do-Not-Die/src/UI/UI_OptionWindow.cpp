@@ -32,10 +32,11 @@ void UI_OptionWindow::InitOptionWindow()
 	option_window_->AddChildUI(option_resolution_list_box_);
 	option_resolution_list_box_->SetLocalRectByMin({ 40.0f, 180.0f }, 265.0f, 51.0f);
 	option_resolution_list_box_->SetOpenPanelLocalRectByMin({ 0.0f, option_resolution_list_box_->rect_transform_.world_rect.height - 20.0f }, 263.0f, 181.0f);
-	option_resolution_list_box_->AddItem("1920 x 1080");
-	option_resolution_list_box_->AddItem("800 x 600");
-	option_resolution_list_box_->SetItemSelected(0);
+	option_resolution_list_box_->AddItem(E_Resolution_String[E_Resolution::R1920x1080]);
+	option_resolution_list_box_->AddItem(E_Resolution_String[E_Resolution::R1280x720]);
+	option_resolution_list_box_->SetItemSelected(E_Resolution_String[ENGINE->GetWindowResolution()]);
 
+	resolution_value = option_resolution_list_box_->GetCurrentItem();
 
 	// Volume Slider
 	option_volume_slider_ = make_shared<UI_Slider>();
@@ -49,6 +50,12 @@ void UI_OptionWindow::UpdateThisUI()
 {
 	FMOD_MGR->SetMusicVolume(option_volume_slider_->GetValue() / 10.0f);
 	FMOD_MGR->SetSFXVolume(option_volume_slider_->GetValue() / 10.0f);
+
+	if (resolution_value != option_resolution_list_box_->GetCurrentItem())
+	{
+		resolution_value = option_resolution_list_box_->GetCurrentItem();
+		ENGINE->Resize((E_Resolution)option_resolution_list_box_->GetCurrentIndex());
+	}
 }
 
 E_UIState UI_OptionWindow::GetCloseButtonState()
