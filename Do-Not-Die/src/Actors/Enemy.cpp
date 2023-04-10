@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "AnimationStateMachine.h"
 
 using namespace reality;
 
@@ -9,8 +10,6 @@ void Enemy::OnInit(entt::registry& registry)
 	// setting character data
 	movement_component_->speed = 100;
 	max_hp_ = cur_hp_ = 100;
-
-	SetCharacterAnimation("Zombie_Idle_1_v2_IPC_Anim_Unreal Take.anim");
 
 	// setting character objects
 	reality::C_SkeletalMesh skm;
@@ -34,6 +33,11 @@ void Enemy::OnInit(entt::registry& registry)
 	reality::C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
 	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180.f));
 
+	AnimationBase animation_base;
+	C_Animation animation(&animation_base);
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+	SetCharacterAnimation("Zombie_Idle_1_v2_IPC_Anim_Unreal Take.anim");
+
 	// setting a character into quad tree
 	QUADTREE->RegistDynamicCapsule(entity_id_);
 }
@@ -45,13 +49,10 @@ void Enemy::OnUpdate()
 
 void Enemy::SetCharacterAnimation(string anim_id) const
 {
-	C_Animation* prev_animation = reg_scene_->try_get<reality::C_Animation>(entity_id_);
-	if (prev_animation != nullptr && prev_animation->anim_id == anim_id) {
-		return;
-	}
-	C_Animation animation;
-	animation.anim_id = anim_id;
-	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
+	int base_index = animation_component_ptr->name_to_anim_slot_index["Base"];
+	animation_component_ptr->anim_slots[base_index].second.anim_object_->SetAnimation(anim_id, 0.3);
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
 }
 
 void Enemy::Move()
