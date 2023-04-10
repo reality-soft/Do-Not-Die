@@ -30,6 +30,7 @@ private:
 	StaticMeshLevel level;
 
 	reality::LightingSystem sys_light;
+	reality::AnimationSystem sys_animation;
 	reality::RenderSystem sys_render;
 	reality::CameraSystem sys_camera;
 	reality::SoundSystem sys_sound;

@@ -29,6 +29,7 @@ project "Do-Not-Die"
 	includedirs
 	{
 		"../Game-Engine/Engine/src/Actors",
+		"../Game-Engine/Engine/src/Animation",
 		"../Game-Engine/Engine/src/Components",
 		"../Game-Engine/Engine/src/Core",
 		"../Game-Engine/Engine/src/DataTypes",
