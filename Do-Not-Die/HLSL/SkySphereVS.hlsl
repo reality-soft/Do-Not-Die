@@ -21,7 +21,7 @@ VS_OUT VS(VS_IN input)
     float4 local = float4(input.p, 1.0f);
     float4 normal = float4(input.n, 1.0f);
     
-    float4 world = mul(local, FarScaleMatrix() * camera_translation);
+    float4 world = mul(local, mul(FarScaleMatrix(), camera_translation));
     float4 projection = mul(world, ViewProjection());
 
     output.origin = world;
