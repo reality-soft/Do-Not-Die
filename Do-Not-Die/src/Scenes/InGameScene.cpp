@@ -128,6 +128,7 @@ void InGameScene::OnUpdate()
 	sys_effect.OnUpdate(reg_scene_);
 	sys_sound.OnUpdate(reg_scene_);
 	QUADTREE->Frame(&sys_camera);
+	QUADTREE->UpdatePhysics("SimpleCapsuleCS.cso");
 
 	environment_.Update(&sys_camera, &sys_light);
 
