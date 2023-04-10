@@ -9,7 +9,7 @@ struct RayShape
 
 struct TriangleShape
 {
-    uint index;
+    uint including_node;
     float3 normal;
     float3 vertex0, vertex1, vertex2;
 };
@@ -20,6 +20,7 @@ struct CapsuleShape
     float3 point_a;
     float3 point_b;
     int entity;
+    int node_numbers[4];
 };
 
 struct CollisionResult
@@ -310,7 +311,13 @@ uint GI : SV_GroupIndex)
     {
         TriangleShape tri = level_triangles[i];
         
-        CapsuleCallback callback = CapsuleToTriangle(capsule, tri);        
+        if (capsule.node_numbers[0] != tri.including_node &&
+            capsule.node_numbers[1] != tri.including_node &&
+            capsule.node_numbers[2] != tri.including_node &&
+            capsule.node_numbers[3] != tri.including_node)
+            continue;
+        
+        CapsuleCallback callback = CapsuleToTriangle(capsule, tri);
         if (callback.collide_type == 1)
         {
             result.collide_type = 1;
