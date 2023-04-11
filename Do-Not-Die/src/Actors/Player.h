@@ -86,7 +86,6 @@ public:
 		transitions_.insert({ AIM_POSE, Transition(FIRE,[this](const AnimationBase* animation_base) {
 				Player* player = SCENE_MGR->GetActor<Player>(owner_id_);
 				if (player->fire_ == true) {
-					player->fire_ = false;
 					return true;
 				}
 				else {
@@ -97,6 +96,7 @@ public:
 		transitions_.insert({ FIRE, Transition(AIM_POSE,[this](const AnimationBase* animation_base) {
 				Player* player = SCENE_MGR->GetActor<Player>(owner_id_);
 				if (this->IsAnimationEnded()) {
+					player->fire_ = false;
 					return true;
 				}
 				else {
@@ -151,7 +151,7 @@ public:
 	public:
 		virtual void Enter(AnimationBase* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_Handgun_Fire_Anim_Retargeted_Unreal Take.anim", 0.0f);
+			animation_base->SetAnimation("A_TP_CH_Handgun_Fire_Retargeted_Unreal Take.anim", 0.0f);
 		}
 		virtual void Exit(AnimationBase* animation_base) override
 		{
