@@ -173,6 +173,19 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	string steel_count = "10";
 	string steel_max_count = " / 30";
 	steel_text_->SetText(steel_str + steel_count + steel_max_count);
+
+	// Cross Hair Update
+	static bool isAiming = ui_comp_->ui_list.find("CrossHair UI") != ui_comp_->ui_list.end();
+	if (isAiming != player_->IsAiming())
+	{
+		isAiming = player_->IsAiming();
+
+		if (isAiming)
+			ui_comp_->ui_list.insert({ "CrossHair UI", crosshair_ui_ });
+		else
+			ui_comp_->ui_list.erase("CrossHair UI");
+	}
+	
 }
 
 void UI_Actor_Ingame::UpdateMenuUI()
