@@ -175,15 +175,15 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	steel_text_->SetText(steel_str + steel_count + steel_max_count);
 
 	// Cross Hair Update
-	static bool isAiming = ui_comp_->ui_list.find("CrossHair UI") != ui_comp_->ui_list.end();
-	if (isAiming != player_->IsAiming())
+	if (ui_comp_->ui_list.find("CrossHair UI") != ui_comp_->ui_list.end())
 	{
-		isAiming = player_->IsAiming();
-
-		if (isAiming)
-			ui_comp_->ui_list.insert({ "CrossHair UI", crosshair_ui_ });
-		else
+		if(!player_->IsAiming())
 			ui_comp_->ui_list.erase("CrossHair UI");
+	}
+	else
+	{
+		if (player_->IsAiming())
+			ui_comp_->ui_list.insert(make_pair("CrossHair UI", crosshair_ui_));
 	}
 	
 }
@@ -251,7 +251,7 @@ void UI_Actor_Ingame::OpenMenu()
 	ui_comp_->ui_list.erase("Status UI");
 	ui_comp_->ui_list.erase("Objective UI");
 	ui_comp_->ui_list.erase("Time UI");
-	ui_comp_->ui_list.erase("Crosshair UI");
+	ui_comp_->ui_list.erase("CrossHair UI");
 
 	auto game_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 	game_scene->SetCursorVisible();
@@ -267,7 +267,7 @@ void UI_Actor_Ingame::CloseMenu()
 	ui_comp_->ui_list.insert({ "Status UI", status_ui });
 	ui_comp_->ui_list.insert({ "Objective UI", objective_ui_ });
 	ui_comp_->ui_list.insert({ "Time UI", time_ui_ });
-	ui_comp_->ui_list.insert({ "Crosshair UI", crosshair_ui_ });
+	ui_comp_->ui_list.insert({ "CrossHair UI", crosshair_ui_ });
 
 	auto game_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 	game_scene->SetCursorInvisible();
