@@ -12,12 +12,12 @@ namespace reality
 		void InitOptionWindow();
 	protected:
 		void UpdateThisUI() override;
-	private:
+	public:
 		shared_ptr<UI_Image>	option_window_;
 		shared_ptr<UI_Button>	option_close_button_;
 		shared_ptr<UI_Listbox>  option_resolution_list_box_;
 		shared_ptr<UI_Slider>	option_volume_slider_;
-	private:
+	public:
 		string					resolution_value;
 	public:
 		E_UIState	GetCloseButtonState();
