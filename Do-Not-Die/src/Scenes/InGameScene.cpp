@@ -26,15 +26,14 @@ void InGameScene::OnInit()
 
 	sys_render.OnCreate(reg_scene_);
 	sys_camera.OnCreate(reg_scene_);
-
-	ingame_ui.OnInit(reg_scene_);
 	sys_ui.OnCreate(reg_scene_);
-
 	sys_camera.SetSpeed(1000);
 	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
 	sys_light.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
 	sys_sound.OnCreate(reg_scene_);
+
+	ingame_ui.OnInit(reg_scene_);
 
 	// LOADING : LOADING_MAP
 	loading_progress = LOADING_MAP;

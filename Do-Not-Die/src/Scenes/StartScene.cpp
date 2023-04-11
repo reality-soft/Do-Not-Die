@@ -9,17 +9,16 @@ void StartScene::OnInit()
 	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
 	
 	sys_render.OnCreate(reg_scene_);
-
-	start_scene_ui.OnInit(reg_scene_);
 	sys_ui.OnCreate(reg_scene_);
 	sys_sound.OnCreate(reg_scene_);
+
+	start_scene_ui.OnInit(reg_scene_);
 }
 
 void StartScene::OnUpdate()
 {
 	start_scene_ui.OnUpdate();
 	sys_sound.OnUpdate(reg_scene_);
-	sys_ui.OnUpdate(reg_scene_);
 }
 
 void StartScene::OnRender()
