@@ -20,7 +20,7 @@ void LoadingScene::OnUpdate()
 
 	static float init_width = loading_scene_ui.progress_bar_->rect_transform_.local_rect.width;
 	static float percentage = 0;
-	static float speed = 10.0f;
+	static float speed = 100.0f;
 
 	if (ingame_scene == nullptr)
 	{
