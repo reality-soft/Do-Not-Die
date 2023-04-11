@@ -71,8 +71,11 @@ void InGameScene::OnInit()
 	//level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_Blocking1.mapdat", GuideLine::GuideType::eBlocking);
 	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_NpcTrack_01.mapdat", GuideLine::GuideType::eNpcTrack);
 
-	QUADTREE->Init(&level, 3, reg_scene_);
-
+	//QUADTREE->Init(&level, 3, reg_scene_);
+	QUADTREE->Init(&level, reg_scene_);
+	QUADTREE->ImportQuadTreeData("../../Contents/BinaryPackage/QuadTreeData_01.matdat");
+	QUADTREE->CreatePhysicsCS();
+	
 	// LOADING : LOADING_ACTOR
 	loading_progress = LOADING_ACTOR;
 
