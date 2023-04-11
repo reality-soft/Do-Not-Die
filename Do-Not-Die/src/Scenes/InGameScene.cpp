@@ -31,6 +31,7 @@ void InGameScene::OnInit()
 	sys_ui.OnCreate(reg_scene_);
 
 	sys_camera.SetSpeed(1000);
+	sys_camera.SetFarZ(10000.f);
 	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
 	sys_light.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
@@ -86,8 +87,7 @@ void InGameScene::OnInit()
 	environment_.SetLightProperty(0.2f, 0.2f);
 
 	gw_property_.AddProperty<float>("FPS", &TIMER->fps);
-	gw_property_.AddProperty<int>("calculating triagnles", &QUADTREE->calculating_triagnles);
-	gw_property_.AddProperty<int>("character collision", &QUADTREE->collision_result_pool_[0].collide_type);
+	gw_property_.AddProperty<UINT>("culling nodes", &QUADTREE->culling_nodes);
 
 	EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 
@@ -155,6 +155,7 @@ void InGameScene::OnRender()
 	
 	level.Update();
 	level.Render();
+	//QUADTREE->Render();
 
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
