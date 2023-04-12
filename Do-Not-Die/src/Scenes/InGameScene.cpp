@@ -118,7 +118,7 @@ void InGameScene::OnUpdate()
 		enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
 
 		//auto player = SCENE_MGR->GetPlayer<Player>(0);
-		//player->SetPos(level.GetGuideLines()->at(guidlwwwwwwwwwwwww ine_index).line_nodes[0]);
+		//player->SetPos(level.GetGuideLines()->at(guidline_index).line_nodes[0]);
 		
 		cur_time = 0.0f;
 
