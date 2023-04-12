@@ -2,7 +2,7 @@
 
 void HealKit::OnCreate()
 {
-	item_icon_ = "";
+	item_icon_ = "T_HealKit.png"; 
 	item_count_ = 0;
 }
 
