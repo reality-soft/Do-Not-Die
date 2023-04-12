@@ -11,7 +11,6 @@ void Player::OnInit(entt::registry& registry)
 	max_hp_ = cur_hp_ = 100;
 
 	reality::C_SkeletalMesh skm;
-	skm.local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
 	skm.skeletal_mesh_id = "SM_Chr_Biker_Male_01.skmesh";
 	skm.vertex_shader_id = "SkinningVS.cso";
 	registry.emplace_or_replace<reality::C_SkeletalMesh>(entity_id_, skm);
@@ -53,6 +52,9 @@ void Player::OnInit(entt::registry& registry)
 
 	transform_matrix_ = XMMatrixTranslation(0, 100, 0);
 	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
+
+	C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
+	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
 
 	// create anim slot
 	AnimationBase animation_base;
