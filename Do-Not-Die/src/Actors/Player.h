@@ -1,6 +1,11 @@
 #pragma once
 #include "Engine_include.h"
 #include "AnimationStateMachine.h"
+
+#define INVENTORY_MAX 4
+
+class ItemBase;
+
 using namespace reality;
 
 class Player : public Character
@@ -44,7 +49,11 @@ private:
 	int max_hp_;
 	int cur_hp_;
 	bool is_aiming_ = false;
-
+private:
+	vector<shared_ptr<ItemBase>> inventory_;
+public:
+	bool AcquireItem(shared_ptr<ItemBase> item, int count = 1);
+	vector<shared_ptr<ItemBase>>& GetInventory();
 public:
 	bool fire_ = false;
 };

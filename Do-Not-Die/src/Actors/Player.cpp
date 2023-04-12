@@ -1,5 +1,7 @@
 #include "Player.h"
 #include "Weapon.h"
+#include "ItemBase.h"
+#include "HealKit.h"
 
 using namespace reality;
 
@@ -59,6 +61,13 @@ void Player::OnInit(entt::registry& registry)
 
 	// FlashLight
 	AddFlashLight();
+
+
+	// ITEM TEST CODE
+	shared_ptr<HealKit> heal_kit = make_shared<HealKit>();
+	heal_kit->OnCreate();
+	heal_kit->AddCount(1);
+	inventory_.push_back(heal_kit);
 }
 
 void Player::OnUpdate()
@@ -272,4 +281,33 @@ void Player::UpdateFlashLight()
 		spot_light_comp.spot_light.range = 0.0f;
 	}
 	
+}
+
+bool Player::AcquireItem(shared_ptr<ItemBase> item, int count)
+{
+	string item_id = typeid(item.get()).name();
+
+	// 1. If item exists in inventory.
+	for (int i = 0; i < inventory_.size(); i++)
+	{
+		if (item_id == typeid(inventory_[i].get()).name())
+		{
+			inventory_[i]->AddCount(count);
+			return true;
+		}
+	}
+
+	// 2. if Item doesn't exist in inventory, Check Inventory
+	if (inventory_.size() >= INVENTORY_MAX)
+		return false;
+	else
+	{
+		inventory_.push_back(item);
+		return true;
+	}
+}
+
+vector<shared_ptr<ItemBase>>& Player::GetInventory()
+{
+	return inventory_;
 }
