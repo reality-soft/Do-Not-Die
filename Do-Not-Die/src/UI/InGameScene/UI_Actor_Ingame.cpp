@@ -2,6 +2,7 @@
 #include "UI_Actor_Ingame.h"
 #include "SceneMgr.h"
 #include "InGameScene.h"
+#include "ItemBase.h"
 
 using namespace reality;
 
@@ -44,6 +45,26 @@ void UI_Actor_Ingame::CreateIngameUI()
 	status_ui = make_shared<UI_Image>();
 	status_ui->InitImage("T_ItemUI.png");
 	status_ui->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height - 150.0f }, 512.0f, 200.0f);
+
+	inven_[0] = make_shared<UI_Image>();
+	inven_[0]->InitImage("");
+	inven_[0]->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
+	//status_ui->AddChildUI(inven_1_);
+
+	inven_[1] = make_shared<UI_Image>();
+	inven_[1]->InitImage("");
+	inven_[1]->SetLocalRectByCenter({ 203.5f, 76.5f }, 90.0f, 90.0f);
+	//status_ui->AddChildUI(inven_2_);
+
+	inven_[2] = make_shared<UI_Image>();
+	inven_[2]->InitImage("");
+	inven_[2]->SetLocalRectByCenter({ 306.5f, 76.5f }, 90.0f, 90.0f);
+	//status_ui->AddChildUI(inven_3_);
+
+	inven_[3] = make_shared<UI_Image>();
+	inven_[3]->InitImage("");
+	inven_[3]->SetLocalRectByCenter({ 410.5f, 76.5f }, 90.0f, 90.0f);
+	//status_ui->AddChildUI(inven_4_);
 
 	hp_img_ = make_shared<UI_Image>();
 	status_ui->AddChildUI(hp_img_);
@@ -184,6 +205,22 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	{
 		if (player_->IsAiming())
 			ui_comp_->ui_list.insert(make_pair("CrossHair UI", crosshair_ui_));
+	}
+
+	// Item UI Update
+	if (player_ != nullptr)
+	{
+		auto& inventory = player_->GetInventory();
+		for (int i = 0; i < INVENTORY_MAX; i++)
+		{
+			if (i >= inventory.size())
+				status_ui->DeleteChildUI(inven_[i]);
+			else
+			{
+				status_ui->AddChildUI(inven_[i]);
+				inven_[i]->InitImage(inventory[i]->GetIcon());
+			}
+		}
 	}
 	
 }
