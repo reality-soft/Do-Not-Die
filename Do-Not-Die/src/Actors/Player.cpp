@@ -2,6 +2,7 @@
 #include "Weapon.h"
 #include "ItemBase.h"
 #include "HealKit.h"
+#include "HealFood.h"
 
 using namespace reality;
 
@@ -75,6 +76,10 @@ void Player::OnInit(entt::registry& registry)
 	heal_kit->OnCreate();
 	heal_kit->AddCount(1);
 	inventory_.push_back(heal_kit);
+	shared_ptr<HealFood> heal_food = make_shared<HealFood>();
+	heal_food->OnCreate();
+	heal_food->AddCount(1);
+	inventory_.push_back(heal_food);
 }
 
 void Player::OnUpdate()
