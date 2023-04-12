@@ -22,6 +22,7 @@ namespace reality
 		shared_ptr<UI_Minimap>	minimap_ui;
 
 		shared_ptr<UI_Image>	status_ui;
+			shared_ptr<UI_Image>	inven_[4];
 			shared_ptr<UI_Image>	hp_img_;
 
 		shared_ptr<UI_Image>	objective_ui_;
