@@ -33,7 +33,7 @@ void Player::OnInit(entt::registry& registry)
 	XMMATRIX socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
 		* XMMatrixRotationX(XMConvertToRadians(180))
 		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
-	socket_component.AddSocket("RightHand", skeleton_id, skm.local, socket_offset);
+	socket_component.AddSocket("RightHand", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 	registry.emplace<C_Socket>(entity_id_, socket_component);
 
 	C_StaticMesh static_mesh_component;
@@ -70,13 +70,13 @@ void Player::OnInit(entt::registry& registry)
 
 void Player::OnUpdate()
 {
-	//C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-	//XMVECTOR scale, rotation, translation;
-	//XMMatrixDecompose(&scale, &rotation, &translation, transform_matrix_);
-	//XMMATRIX rotation_matrix = XMMatrixRotationY(camera->pitch_yaw.y);
-	//transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, translation, rotation_matrix);
-	//front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
-	//right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
+	C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
+	XMVECTOR scale, rotation, translation;
+	XMMatrixDecompose(&scale, &rotation, &translation, transform_matrix_);
+	XMMATRIX rotation_matrix = XMMatrixRotationY(camera->pitch_yaw.y);
+	transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, translation, rotation_matrix);
+	front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
+	right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
 
 	// FlashLight Update
 	UpdateFlashLight();
