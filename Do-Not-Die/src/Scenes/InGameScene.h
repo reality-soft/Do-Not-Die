@@ -49,8 +49,6 @@ private:
 	reality::MovementSystem  sys_movement;
 	reality::UISystem		sys_ui;
 
-	StaticObject test_object;
-
 private:
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;

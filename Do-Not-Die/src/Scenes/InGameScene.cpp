@@ -32,6 +32,7 @@ void InGameScene::OnInit()
 
 	sys_camera.SetSpeed(1000);
 	sys_camera.SetFarZ(10000.f);
+	sys_camera.SetFov(XMConvertToRadians(45));
 	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
 	sys_light.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
@@ -75,6 +76,7 @@ void InGameScene::OnInit()
 	//QUADTREE->Init(&level, 3, reg_scene_);
 	QUADTREE->Init(&level, reg_scene_);
 	QUADTREE->ImportQuadTreeData("../../Contents/BinaryPackage/QuadTreeData_01.matdat");
+	QUADTREE->SetSpaceHeight(-100.0f, 3000.0f);
 	QUADTREE->CreatePhysicsCS();
 	
 	// LOADING : LOADING_ACTOR
@@ -87,7 +89,7 @@ void InGameScene::OnInit()
 	environment_.SetLightProperty(0.2f, 0.2f);
 
 	gw_property_.AddProperty<float>("FPS", &TIMER->fps);
-	gw_property_.AddProperty<UINT>("culling nodes", &QUADTREE->culling_nodes);
+	gw_property_.AddProperty<UINT>("visible nodes", &QUADTREE->visible_nodes);
 
 	EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 
@@ -134,7 +136,7 @@ void InGameScene::OnUpdate()
 	sys_effect.OnUpdate(reg_scene_);
 	sys_sound.OnUpdate(reg_scene_);
 	QUADTREE->Frame(&sys_camera);
-	QUADTREE->UpdatePhysics("SimpleCapsuleCS.cso");
+	QUADTREE->UpdatePhysics("PhysicsCS.cso");
 
 	environment_.Update(&sys_camera, &sys_light);
 
@@ -155,7 +157,6 @@ void InGameScene::OnRender()
 	
 	level.Update();
 	level.Render();
-	//QUADTREE->Render();
 
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
