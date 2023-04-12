@@ -19,7 +19,8 @@ void InGameScene::OnInit()
 
 	WRITER->Init();
 	//reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
-
+	//FBX->ImportAndSaveFbx("../../Contents/FBX/CapsuleMesh.fbx", FbxImportOption(), FbxVertexOption::BY_CONTROL_POINT);
+	
 
 	// LOADING : LOADING_SYSTEM
 	loading_progress = LOADING_SYSTEM;
@@ -77,6 +78,7 @@ void InGameScene::OnInit()
 	QUADTREE->ImportQuadTreeData("../../Contents/BinaryPackage/QuadTreeData_01.matdat");
 	QUADTREE->SetSpaceHeight(-100.0f, 3000.0f);
 	QUADTREE->CreatePhysicsCS();
+	QUADTREE->InitCollisionMeshes();
 	
 	// LOADING : LOADING_ACTOR
 	loading_progress = LOADING_ACTOR;
@@ -156,6 +158,8 @@ void InGameScene::OnRender()
 	
 	level.Update();
 	level.Render();
+
+	QUADTREE->RenderCollisionMeshes();
 
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
