@@ -23,42 +23,42 @@ void UI_Actor_StartScene::CreateUI()
 {
 	ui_comp_ = &reg_scene_->get<C_UI>(GetEntityId());
 
-	float window_size_width = ENGINE->GetWindowSize().x;
-	float window_size_height = ENGINE->GetWindowSize().y;
+	float win_size_1920_width = E_Resolution_Size[E_Resolution::R1920x1080].x;
+	float win_size_1920_height = E_Resolution_Size[E_Resolution::R1920x1080].y;
 
 	// Background UI
 	background_ = make_shared<UI_Image>();
 	background_->InitImage("T_StartScene_background.png");
-	background_->SetLocalRectByMin({ 0, 0 }, window_size_width, window_size_height);
+	background_->SetLocalRectByMin({ 0, 0 }, win_size_1920_width, win_size_1920_height);
 	ui_comp_->ui_list.insert({ "Background", background_ });
 	
 	// New Game Button
 	newgame_button_ = make_shared<UI_Button>();
 	newgame_button_->InitButton("T_Button_NewGame_Normal.png", "T_Button_NewGame_Hover.png", "T_Button_NewGame_Pushed.png");
-	newgame_button_->SetLocalRectByMin({ window_size_width * 3.0f / 4.0f, window_size_height * 3.0f / 5.0f }, 200.0f, 70.0f);
+	newgame_button_->SetLocalRectByMin({ win_size_1920_width * 3.0f / 4.0f, win_size_1920_height * 3.0f / 5.0f }, 200.0f, 70.0f);
 	ui_comp_->ui_list.insert({ "New Game Button", newgame_button_ });
 
 	// Load Game Button
 	loadinggame_button = make_shared<UI_Button>();
 	loadinggame_button->InitButton("T_Button_LoadGame_Normal.png", "T_Button_LoadGame_Hover.png", "T_Button_LoadGame_Pushed.png");
-	loadinggame_button->SetLocalRectByMin({ window_size_width * 3.0f / 4.0f, window_size_height * 3.0f / 5.0f + 70.0f * 1.0f }, 200.0f, 70.0f);
+	loadinggame_button->SetLocalRectByMin({ win_size_1920_width * 3.0f / 4.0f, win_size_1920_height * 3.0f / 5.0f + 70.0f * 1.0f }, 200.0f, 70.0f);
 	ui_comp_->ui_list.insert({ "Load Game Button", loadinggame_button });
 
 	// Option Button
 	option_button_ = make_shared<UI_Button>();
 	option_button_->InitButton("T_Button_Option_Normal.png", "T_Button_Option_Hover.png", "T_Button_Option_Pushed.png");
-	option_button_->SetLocalRectByMin({ window_size_width * 3.0f / 4.0f, window_size_height * 3.0f / 5.0f + 70.0f * 2.0f }, 200.0f, 70.0f);
+	option_button_->SetLocalRectByMin({ win_size_1920_width * 3.0f / 4.0f, win_size_1920_height * 3.0f / 5.0f + 70.0f * 2.0f }, 200.0f, 70.0f); 
 	ui_comp_->ui_list.insert({ "Option Button", option_button_ });
 
 	// Exit Button
 	exit_button_ = make_shared<UI_Button>();
 	exit_button_->InitButton("T_Button_Exit_Normal.png", "T_Button_Exit_Hover.png", "T_Button_Exit_Pushed.png");
-	exit_button_->SetLocalRectByMin({ window_size_width * 3.0f / 4.0f, window_size_height * 3.0f / 5.0f + 70.0f * 3.0f }, 200.0f, 70.0f);
+	exit_button_->SetLocalRectByMin({ win_size_1920_width * 3.0f / 4.0f, win_size_1920_height * 3.0f / 5.0f + 70.0f * 3.0f }, 200.0f, 70.0f); 
 	ui_comp_->ui_list.insert({ "Exit Button", exit_button_ });
 
 	// Opaque
-	option_opaque_ = make_shared<UI_OptionWindow>();
-	option_opaque_->InitOptionWindow();
+	option_window_ = make_shared<UI_OptionWindow>();
+	option_window_->InitOptionWindow();
 }
 
 void UI_Actor_StartScene::UpdateUI()
@@ -85,8 +85,15 @@ void UI_Actor_StartScene::UpdateUI()
 	// If Option Window Opened
 	if (ui_comp_->ui_list.find("Option Window") != ui_comp_->ui_list.end())
 	{
-		if (option_opaque_->GetCloseButtonState() == E_UIState::UI_SELECT || DINPUT->GetKeyState(DIK_ESCAPE) == KEY_PUSH)
+		if (option_window_->GetCloseButtonState() == E_UIState::UI_SELECT || DINPUT->GetKeyState(DIK_ESCAPE) == KEY_PUSH)
 			CloseOptionWindow();
+	}
+
+	if (option_window_->resolution_value != option_window_->option_resolution_list_box_->GetCurrentItem())
+	{
+		option_window_->resolution_value = option_window_->option_resolution_list_box_->GetCurrentItem();
+		ENGINE->Resize((E_Resolution)option_window_->option_resolution_list_box_->GetCurrentIndex());
+		CloseOptionWindow();
 	}
 }
 
@@ -99,7 +106,7 @@ void UI_Actor_StartScene::OpenOptionWindow()
 
 	option_button_->SetCurrentState(E_UIState::UI_NORMAL);
 
-	ui_comp_->ui_list.insert({ "Option Window", option_opaque_ });
+	ui_comp_->ui_list.insert({ "Option Window", option_window_ });
 }
 
 void UI_Actor_StartScene::CloseOptionWindow()
@@ -109,7 +116,7 @@ void UI_Actor_StartScene::CloseOptionWindow()
 	option_button_->On();
 	exit_button_->On();
 
-	option_opaque_->SetCloseButtonState(E_UIState::UI_NORMAL);
+	option_window_->SetCloseButtonState(E_UIState::UI_NORMAL);
 
 	ui_comp_->ui_list.erase("Option Window");
 }

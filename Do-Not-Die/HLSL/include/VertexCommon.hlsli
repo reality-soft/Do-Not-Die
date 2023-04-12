@@ -17,7 +17,7 @@ float4x4 ViewProjection()
 // Identity Matrix
 float4x4 IdentityMatrix()
 {
-    return float4x4(  
+    return float4x4(
         1.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,  
         0.0, 0.0, 1.0, 0.0,

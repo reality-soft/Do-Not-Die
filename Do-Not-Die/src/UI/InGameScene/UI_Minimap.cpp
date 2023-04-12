@@ -63,7 +63,8 @@ void UI_Minimap::RenderThisUI()
 {
 	UpdateTextureCoordAlongPlayer();
 
-	UISystem::SetCbData(XMMatrixTranspose(rect_transform_.world_matrix));
+	auto resolution = ENGINE->GetWindowResolution();
+	UISystem::SetCbData(XMMatrixTranspose(rect_transform_[resolution].world_matrix));
 
 	// Set Topology
 	DX11APP->GetDeviceContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

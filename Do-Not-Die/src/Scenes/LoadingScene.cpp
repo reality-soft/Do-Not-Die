@@ -18,9 +18,9 @@ void LoadingScene::OnUpdate()
 {
 	sys_sound.OnUpdate(reg_scene_);
 
-	static float init_width = loading_scene_ui.progress_bar_->rect_transform_.local_rect.width;
+	static float init_width = loading_scene_ui.progress_bar_->rect_transform_[E_Resolution::R1920x1080].local_rect.width;
 	static float percentage = 0;
-	static float speed = 10.0f;
+	static float speed = 100.0f;
 
 	if (ingame_scene == nullptr)
 	{
@@ -35,38 +35,38 @@ void LoadingScene::OnUpdate()
 		case E_IngameLoading::LOADING_START:
 			if (percentage < 10.0f)
 				percentage += speed * TIMER->GetDeltaTime();
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, 
-				init_width * percentage / 100.0f, loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.min,
+				init_width * percentage / 100.0f, loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.height);
 			break; 
 		case E_IngameLoading::LOADING_MANAGER:
 			if (percentage < 20.0f)
 				percentage += speed * TIMER->GetDeltaTime();
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, init_width * percentage / 100.0f, 
-				loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.min, init_width * percentage / 100.0f,
+				loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.height);
 			break; 
 		case E_IngameLoading::LOADING_SYSTEM:
 			if (percentage < 40.0f)
 				percentage += speed * TIMER->GetDeltaTime();
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, init_width * percentage / 100.0f, 
-				loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.min, init_width * percentage / 100.0f,
+				loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.height);
 			break;
 		case E_IngameLoading::LOADING_MAP:
 			if (percentage < 80.0f)
 				percentage += speed * TIMER->GetDeltaTime();
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, init_width * percentage / 100.0f, 
-				loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.min, init_width * percentage / 100.0f,
+				loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.height);
 			break;
 		case E_IngameLoading::LOADING_ACTOR:
 			if (percentage < 90.0f)
 				percentage += speed * TIMER->GetDeltaTime();
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, init_width * percentage / 100.0f, 
-				loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.min, init_width * percentage / 100.0f,
+				loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.height);
 			break;
 		case E_IngameLoading::LOADING_FINISHED:
 			if (percentage <= 100.0f)
 				percentage += speed * TIMER->GetDeltaTime();
-			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_.local_rect.min, init_width * percentage / 100.0f, 
-				loading_scene_ui.progress_bar_->rect_transform_.local_rect.height);
+			loading_scene_ui.progress_bar_->SetLocalRectByMin(loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.min, init_width * percentage / 100.0f,
+				loading_scene_ui.progress_bar_->rect_transform_[R1920x1080].local_rect.height);
 			if (percentage > 100.0f)
 			{
 				Sleep(200);

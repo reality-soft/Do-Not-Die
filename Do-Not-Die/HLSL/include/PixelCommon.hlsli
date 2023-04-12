@@ -50,7 +50,7 @@ cbuffer CbDistanceFog : register(b4)
 {
     float4 fog_color;
     float3 eye_position;
-    float distance;
+    float fog_distance;
 }
 
 // White Basic color  
@@ -276,9 +276,9 @@ float4 ApplySpotLight(float4 color, float3 normal, float3 world_pos, float3 view
 float4 ApplyDistanceFog(float4 color, float3 pixel_world)
 {
     float3 fog_start = eye_position;
-    float3 fog_end = normalize(pixel_world - fog_start) * distance;
+    float3 fog_end = normalize(pixel_world - fog_start) * fog_distance;
 
-    float f = 1 / pow(e, pow(length(pixel_world - fog_start) / distance, 2));
+    float f = 1 / pow(e, pow(length(pixel_world - fog_start) / fog_distance, 2));
 
     return f * color + (1.0f - f) * fog_color;
 }

@@ -18,7 +18,7 @@ namespace reality
 		shared_ptr<UI_Button>	option_button_;
 		shared_ptr<UI_Button>	exit_button_;
 
-		shared_ptr<UI_OptionWindow>	option_opaque_;
+		shared_ptr<UI_OptionWindow>	option_window_;
 	private:
 		void CreateUI();
 		void UpdateUI();
