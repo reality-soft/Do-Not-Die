@@ -26,10 +26,7 @@ void InGameScene::OnInit()
 
 	sys_render.OnCreate(reg_scene_);
 	sys_camera.OnCreate(reg_scene_);
-
-	ingame_ui.OnInit(reg_scene_);
 	sys_ui.OnCreate(reg_scene_);
-
 	sys_camera.SetSpeed(1000);
 	sys_camera.SetFarZ(10000.f);
 	sys_camera.SetFov(XMConvertToRadians(45));
@@ -37,6 +34,8 @@ void InGameScene::OnInit()
 	sys_light.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
 	sys_sound.OnCreate(reg_scene_);
+
+	ingame_ui.OnInit(reg_scene_);
 
 	// LOADING : LOADING_MAP
 	loading_progress = LOADING_MAP;
@@ -121,7 +120,7 @@ void InGameScene::OnUpdate()
 		enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
 
 		//auto player = SCENE_MGR->GetPlayer<Player>(0);
-		//player->SetPos(level.GetGuideLines()->at(guidlwwwwwwwwwwwww ine_index).line_nodes[0]);
+		//player->SetPos(level.GetGuideLines()->at(guidline_index).line_nodes[0]);
 		
 		cur_time = 0.0f;
 

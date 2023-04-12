@@ -1,5 +1,8 @@
 #include "Player.h"
 #include "Weapon.h"
+#include "ItemBase.h"
+#include "HealKit.h"
+#include "HealFood.h"
 
 using namespace reality;
 
@@ -11,8 +14,6 @@ void Player::OnInit(entt::registry& registry)
 	max_hp_ = cur_hp_ = 100;
 
 	reality::C_SkeletalMesh skm;
-	skm.local = XMMatrixIdentity();
-	skm.world = XMMatrixIdentity();
 	skm.skeletal_mesh_id = "SM_Chr_Biker_Male_01.skmesh";
 	skm.vertex_shader_id = "SkinningVS.cso";
 	registry.emplace_or_replace<reality::C_SkeletalMesh>(entity_id_, skm);
@@ -29,25 +30,34 @@ void Player::OnInit(entt::registry& registry)
 	sound_listener.local = camera.local;
 	registry.emplace<C_SoundListener>(entity_id_, sound_listener);
 
+	C_Socket socket_component;
+	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
+	int skeleton_id = skeletal_mesh->skeleton.bone_name_id_map["Hand_R"];
+	XMMATRIX socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(180))
+		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
+	socket_component.AddSocket("RightHand", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+	registry.emplace<C_Socket>(entity_id_, socket_component);
 
-	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(reality::C_CapsuleCollision));
+	C_StaticMesh static_mesh_component;
+	static_mesh_component.local = XMMatrixScalingFromVector({ 1.4f, 1.4f, 1.4f, 0.0f });
+	static_mesh_component.world = XMMatrixIdentity();
+	static_mesh_component.static_mesh_id = "SK_Handgun_01.stmesh";
+	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
+	static_mesh_component.socket_name = "RightHand";
+	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
+
+	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_CapsuleCollision));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SkeletalMesh));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_Camera));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SoundListener));
+	transform_tree_.AddNodeToNode(TYPE_ID(C_SkeletalMesh), TYPE_ID(C_Socket));
 
 	transform_matrix_ = XMMatrixTranslation(0, 100, 0);
 	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
 
-	reality::C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
-	skm_ptr->local = XMMatrixRotationY(XMConvertToRadians(180)) * XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 });
-
-	// weapon
-	entt::entity weapon_id = SCENE_MGR->GetScene(INGAME)->AddActor<Weapon>(entity_id_);
-	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
-	int skeleton_id = skeletal_mesh->skeleton.bone_name_id_map["Hand_R"];
-	Weapon* weapon = SCENE_MGR->GetScene(INGAME)->GetActor<Weapon>(weapon_id);
-	weapon->SetSocket(skeleton_id);
-	weapon->SetOwnerTransform(skm_ptr->local);
+	C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
+	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
 
 	// create anim slot
 	AnimationBase animation_base;
@@ -59,6 +69,17 @@ void Player::OnInit(entt::registry& registry)
 
 	// FlashLight
 	AddFlashLight();
+
+
+	// ITEM TEST CODE
+	shared_ptr<HealKit> heal_kit = make_shared<HealKit>();
+	heal_kit->OnCreate();
+	heal_kit->AddCount(1);
+	inventory_.push_back(heal_kit);
+	shared_ptr<HealFood> heal_food = make_shared<HealFood>();
+	heal_food->OnCreate();
+	heal_food->AddCount(1);
+	inventory_.push_back(heal_food);
 }
 
 void Player::OnUpdate()
@@ -272,4 +293,33 @@ void Player::UpdateFlashLight()
 		spot_light_comp.spot_light.range = 0.0f;
 	}
 	
+}
+
+bool Player::AcquireItem(shared_ptr<ItemBase> item, int count)
+{
+	string item_id = typeid(item.get()).name();
+
+	// 1. If item exists in inventory.
+	for (int i = 0; i < inventory_.size(); i++)
+	{
+		if (item_id == typeid(inventory_[i].get()).name())
+		{
+			inventory_[i]->AddCount(count);
+			return true;
+		}
+	}
+
+	// 2. if Item doesn't exist in inventory, Check Inventory
+	if (inventory_.size() >= INVENTORY_MAX)
+		return false;
+	else
+	{
+		inventory_.push_back(item);
+		return true;
+	}
+}
+
+vector<shared_ptr<ItemBase>>& Player::GetInventory()
+{
+	return inventory_;
 }
