@@ -180,46 +180,25 @@ void InGameScene::CreateImpactEffectFromRay()
 
 	RayShape ray = sys_camera.CreateFrontRay();
 
-	//RayCallback raycallback_node = QUADTREE->RaycastAdjustLevel(ray, 10000.0f);
-	//auto raycallback_pair = QUADTREE->RaycastAdjustActor(ray);
-	//if (raycallback_pair.first.success && raycallback_node.success)
-	//{
-	//	if (raycallback_pair.first.distance < raycallback_node.distance)
-	//	{
-	//		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
-	//	}
-	//	else
-	//		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
-	//}
-	//else if (raycallback_pair.first.success)
-	//{
-	//	EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
-	//}
-	//else if (raycallback_node.success)
-	//	EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
+	RayCallback raycallback = QUADTREE->Raycast(ray);
+
+	if (raycallback.success && raycallback.is_actor)
+		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback.point, raycallback.normal);
+	
+	else if (raycallback.success && !raycallback.is_actor)
+		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback.point, raycallback.normal);
 }
 
 void InGameScene::CreateExplosionEffectFromRay()
 {
-	//RayShape ray = sys_camera.CreateFrontRay();
+	RayShape ray = sys_camera.CreateFrontRay();
 
-	//RayCallback raycallback_node = QUADTREE->RaycastAdjustLevel(ray, 10000.0f);
-	//auto raycallback_pair = QUADTREE->RaycastAdjustActor(ray);
-	//if (raycallback_pair.first.success && raycallback_node.success)
-	//{
-	//	if (raycallback_pair.first.distance < raycallback_node.distance)
-	//	{
-	//		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_pair.first.point);
-	//	}
-	//	else
-	//		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_node.point);
-	//}
-	//else if (raycallback_pair.first.success)
-	//{
-	//	EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_pair.first.point);
-	//}
-	//else if (raycallback_node.success)
-	//	EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_node.point);
+	RayCallback raycallback = QUADTREE->Raycast(ray);
+
+	if (raycallback.success)
+	{
+		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback.point);		
+	}
 }
 
 void InGameScene::CursorStateUpdate()
