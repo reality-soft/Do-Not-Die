@@ -48,12 +48,12 @@ private:
 	reality::EffectSystem sys_effect;
 	reality::MovementSystem  sys_movement;
 	reality::UISystem		sys_ui;
-
+public:
+	reality::CameraSystem GetCameraSystem() { return sys_camera; }
 private:
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
 	UI_Actor_Ingame ingame_ui;
-	void CreateImpactEffectFromRay();
 	void CreateExplosionEffectFromRay();
 	void CursorStateUpdate();
 

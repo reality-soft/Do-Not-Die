@@ -1,10 +1,7 @@
 #include "InGameScene.h"
 #include "Player.h"
 #include "Enemy.h"
-#include "FX_BloodImpact.h"
-#include "FX_ConcreteImpact.h"
 #include "FX_Flame.h"
-#include "FX_Muzzle.h"
 #include "FX_Explosion.h"
 #include "FbxMgr.h"
 
@@ -143,9 +140,6 @@ void InGameScene::OnUpdate()
 
 	ingame_ui.OnUpdate();
 
-	if (DINPUT->GetMouseState(L_BUTTON) == KeyState::KEY_PUSH)
-		CreateImpactEffectFromRay();
-
 	if (DINPUT->GetKeyState(DIK_G) == KeyState::KEY_PUSH)
 		CreateExplosionEffectFromRay();
 
@@ -171,25 +165,6 @@ void InGameScene::OnRelease()
 {
 	QUADTREE->Release();
 	reality::RESOURCE->Release();
-}
-
-void InGameScene::CreateImpactEffectFromRay()
-{
-	// Make Muzzle when Shot
-	auto player_transform = SCENE_MGR->GetPlayer<Player>(0)->GetTransformMatrix();
-	XMVECTOR s, r, t;
-	XMMatrixDecompose(&s, &r, &t, player_transform);
-	EFFECT_MGR->SpawnEffect<FX_Muzzle>(t);
-
-	RayShape ray = sys_camera.CreateFrontRay();
-
-	RayCallback raycallback = QUADTREE->Raycast(ray);
-
-	if (raycallback.success && raycallback.is_actor)
-		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback.point, raycallback.normal);
-	
-	else if (raycallback.success && !raycallback.is_actor)
-		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback.point, raycallback.normal);
 }
 
 void InGameScene::CreateExplosionEffectFromRay()

@@ -1,8 +1,13 @@
 #include "Player.h"
 #include "Weapon.h"
-#include "ItemBase.h"
+#include "InGameScene.h"
 #include "HealKit.h"
 #include "HealFood.h"
+#include "FX_BloodImpact.h"
+#include "FX_ConcreteImpact.h"
+#include "FX_Flame.h"
+#include "FX_Muzzle.h"
+#include "FX_Explosion.h"
 
 using namespace reality;
 
@@ -178,6 +183,23 @@ void Player::Fire()
 {
 	if (is_aiming_) {
 		fire_ = true;
+
+		// Make Muzzle when Shot
+		auto player_transform = GetTransformMatrix();
+		XMVECTOR s, r, t;
+		XMMatrixDecompose(&s, &r, &t, player_transform);
+		EFFECT_MGR->SpawnEffect<FX_Muzzle>(t);
+
+		// Make Shot Impact Effect
+		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+ 		RayShape ray = ingame_scene->GetCameraSystem().CreateFrontRay();
+		RayCallback raycallback = QUADTREE->Raycast(ray);
+
+		if (raycallback.success && raycallback.is_actor)
+			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback.point, raycallback.normal);
+
+		else if (raycallback.success && !raycallback.is_actor)
+			EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback.point, raycallback.normal);
 	}
 }
 
