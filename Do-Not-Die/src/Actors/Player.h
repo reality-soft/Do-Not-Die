@@ -49,6 +49,9 @@ private:
 	int cur_hp_;
 	bool is_aiming_ = false;
 private:
+	float fire_cooltime_ = 0.2f;
+	float fire_timer_;
+private:
 	vector<shared_ptr<ItemBase>>	inventory_;
 	vector<float>					inventory_timer_;
 public:
@@ -57,7 +60,7 @@ public:
 	vector<shared_ptr<ItemBase>>&	GetInventory();
 	vector<float>&					GetInventoryTimer();
 private:
-	void UpdateInventory();
+	void UpdateTimer();
 public:
 	bool fire_ = false;
 };

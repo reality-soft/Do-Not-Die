@@ -75,6 +75,8 @@ void Player::OnInit(entt::registry& registry)
 	// FlashLight
 	AddFlashLight();
 
+	fire_timer_ = 0.0f;
+
 	// Inventory
 	inventory_.resize(INVENTORY_MAX);
 	inventory_timer_.resize(INVENTORY_MAX);
@@ -104,7 +106,7 @@ void Player::OnUpdate()
 	// FlashLight Update
 	UpdateFlashLight();
 
-	UpdateInventory();
+	UpdateTimer();
 }
 
 void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
@@ -183,6 +185,12 @@ void Player::Idle()
 void Player::Fire()
 {
 	if (is_aiming_) {
+
+		if (fire_timer_ < fire_cooltime_)
+			return;
+
+		fire_timer_ -= fire_cooltime_;
+
 		fire_ = true;
 
 		// Make Muzzle when Shot
@@ -323,8 +331,13 @@ void Player::UpdateFlashLight()
 	
 }
 
-void Player::UpdateInventory()
+void Player::UpdateTimer()
 {
+	// Fire Timer
+	if(fire_timer_ < fire_cooltime_)
+		fire_timer_ += TIMER->GetDeltaTime();
+
+	// Inventory Timer
 	for (int i = 0; i < inventory_.size(); i++)
 	{
 		if (inventory_[i] == NULL)
