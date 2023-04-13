@@ -4,7 +4,7 @@ void HealFood::OnCreate()
 {
 	item_icon_ = "T_HealFood.png";
 	item_count_ = 0;
-	item_cooltime_ = 5.0f;
+	item_cooltime_ = 3.0f;
 
 	heal_amount = 15.0f;
 }
