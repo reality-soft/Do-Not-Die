@@ -226,7 +226,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 			else
 			{
 				status_ui->AddChildUI(inven_[i]);
-				inven_[i]->InitImage(inventory[i]->GetIcon());
+				inven_[i]->SetImage(inventory[i]->GetIcon());
 				inven_text_[i]->SetText(to_string(inventory[i]->GetCount()));
 			}
 		}
