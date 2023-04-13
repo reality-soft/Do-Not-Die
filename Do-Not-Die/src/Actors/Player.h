@@ -54,7 +54,8 @@ private:
 public:
 	bool AcquireItem(shared_ptr<ItemBase> item);
 	void UseItem(int slot);
-	vector<shared_ptr<ItemBase>>& GetInventory();
+	vector<shared_ptr<ItemBase>>&	GetInventory();
+	vector<float>&					GetInventoryTimer();
 private:
 	void UpdateInventory();
 public:

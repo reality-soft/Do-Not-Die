@@ -396,3 +396,8 @@ vector<shared_ptr<ItemBase>>& Player::GetInventory()
 {
 	return inventory_;
 }
+
+vector<float>& Player::GetInventoryTimer()
+{
+	return inventory_timer_;
+}
