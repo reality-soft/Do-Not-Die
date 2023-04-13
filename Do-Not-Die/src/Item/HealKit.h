@@ -7,6 +7,6 @@ private:
 	float heal_amount = 30.0f;
 public:
 	void OnCreate() override;
-	void Use() override;
+	void UseItem() override;
 };
 
