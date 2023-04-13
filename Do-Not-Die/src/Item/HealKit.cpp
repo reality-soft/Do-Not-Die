@@ -4,6 +4,9 @@ void HealKit::OnCreate()
 {
 	item_icon_ = "T_HealKit.png"; 
 	item_count_ = 0;
+	item_cooltime_ = 5.0f; 
+	
+	heal_amount = 30.0f;
 }
 
 void HealKit::UseItem()
