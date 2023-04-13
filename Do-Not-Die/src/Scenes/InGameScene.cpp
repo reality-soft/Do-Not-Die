@@ -16,7 +16,10 @@ void InGameScene::OnInit()
 
 	WRITER->Init();
 	//reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
-	//FBX->ImportAndSaveFbx("../../Contents/FBX/CapsuleMesh.fbx", FbxImportOption(), FbxVertexOption::BY_CONTROL_POINT);
+	//FbxImportOption option;
+	//option.import_scale = 10.0f;
+	//option.recalculate_normal = true;
+	//FBX->ImportAndSaveFbx("../../Contents/FBX/DNDLevel_WithCollision_01.fbx", option, FbxVertexOption::BY_POLYGON_VERTEX);
 	
 
 	// LOADING : LOADING_SYSTEM
@@ -72,14 +75,13 @@ void InGameScene::OnInit()
 	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, std::bind(&Player::Fire, character_actor), KEY_HOLD);
 	//INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
 
-	level.Create("DeadPoly_FullLevel_04.stmesh", "LevelVS.cso", "DeadPoly_Level_Collision_04.stmesh");
+	level.Create("DNDLevel_WithCollision_01.stmesh", "LevelVS.cso");
 	//level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_Blocking1.mapdat", GuideLine::GuideType::eBlocking);
 	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_NpcTrack_01.mapdat", GuideLine::GuideType::eNpcTrack);
 
 	//QUADTREE->Init(&level, 3, reg_scene_);
 	QUADTREE->Init(&level, reg_scene_);
 	QUADTREE->ImportQuadTreeData("../../Contents/BinaryPackage/QuadTreeData_01.matdat");
-	QUADTREE->SetSpaceHeight(-100.0f, 3000.0f);
 	QUADTREE->CreatePhysicsCS();
 	QUADTREE->InitCollisionMeshes();
 	
