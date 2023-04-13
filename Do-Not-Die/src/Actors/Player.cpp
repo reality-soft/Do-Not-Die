@@ -75,19 +75,18 @@ void Player::OnInit(entt::registry& registry)
 	// FlashLight
 	AddFlashLight();
 
-
-	// ITEM TEST CODE
+	// Inventory
 	inventory_.resize(INVENTORY_MAX);
 	inventory_timer_.resize(INVENTORY_MAX);
+
+	// ITEM TEST CODE
 	shared_ptr<HealKit> heal_kit = make_shared<HealKit>();
 	heal_kit->OnCreate();
 	heal_kit->AddCount(1);
-	heal_kit->SetOwner(this);
 	AcquireItem(heal_kit);
 	shared_ptr<HealFood> heal_food = make_shared<HealFood>();
 	heal_food->OnCreate();
 	heal_food->AddCount(2);
-	heal_food->SetOwner(this);
 	AcquireItem(heal_food);
 	cur_hp_ = 0;
 }
@@ -361,6 +360,7 @@ bool Player::AcquireItem(shared_ptr<ItemBase> item)
 		if (inventory_[i] == NULL)
 		{
 			inventory_[i] = item;
+			item->SetOwner(this);
 			inventory_timer_[i] = 0;
 			return true;
 		}
