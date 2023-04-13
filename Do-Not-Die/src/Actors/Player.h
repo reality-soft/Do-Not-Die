@@ -44,17 +44,19 @@ public:
 private:
 	void AddFlashLight();
 	void UpdateFlashLight();
-	void UpdateItem();
 private:
 	int max_hp_;
 	int cur_hp_;
 	bool is_aiming_ = false;
 private:
-	vector<shared_ptr<ItemBase>> inventory_;
+	vector<shared_ptr<ItemBase>>	inventory_;
+	vector<float>					inventory_timer_;
 public:
 	bool AcquireItem(shared_ptr<ItemBase> item);
 	void UseItem(int slot);
 	vector<shared_ptr<ItemBase>>& GetInventory();
+private:
+	void UpdateInventory();
 public:
 	bool fire_ = false;
 };

@@ -78,6 +78,7 @@ void Player::OnInit(entt::registry& registry)
 
 	// ITEM TEST CODE
 	inventory_.resize(INVENTORY_MAX);
+	inventory_timer_.resize(INVENTORY_MAX);
 	shared_ptr<HealKit> heal_kit = make_shared<HealKit>();
 	heal_kit->OnCreate();
 	heal_kit->AddCount(1);
@@ -88,6 +89,7 @@ void Player::OnInit(entt::registry& registry)
 	heal_food->AddCount(2);
 	heal_food->SetOwner(this);
 	AcquireItem(heal_food);
+	cur_hp_ = 0;
 }
 
 void Player::OnUpdate()
@@ -103,7 +105,7 @@ void Player::OnUpdate()
 	// FlashLight Update
 	UpdateFlashLight();
 
-	UpdateItem();
+	UpdateInventory();
 }
 
 void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
@@ -322,16 +324,18 @@ void Player::UpdateFlashLight()
 	
 }
 
-void Player::UpdateItem()
+void Player::UpdateInventory()
 {
-	if (DINPUT->GetKeyState(DIK_1) == KEY_PUSH)
-		UseItem(0); 
-	if (DINPUT->GetKeyState(DIK_2) == KEY_PUSH)
-		UseItem(1); 
-	if (DINPUT->GetKeyState(DIK_3) == KEY_PUSH)
-		UseItem(2);
-	if (DINPUT->GetKeyState(DIK_4) == KEY_PUSH)
-		UseItem(3);
+	for (int i = 0; i < inventory_.size(); i++)
+	{
+		if (inventory_[i] == NULL)
+			continue;
+		if (inventory_[i]->GetCooltime() > inventory_timer_[i])
+		{
+			inventory_timer_[i] += TIMER->GetDeltaTime();
+		}
+
+	}
 }
 
 bool Player::AcquireItem(shared_ptr<ItemBase> item)
@@ -357,6 +361,7 @@ bool Player::AcquireItem(shared_ptr<ItemBase> item)
 		if (inventory_[i] == NULL)
 		{
 			inventory_[i] = item;
+			inventory_timer_[i] = 0;
 			return true;
 		}
 			
@@ -374,7 +379,12 @@ void Player::UseItem(int slot)
 	if (inventory_[slot] == NULL)
 		return;
 
+	if (inventory_timer_[slot] < inventory_[slot]->GetCooltime())
+		return;
+
 	inventory_[slot]->Use();
+
+	inventory_timer_[slot] = 0;
 
 	if (inventory_[slot]->GetCount() == 0)
 	{
