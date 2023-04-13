@@ -279,6 +279,7 @@ CapsuleCallback CapsuleToTriangle(CapsuleShape cap, TriangleShape tri)
 
 StructuredBuffer<TriangleShape> level_triangles : register(t0);
 StructuredBuffer<CapsuleShape> character_capsules : register(t1); // capsule_pool_64
+
 RWStructuredBuffer<CollisionResult> collision_result : register(u0); // capsule_pool_64
 
 [numthreads(64, 1, 1)]
@@ -289,6 +290,7 @@ uint3 GTid : SV_GroupThreadID,
 uint GI : SV_GroupIndex)
 {
     CapsuleShape capsule = character_capsules[GTid.x];
+    
     if (capsule.radius < 1.0f)
         return;
     
@@ -298,7 +300,7 @@ uint GI : SV_GroupIndex)
     level_triangles.GetDimensions(triangle_count, stride);
     
     CollisionResult result;
-    result.entity = character_capsules[GTid.x].entity;
+    result.entity = capsule.entity;
     result.collide_type = 0;
     result.floor_position = GetCapsuleBase(capsule);
     
@@ -336,8 +338,7 @@ uint GI : SV_GroupIndex)
                     result.blocking_rays[j] = callback.blocking_ray;
                 }
             }
-        }            
-        
+        }
     }
         
     collision_result[GTid.x] = result;

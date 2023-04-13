@@ -19,7 +19,8 @@ void InGameScene::OnInit()
 
 	WRITER->Init();
 	//reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
-
+	//FBX->ImportAndSaveFbx("../../Contents/FBX/CapsuleMesh.fbx", FbxImportOption(), FbxVertexOption::BY_CONTROL_POINT);
+	
 
 	// LOADING : LOADING_SYSTEM
 	loading_progress = LOADING_SYSTEM;
@@ -77,6 +78,7 @@ void InGameScene::OnInit()
 	QUADTREE->ImportQuadTreeData("../../Contents/BinaryPackage/QuadTreeData_01.matdat");
 	QUADTREE->SetSpaceHeight(-100.0f, 3000.0f);
 	QUADTREE->CreatePhysicsCS();
+	QUADTREE->InitCollisionMeshes();
 	
 	// LOADING : LOADING_ACTOR
 	loading_progress = LOADING_ACTOR;
@@ -157,6 +159,8 @@ void InGameScene::OnRender()
 	level.Update();
 	level.Render();
 
+	QUADTREE->RenderCollisionMeshes();
+
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
 
@@ -179,46 +183,25 @@ void InGameScene::CreateImpactEffectFromRay()
 
 	RayShape ray = sys_camera.CreateFrontRay();
 
-	//RayCallback raycallback_node = QUADTREE->RaycastAdjustLevel(ray, 10000.0f);
-	//auto raycallback_pair = QUADTREE->RaycastAdjustActor(ray);
-	//if (raycallback_pair.first.success && raycallback_node.success)
-	//{
-	//	if (raycallback_pair.first.distance < raycallback_node.distance)
-	//	{
-	//		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
-	//	}
-	//	else
-	//		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
-	//}
-	//else if (raycallback_pair.first.success)
-	//{
-	//	EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback_pair.first.point, raycallback_pair.first.normal);
-	//}
-	//else if (raycallback_node.success)
-	//	EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback_node.point, raycallback_node.normal);
+	RayCallback raycallback = QUADTREE->Raycast(ray);
+
+	if (raycallback.success && raycallback.is_actor)
+		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback.point, raycallback.normal);
+	
+	else if (raycallback.success && !raycallback.is_actor)
+		EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback.point, raycallback.normal);
 }
 
 void InGameScene::CreateExplosionEffectFromRay()
 {
-	//RayShape ray = sys_camera.CreateFrontRay();
+	RayShape ray = sys_camera.CreateFrontRay();
 
-	//RayCallback raycallback_node = QUADTREE->RaycastAdjustLevel(ray, 10000.0f);
-	//auto raycallback_pair = QUADTREE->RaycastAdjustActor(ray);
-	//if (raycallback_pair.first.success && raycallback_node.success)
-	//{
-	//	if (raycallback_pair.first.distance < raycallback_node.distance)
-	//	{
-	//		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_pair.first.point);
-	//	}
-	//	else
-	//		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_node.point);
-	//}
-	//else if (raycallback_pair.first.success)
-	//{
-	//	EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_pair.first.point);
-	//}
-	//else if (raycallback_node.success)
-	//	EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback_node.point);
+	RayCallback raycallback = QUADTREE->Raycast(ray);
+
+	if (raycallback.success)
+	{
+		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback.point);		
+	}
 }
 
 void InGameScene::CursorStateUpdate()

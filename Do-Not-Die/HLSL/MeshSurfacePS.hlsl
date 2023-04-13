@@ -3,7 +3,7 @@
 struct PS_OUT
 {
     float4 p : SV_POSITION;
-    float4 n : NORMAL;
+    float3 n : NORMAL;
     float2 t : TEXCOORD;
     float lod : TEXCOORD1;
 };
