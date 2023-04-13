@@ -12,7 +12,7 @@ void Player::OnInit(entt::registry& registry)
 
 	movement_component_->speed = 150;
 	max_hp_ = cur_hp_ = 100;
-
+	
 	reality::C_SkeletalMesh skm;
 	skm.skeletal_mesh_id = "SM_Chr_Biker_Male_01.skmesh";
 	skm.vertex_shader_id = "SkinningVS.cso";
@@ -68,9 +68,8 @@ void Player::OnInit(entt::registry& registry)
 	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
 
 	// FlashLight
-	AddFlashLight();
-
-
+	AddFlashLight();	
+	
 	// ITEM TEST CODE
 	shared_ptr<HealKit> heal_kit = make_shared<HealKit>();
 	heal_kit->OnCreate();
@@ -161,7 +160,6 @@ void Player::MoveBack()
 void Player::Jump()
 {
 	movement_component_->jump_scale = 1000.0f;
-	movement_state_ = MovementState::GRAVITY_FALL;
 }
 
 void Player::Idle()

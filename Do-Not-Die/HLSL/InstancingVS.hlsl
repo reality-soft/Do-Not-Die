@@ -2,7 +2,7 @@
 
 struct VS_IN
 {
-    float3 p : F3_POSITION;  
+    float3 p : F3_POSITION;
     float3 n : F3_NORMAL;    
     float2 t : F2_TEXTURE;
 };
@@ -22,7 +22,7 @@ struct IntanceData
 StructuredBuffer<IntanceData> instance_buffer : register(t0);
 
 VS_OUT VS(VS_IN input, uint inst : SV_InstanceID)
-{    
+{
     VS_OUT output = (VS_OUT) 0;
     
     float4 local = float4(input.p, 1.0f);

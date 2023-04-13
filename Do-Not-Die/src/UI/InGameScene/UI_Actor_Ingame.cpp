@@ -20,7 +20,7 @@ void UI_Actor_Ingame::OnInit(entt::registry& registry)
 
 void UI_Actor_Ingame::OnUpdate()
 {
-	UIActor::OnUpdate();
+ 	UIActor::OnUpdate();
 
 	UpdateIngameUI();
 

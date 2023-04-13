@@ -29,7 +29,7 @@ struct CollisionResult
     int collide_type;
     
     float3 floor_position;
-    RayShape blocking_rays[4];
+    float4 wall_planes[4];
 };
 
 struct RayTriCallback
@@ -51,7 +51,7 @@ struct CapsuleCallback
 {
     int collide_type; // 0 : none, 1 : floor, 2 : blocking
     float3 floor_position;
-    RayShape blocking_ray;
+    float4 wall_plane;
 };
 
 RayShape EmptyRay()
@@ -77,6 +77,13 @@ float3 GetCapsuleBase(CapsuleShape capsule)
     base.y -= capsule.radius;
     
     return base;
+}
+
+float4 GetTriPlane(TriangleShape tri)
+{
+    float3 n = tri.normal;
+    float d = n.x * tri.vertex0.x + n.y * tri.vertex0.y + n.z * tri.vertex0.z;    
+    return float4(n, d);
 }
 
 float3 TriangleCenter(TriangleShape tri)
@@ -163,7 +170,7 @@ RayTriCallback RayToTriangle(RayShape ray, TriangleShape tri)
     float3 n = tri.normal;
     float d = n.x * tri.vertex0.x + n.y * tri.vertex0.y + n.z * tri.vertex0.z;
     
-    float4 plane = float4(n, d);
+    float4 plane = GetTriPlane(tri);
     float4 intersect_point = PlaneIntersectLine(plane, ray);
     
     if (intersect_point.w == true)
@@ -230,7 +237,7 @@ CapsuleCallback CapsuleToTriangle(CapsuleShape cap, TriangleShape tri)
     CapsuleCallback callback;
     callback.collide_type = 0;
     callback.floor_position = base;
-    callback.blocking_ray = EmptyRay();
+    callback.wall_plane - float4(0, 0, 0, 0);
     
     // floor
     RayShape foot_ray;
@@ -239,39 +246,23 @@ CapsuleCallback CapsuleToTriangle(CapsuleShape cap, TriangleShape tri)
     
     RayTriCallback foot_callback = RayToTriangle(foot_ray, tri);
     if (foot_callback.is_intersect && DegreeBetweenVectors(GetRayVector(foot_ray), -tri.normal) <= 75)
-    {
+    {// floor        
         callback.collide_type = 1;
-        callback.floor_position = foot_callback.intersect_point;
+        callback.floor_position = foot_callback.intersect_point;        
     }
-    
-    // wall
     else
-    {
-        //float3 sphere_center = PointLineSegment(TriangleCenter(tri), cap.point_a, cap.point_b);
-        //float3 sphere_center = cap.point_a;
-        //if (SphereToTriangle(sphere_center, cap.radius, tri))
-        //{
-        //    callback.collide_type = 2;
+    { // wall
+        float3 sphere_center = cap.point_b;
+        float side = dot(tri.normal, sphere_center - tri.vertex0);
+        if (side < 0.0f)
+            tri.normal *= -1.0f;
             
-        //    float min_x = tri.vertex0.x;
-        //    min_x = min(min_x, tri.vertex1.x);
-        //    min_x = min(min_x, tri.vertex2.x);
-            
-        //    float min_z = tri.vertex0.z;
-        //    min_z = min(min_z, tri.vertex1.z);
-        //    min_z = min(min_z, tri.vertex2.z);
-            
-        //    float max_x = tri.vertex0.x;
-        //    max_x = max(max_x, tri.vertex1.x);
-        //    max_x = max(max_x, tri.vertex2.x);
-            
-        //    float max_z = tri.vertex0.z;
-        //    max_z = max(max_z, tri.vertex1.z);
-        //    max_z = max(max_z, tri.vertex2.z);
-            
-        //    callback.blocking_ray.start = float4(min_x, 0, min_z, 0);
-        //    callback.blocking_ray.end = float4(max_x, 0, max_z, 0);
-        //}
+        if (SphereToTriangle(sphere_center, cap.radius, tri))
+        {
+            callback.collide_type = 2;
+            float4 tri_plane = GetTriPlane(tri);            
+            callback.wall_plane = tri_plane;
+        }
     }
     
     return callback;
@@ -279,7 +270,6 @@ CapsuleCallback CapsuleToTriangle(CapsuleShape cap, TriangleShape tri)
 
 StructuredBuffer<TriangleShape> level_triangles : register(t0);
 StructuredBuffer<CapsuleShape> character_capsules : register(t1); // capsule_pool_64
-
 RWStructuredBuffer<CollisionResult> collision_result : register(u0); // capsule_pool_64
 
 [numthreads(64, 1, 1)]
@@ -304,10 +294,13 @@ uint GI : SV_GroupIndex)
     result.collide_type = 0;
     result.floor_position = GetCapsuleBase(capsule);
     
-    result.blocking_rays[0] = EmptyRay();
-    result.blocking_rays[1] = EmptyRay();
-    result.blocking_rays[2] = EmptyRay();
-    result.blocking_rays[3] = EmptyRay();
+    result.wall_planes[0] = float4(0, 0, 0, 0);
+    result.wall_planes[1] = float4(0, 0, 0, 0);
+    result.wall_planes[2] = float4(0, 0, 0, 0);
+    result.wall_planes[3] = float4(0, 0, 0, 0);
+    
+    bool floor_detected = false;
+    bool wall_detected = false;
     
     for (int i = 0; i < triangle_count; ++i)
     {
@@ -320,26 +313,36 @@ uint GI : SV_GroupIndex)
             continue;
         
         CapsuleCallback callback = CapsuleToTriangle(capsule, tri);
+        
         if (callback.collide_type == 1)
         {
-            result.collide_type = 1;
+            floor_detected = true;
             if (length(capsule.point_a - result.floor_position) > length(capsule.point_a - callback.floor_position))
                 result.floor_position = callback.floor_position;
         }
             
         if (callback.collide_type == 2) // wall
         {
-            result.collide_type = 2;
-            
+            wall_detected = true;
             for (int j = 0; j < 4; ++j)
             {
-                if (length(GetRayVector(result.blocking_rays[j])) < EPSILON)
+                if (length(result.wall_planes[j].xyz) < EPSILON)
                 {
-                    result.blocking_rays[j] = callback.blocking_ray;
+                    result.wall_planes[j] = callback.wall_plane;
+                    break;
                 }
             }
         }
     }
-        
+    
+    if (floor_detected && wall_detected) // floor and walls
+        result.collide_type = 3;
+    else if (!floor_detected && wall_detected) // wall only
+        result.collide_type = 2;
+    else if (floor_detected && !wall_detected) // floor only
+        result.collide_type = 1;
+    else
+        result.collide_type = 0; // none collision
+    
     collision_result[GTid.x] = result;
 }

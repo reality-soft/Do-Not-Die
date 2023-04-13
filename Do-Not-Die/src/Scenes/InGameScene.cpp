@@ -120,7 +120,7 @@ void InGameScene::OnUpdate()
 		}
 		enemy_actor->SetRoute(target_poses);
 		enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
-
+		
 		//auto player = SCENE_MGR->GetPlayer<Player>(0);
 		//player->SetPos(level.GetGuideLines()->at(guidline_index).line_nodes[0]);
 		
