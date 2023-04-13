@@ -4,9 +4,9 @@
 class HealFood : public ItemBase
 {
 private:
-	float heal_amount = 15.0f;
+	float heal_amount;
 public:
 	void OnCreate() override;
-	void Use() override;
+	void UseItem() override;
 };
 

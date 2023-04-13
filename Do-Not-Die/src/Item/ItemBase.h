@@ -5,16 +5,19 @@
 class ItemBase
 {
 public:
-	string item_icon_;
-	int item_count_;
-protected:
+	int		item_count_;
+	float	item_cooltime_;
+	string	item_icon_;
 	Player* owner_;
+protected:
+	virtual void UseItem() = 0;
 public:
 	virtual void OnCreate() = 0;
-	virtual void Use() = 0;
-	void SetOwner(Player* player); 
-	void AddCount(int count = 1);
-	int GetCount() { return item_count_; }
-	string GetIcon() { return item_icon_; }
+	void	Use();
+	void	SetOwner(Player* player); 
+	void	AddCount(int count = 1);
+	int		GetCount() { return item_count_; }
+	float	GetCooltime() { return item_cooltime_; }
+	string	GetIcon() { return item_icon_; }
 };
 

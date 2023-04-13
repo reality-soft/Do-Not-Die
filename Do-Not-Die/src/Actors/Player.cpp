@@ -1,8 +1,13 @@
 #include "Player.h"
 #include "Weapon.h"
-#include "ItemBase.h"
+#include "InGameScene.h"
 #include "HealKit.h"
 #include "HealFood.h"
+#include "FX_BloodImpact.h"
+#include "FX_ConcreteImpact.h"
+#include "FX_Flame.h"
+#include "FX_Muzzle.h"
+#include "FX_Explosion.h"
 
 using namespace reality;
 
@@ -68,17 +73,22 @@ void Player::OnInit(entt::registry& registry)
 	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
 
 	// FlashLight
-	AddFlashLight();	
-	
+	AddFlashLight();
+
+	// Inventory
+	inventory_.resize(INVENTORY_MAX);
+	inventory_timer_.resize(INVENTORY_MAX);
+
 	// ITEM TEST CODE
 	shared_ptr<HealKit> heal_kit = make_shared<HealKit>();
 	heal_kit->OnCreate();
 	heal_kit->AddCount(1);
-	inventory_.push_back(heal_kit);
+	AcquireItem(heal_kit);
 	shared_ptr<HealFood> heal_food = make_shared<HealFood>();
 	heal_food->OnCreate();
-	heal_food->AddCount(1);
-	inventory_.push_back(heal_food);
+	heal_food->AddCount(2);
+	AcquireItem(heal_food);
+	cur_hp_ = 0;
 }
 
 void Player::OnUpdate()
@@ -93,6 +103,8 @@ void Player::OnUpdate()
 
 	// FlashLight Update
 	UpdateFlashLight();
+
+	UpdateInventory();
 }
 
 void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
@@ -171,6 +183,23 @@ void Player::Fire()
 {
 	if (is_aiming_) {
 		fire_ = true;
+
+		// Make Muzzle when Shot
+		auto player_transform = GetTransformMatrix();
+		XMVECTOR s, r, t;
+		XMMatrixDecompose(&s, &r, &t, player_transform);
+		EFFECT_MGR->SpawnEffect<FX_Muzzle>(t);
+
+		// Make Shot Impact Effect
+		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+ 		RayShape ray = ingame_scene->GetCameraSystem().CreateFrontRay();
+		RayCallback raycallback = QUADTREE->Raycast(ray);
+
+		if (raycallback.success && raycallback.is_actor)
+			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback.point, raycallback.normal);
+
+		else if (raycallback.success && !raycallback.is_actor)
+			EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback.point, raycallback.normal);
 	}
 }
 
@@ -293,31 +322,81 @@ void Player::UpdateFlashLight()
 	
 }
 
-bool Player::AcquireItem(shared_ptr<ItemBase> item, int count)
+void Player::UpdateInventory()
 {
-	string item_id = typeid(item.get()).name();
+	for (int i = 0; i < inventory_.size(); i++)
+	{
+		if (inventory_[i] == NULL)
+			continue;
+		if (inventory_[i]->GetCooltime() > inventory_timer_[i])
+		{
+			inventory_timer_[i] += TIMER->GetDeltaTime();
+		}
 
+	}
+}
+
+bool Player::AcquireItem(shared_ptr<ItemBase> item)
+{
+	string item_id = typeid(*item.get()).name();
+	
 	// 1. If item exists in inventory.
 	for (int i = 0; i < inventory_.size(); i++)
 	{
-		if (item_id == typeid(inventory_[i].get()).name())
+		if (inventory_[i] == NULL)
+			continue;
+
+		if (item_id == typeid(*inventory_[i].get()).name())
 		{
-			inventory_[i]->AddCount(count);
+			inventory_[i]->AddCount(item->GetCount());
 			return true;
 		}
 	}
 
 	// 2. if Item doesn't exist in inventory, Check Inventory
-	if (inventory_.size() >= INVENTORY_MAX)
-		return false;
-	else
+	for (int i = 0; i < inventory_.size(); i++)
 	{
-		inventory_.push_back(item);
-		return true;
+		if (inventory_[i] == NULL)
+		{
+			inventory_[i] = item;
+			item->SetOwner(this);
+			inventory_timer_[i] = 0;
+			return true;
+		}
+			
+	}
+
+	// 3. If Inventory was full, Can't Acquire Item
+	return false;
+}
+
+void Player::UseItem(int slot)
+{
+	if (INVENTORY_MAX <= slot)
+		return;
+
+	if (inventory_[slot] == NULL)
+		return;
+
+	if (inventory_timer_[slot] < inventory_[slot]->GetCooltime())
+		return;
+
+	inventory_[slot]->Use();
+
+	inventory_timer_[slot] = 0;
+
+	if (inventory_[slot]->GetCount() == 0)
+	{
+		inventory_[slot] = NULL;
 	}
 }
 
 vector<shared_ptr<ItemBase>>& Player::GetInventory()
 {
 	return inventory_;
+}
+
+vector<float>& Player::GetInventoryTimer()
+{
+	return inventory_timer_;
 }

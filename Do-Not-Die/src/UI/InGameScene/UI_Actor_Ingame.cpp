@@ -49,22 +49,46 @@ void UI_Actor_Ingame::CreateIngameUI()
 	inven_[0] = make_shared<UI_Image>();
 	inven_[0]->InitImage("");
 	inven_[0]->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
-	//status_ui->AddChildUI(inven_1_);
+	inven_text_[0] = make_shared<UI_Text>();
+	inven_text_[0]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+	inven_[0]->AddChildUI(inven_text_[0]);
+	inven_cooltime_img_[0] = make_shared<UI_Image>();
+	inven_cooltime_img_[0]->InitImage("T_ItemCoolTime.png");
+	inven_[0]->AddChildUI(inven_cooltime_img_[0]);
+	inven_cooltime_img_[0]->SetLocalRectByMin({0.0f, 0.0f}, 90.0f, 90.0f);
 
 	inven_[1] = make_shared<UI_Image>();
 	inven_[1]->InitImage("");
 	inven_[1]->SetLocalRectByCenter({ 203.5f, 76.5f }, 90.0f, 90.0f);
-	//status_ui->AddChildUI(inven_2_);
+	inven_text_[1] = make_shared<UI_Text>();
+	inven_text_[1]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+	inven_[1]->AddChildUI(inven_text_[1]);
+	inven_cooltime_img_[1] = make_shared<UI_Image>();
+	inven_cooltime_img_[1]->InitImage("T_ItemCoolTime.png");
+	inven_[1]->AddChildUI(inven_cooltime_img_[1]);
+	inven_cooltime_img_[1]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
 
 	inven_[2] = make_shared<UI_Image>();
 	inven_[2]->InitImage("");
 	inven_[2]->SetLocalRectByCenter({ 306.5f, 76.5f }, 90.0f, 90.0f);
-	//status_ui->AddChildUI(inven_3_);
+	inven_text_[2] = make_shared<UI_Text>();
+	inven_text_[2]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+	inven_[2]->AddChildUI(inven_text_[2]);
+	inven_cooltime_img_[2] = make_shared<UI_Image>();
+	inven_cooltime_img_[2]->InitImage("T_ItemCoolTime.png");
+	inven_[2]->AddChildUI(inven_cooltime_img_[2]);
+	inven_cooltime_img_[2]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
 
 	inven_[3] = make_shared<UI_Image>();
 	inven_[3]->InitImage("");
 	inven_[3]->SetLocalRectByCenter({ 410.5f, 76.5f }, 90.0f, 90.0f);
-	//status_ui->AddChildUI(inven_4_);
+	inven_text_[3] = make_shared<UI_Text>();
+	inven_text_[3]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+	inven_[3]->AddChildUI(inven_text_[3]);
+	inven_cooltime_img_[3] = make_shared<UI_Image>();
+	inven_cooltime_img_[3]->InitImage("T_ItemCoolTime.png");
+	inven_[3]->AddChildUI(inven_cooltime_img_[3]);
+	inven_cooltime_img_[3]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
 
 	hp_img_ = make_shared<UI_Image>();
 	status_ui->AddChildUI(hp_img_);
@@ -211,14 +235,24 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	if (player_ != nullptr)
 	{
 		auto& inventory = player_->GetInventory();
+		auto& inventory_timer = player_->GetInventoryTimer();
 		for (int i = 0; i < INVENTORY_MAX; i++)
 		{
-			if (i >= inventory.size())
+			if (inventory[i] == NULL)
+			{
 				status_ui->DeleteChildUI(inven_[i]);
+			}
 			else
 			{
 				status_ui->AddChildUI(inven_[i]);
-				inven_[i]->InitImage(inventory[i]->GetIcon());
+				inven_[i]->SetImage(inventory[i]->GetIcon());
+				inven_text_[i]->SetText(to_string(inventory[i]->GetCount()));
+
+				auto& cooltime_local_rect = inven_cooltime_img_[i]->rect_transform_[E_Resolution::R1920x1080].local_rect;
+				float percentage = (inventory[i]->GetCooltime() - inventory_timer[i]) / inventory[i]->GetCooltime();
+				static float first_height = inven_[i]->rect_transform_[E_Resolution::R1920x1080].local_rect.height;
+				inven_cooltime_img_[i]->SetLocalRectByMax(cooltime_local_rect.max, cooltime_local_rect.width, 
+					first_height * percentage);
 			}
 		}
 	}
