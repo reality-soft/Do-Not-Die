@@ -72,14 +72,17 @@ void Player::OnInit(entt::registry& registry)
 
 
 	// ITEM TEST CODE
+	inventory_.resize(INVENTORY_MAX);
 	shared_ptr<HealKit> heal_kit = make_shared<HealKit>();
 	heal_kit->OnCreate();
 	heal_kit->AddCount(1);
-	inventory_.push_back(heal_kit);
+	heal_kit->SetOwner(this);
+	AcquireItem(heal_kit);
 	shared_ptr<HealFood> heal_food = make_shared<HealFood>();
 	heal_food->OnCreate();
-	heal_food->AddCount(1);
-	inventory_.push_back(heal_food);
+	heal_food->AddCount(2);
+	heal_food->SetOwner(this);
+	AcquireItem(heal_food);
 }
 
 void Player::OnUpdate()
@@ -94,6 +97,8 @@ void Player::OnUpdate()
 
 	// FlashLight Update
 	UpdateFlashLight();
+
+	UpdateItem();
 }
 
 void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
@@ -295,27 +300,63 @@ void Player::UpdateFlashLight()
 	
 }
 
-bool Player::AcquireItem(shared_ptr<ItemBase> item, int count)
+void Player::UpdateItem()
 {
-	string item_id = typeid(item.get()).name();
+	if (DINPUT->GetKeyState(DIK_1) == KEY_PUSH)
+		UseItem(0); 
+	if (DINPUT->GetKeyState(DIK_2) == KEY_PUSH)
+		UseItem(1); 
+	if (DINPUT->GetKeyState(DIK_3) == KEY_PUSH)
+		UseItem(2);
+	if (DINPUT->GetKeyState(DIK_4) == KEY_PUSH)
+		UseItem(3);
+}
 
+bool Player::AcquireItem(shared_ptr<ItemBase> item)
+{
+	string item_id = typeid(*item.get()).name();
+	
 	// 1. If item exists in inventory.
 	for (int i = 0; i < inventory_.size(); i++)
 	{
-		if (item_id == typeid(inventory_[i].get()).name())
+		if (inventory_[i] == NULL)
+			continue;
+
+		if (item_id == typeid(*inventory_[i].get()).name())
 		{
-			inventory_[i]->AddCount(count);
+			inventory_[i]->AddCount(item->GetCount());
 			return true;
 		}
 	}
 
 	// 2. if Item doesn't exist in inventory, Check Inventory
-	if (inventory_.size() >= INVENTORY_MAX)
-		return false;
-	else
+	for (int i = 0; i < inventory_.size(); i++)
 	{
-		inventory_.push_back(item);
-		return true;
+		if (inventory_[i] == NULL)
+		{
+			inventory_[i] = item;
+			return true;
+		}
+			
+	}
+
+	// 3. If Inventory was full, Can't Acquire Item
+	return false;
+}
+
+void Player::UseItem(int slot)
+{
+	if (INVENTORY_MAX <= slot)
+		return;
+
+	if (inventory_[slot] == NULL)
+		return;
+
+	inventory_[slot]->Use();
+
+	if (inventory_[slot]->GetCount() == 0)
+	{
+		inventory_[slot] = NULL;
 	}
 }
 
