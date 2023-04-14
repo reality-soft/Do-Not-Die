@@ -76,14 +76,15 @@ void InGameScene::OnInit()
 	//INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
 
 	level.Create("DNDLevel_WithCollision_01.stmesh", "LevelVS.cso");
-	//level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_Blocking1.mapdat", GuideLine::GuideType::eBlocking);
-	level.ImportGuideLines("../../Contents/BinaryPackage/DeadPoly_NpcTrack_01.mapdat", GuideLine::GuideType::eNpcTrack);
 
 	//QUADTREE->Init(&level, 3, reg_scene_);
 	QUADTREE->Init(&level, reg_scene_);
-	QUADTREE->ImportQuadTreeData("../../Contents/BinaryPackage/QuadTreeData_01.matdat");
+	QUADTREE->ImportQuadTreeData("QuadTreeData_01.mapdat");
 	QUADTREE->CreatePhysicsCS();
 	QUADTREE->InitCollisionMeshes();
+
+	QUADTREE->ImportGuideLines("DND_Blocking_1.mapdat", GuideType::eBlocking);
+	QUADTREE->ImportGuideLines("DND_NpcTrack_1.mapdat", GuideType::eNpcTrack);
 	
 	// LOADING : LOADING_ACTOR
 	loading_progress = LOADING_ACTOR;
@@ -109,18 +110,17 @@ void InGameScene::OnUpdate()
 	static float cur_time = 0.0f;
 
 	cur_time += TM_DELTATIME;
-
-	const vector<reality::GuideLine> npc_guidlines = level.GetGuideLines(reality::GuideLine::GuideType::eNpcTrack);
+	const auto npc_guidlines = QUADTREE->GetGuideLines("DND_NpcTrack_1");
 
 	if (cur_time >= 10.0f) {
 		auto enemy_entity = SCENE_MGR->AddActor<Enemy>();
 		auto enemy_actor = SCENE_MGR->GetActor<Enemy>(enemy_entity);
 
-		int guidline_index = rand() % npc_guidlines.size();
+		int guidline_index = rand() % npc_guidlines->size();
 		int mesh_index = rand() % enemy_meshes.size();
 
 		vector<XMVECTOR> target_poses;
-		for (const auto& target_pos : npc_guidlines[guidline_index].line_nodes) {
+		for (const auto& target_pos : npc_guidlines->at(guidline_index).line_nodes) {
 			target_poses.push_back(target_pos.second);
 		}
 		enemy_actor->SetRoute(target_poses);
