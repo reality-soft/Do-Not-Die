@@ -70,6 +70,7 @@ void InGameScene::OnInit()
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_A }, idle, KEY_UP);
 
 	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, std::bind(&Player::Fire, character_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_G }, std::bind(&Player::ThrowGrenade, character_actor), KEY_PUSH);
 	//INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
 
 	level.Create("DeadPoly_FullLevel_04.stmesh", "LevelVS.cso", "DeadPoly_Level_Collision_04.stmesh");
@@ -96,8 +97,6 @@ void InGameScene::OnInit()
 	gw_property_.AddProperty<UINT>("visible nodes", &QUADTREE->visible_nodes);
 
 	EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
-
-
 	// LOADING FINISH
 	loading_progress = LOADING_FINISHED;
 }
@@ -146,8 +145,8 @@ void InGameScene::OnUpdate()
 
 	ingame_ui.OnUpdate();
 
-	if (DINPUT->GetKeyState(DIK_G) == KeyState::KEY_PUSH)
-		CreateExplosionEffectFromRay();
+	//if (DINPUT->GetKeyState(DIK_G) == KeyState::KEY_PUSH)
+		//CreateExplosionEffectFromRay();
 
 	CursorStateUpdate();
 }
