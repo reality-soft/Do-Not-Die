@@ -3,6 +3,7 @@
 #include "InGameScene.h"
 #include "HealKit.h"
 #include "HealFood.h"
+#include "Grenade.h"
 #include "FX_BloodImpact.h"
 #include "FX_ConcreteImpact.h"
 #include "FX_Flame.h"
@@ -226,6 +227,23 @@ void Player::Aim()
 	}
 }
 
+void Player::ThrowGrenade()
+{
+	if (grenade_timer_ < grenade_cooltime_)
+		return;
+
+	grenade_timer_ -= grenade_cooltime_;
+
+	auto grenade_entity = SCENE_MGR->AddActor<Grenade>();
+	auto grenade_actor = SCENE_MGR->GetActor<Grenade>(grenade_entity); 
+	XMVECTOR s, r, t;
+	XMMatrixDecompose(&s, &r, &t, transform_matrix_);
+	XMVECTOR pos = XMVectorAdd(t, XMVectorSet(0.0f, 50.0f, 0.0f, 0.0f));
+	grenade_actor->SetPos(pos);
+	XMVECTOR dir = XMVectorAdd(front_, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+	grenade_actor->SetDir(dir, 4.0f);
+}
+
 bool Player::IsAiming()
 {
 	return is_aiming_;
@@ -335,6 +353,10 @@ void Player::UpdateTimer()
 	// Fire Timer
 	if(fire_timer_ < fire_cooltime_)
 		fire_timer_ += TIMER->GetDeltaTime();
+
+	// Grenade Timer
+	if (grenade_timer_ < grenade_cooltime_)
+		grenade_timer_ += TIMER->GetDeltaTime();
 
 	// Inventory Timer
 	for (int i = 0; i < inventory_.size(); i++)
