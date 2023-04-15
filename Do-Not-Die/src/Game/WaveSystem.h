@@ -22,6 +22,7 @@ namespace reality
 		shared_ptr<Environment> world_env_;
 		vector<GuideLine>* item_spawns_;
 		vector<GuideLine>* repair_spawns_;
+		map<UINT, bool> item_table_;
 	};
 }
 
