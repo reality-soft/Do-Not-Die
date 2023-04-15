@@ -12,7 +12,7 @@ void InGameScene::OnInit()
 	// LOADING : MANAGER_LOADING
 	loading_progress = LOADING_MANAGER;
 
-	GUI->AddWidget("property", &gw_property_);
+	GUI->AddWidget<PropertyWidget>("property");
 
 	WRITER->Init();
 	//reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
@@ -91,15 +91,13 @@ void InGameScene::OnInit()
 	loading_progress = LOADING_ACTOR;
 
 	environment_.CreateEnvironment();
-	environment_.SetWorldTime(60, 60, true);
+	environment_.SetWorldTime(180, 360);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(0.2f, 0.2f);
 
-	gw_property_.AddProperty<float>("FPS", &TIMER->fps);
-	gw_property_.AddProperty<UINT>("visible nodes", &QUADTREE->visible_nodes);
 
-	EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
+	//EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 
 	// LOADING FINISH
 	loading_progress = LOADING_FINISHED;
@@ -108,6 +106,10 @@ void InGameScene::OnInit()
 	sys_trigger_.OnCreate(reg_scene_);
 	sys_wave_.OnCreate(reg_scene_);
 	sys_wave_.SetWorldEnv(&environment_);
+
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("FPS", &TIMER->fps);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Time Countdown", &sys_wave_.countdown_timer_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Waves", &sys_wave_.wave_count_);
 }
 
 void InGameScene::OnUpdate()
