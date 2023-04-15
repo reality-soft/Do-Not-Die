@@ -89,6 +89,9 @@ void Player::OnInit(entt::registry& registry)
 	heal_food->AddCount(2);
 	AcquireItem(heal_food);
 	cur_hp_ = 0;
+
+	// true means : this actor causes trigger event when overlaped at trigger 
+	trigger_sensor = true;
 }
 
 void Player::OnUpdate()
