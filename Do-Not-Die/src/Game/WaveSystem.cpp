@@ -15,11 +15,29 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 		RandomSpawnItem(10.0f);
 		i = 0;
 	}
+
+	float counting_time = world_env_->GetCountingTime();
+	if (world_env_->IsDayChanged())
+	{
+		switch (world_env_->GetCurrentDay())
+		{
+		case Day::eNoon:
+			countdown_timer_ = fabs(world_env_->GetTimeLimits().x * 2);
+			break;
+		case Day::eNight:
+			countdown_timer_ = fabs(world_env_->GetTimeLimits().y * 2);
+			wave_count_++;
+			break;
+		}
+	}
+
+	countdown_timer_ -= TM_DELTATIME;
 }
 
 void reality::WaveSystem::SetWorldEnv(Environment* env)
 {
 	world_env_ = shared_ptr<Environment>(env);
+	countdown_timer_ = fabs(world_env_->GetTimeLimits().x * 2);
 }
 
 void reality::WaveSystem::RandomSpawnItem(float trigger_radius)
