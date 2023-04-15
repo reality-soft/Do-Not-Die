@@ -100,8 +100,14 @@ void InGameScene::OnInit()
 	gw_property_.AddProperty<UINT>("visible nodes", &QUADTREE->visible_nodes);
 
 	EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
+
 	// LOADING FINISH
 	loading_progress = LOADING_FINISHED;
+
+	// Trigger And Wave System
+	sys_trigger_.OnCreate(reg_scene_);
+	sys_wave_.OnCreate(reg_scene_);
+	sys_wave_.SetWorldEnv(&environment_);
 }
 
 void InGameScene::OnUpdate()
@@ -140,6 +146,11 @@ void InGameScene::OnUpdate()
 	sys_movement.OnUpdate(reg_scene_);
 	sys_effect.OnUpdate(reg_scene_);
 	sys_sound.OnUpdate(reg_scene_);
+
+	// Trigger And Wave System
+	sys_trigger_.OnUpdate(reg_scene_);
+	sys_wave_.OnUpdate(reg_scene_);
+
 	QUADTREE->Frame(&sys_camera);
 	QUADTREE->UpdatePhysics("PhysicsCS.cso");
 

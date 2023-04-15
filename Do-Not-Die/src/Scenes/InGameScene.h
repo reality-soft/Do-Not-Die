@@ -3,6 +3,8 @@
 #include "TestWidget.h"
 #include "UI_Actor_Ingame.h"
 #include "StaticShadowMap.h"
+#include "TriggerSystem.h"
+#include "WaveSystem.h"
 
 using namespace reality;
 
@@ -48,6 +50,10 @@ private:
 	reality::EffectSystem sys_effect;
 	reality::MovementSystem  sys_movement;
 	reality::UISystem		sys_ui;
+
+	TriggerSystem sys_trigger_;
+	WaveSystem sys_wave_;
+
 public:
 	reality::CameraSystem GetCameraSystem() { return sys_camera; }
 private:

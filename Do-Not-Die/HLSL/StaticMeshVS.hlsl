@@ -18,7 +18,7 @@ struct VS_IN
 struct VS_OUT
 {
     float4 p : SV_POSITION;
-    float4 n : NORMAL;
+    float3 n : NORMAL;
     float2 t : TEXCOORD;
     float lod : TEXCOORD1;
 };
@@ -45,7 +45,8 @@ VS_OUT VS(VS_IN input)
     output.lod = GetLod(input.p);
 
     output.p = projection;
-    output.n = normal;
+    output.n = animated_normal;
+  
     output.t = input.t;
 
     return output;
