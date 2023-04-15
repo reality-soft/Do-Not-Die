@@ -27,7 +27,7 @@ public:
 	void Idle();
 	void Fire();
 	void Aim();
-
+	void ThrowGrenade();
 public:
 	bool IsAiming();
 
@@ -49,6 +49,11 @@ private:
 	int cur_hp_;
 	bool is_aiming_ = false;
 private:
+	float fire_cooltime_ = 0.2f;
+	float fire_timer_ = 0.0f;
+	float grenade_cooltime_ = 3.0f;
+	float grenade_timer_ = 0.0f;
+private:
 	vector<shared_ptr<ItemBase>>	inventory_;
 	vector<float>					inventory_timer_;
 public:
@@ -57,7 +62,7 @@ public:
 	vector<shared_ptr<ItemBase>>&	GetInventory();
 	vector<float>&					GetInventoryTimer();
 private:
-	void UpdateInventory();
+	void UpdateTimer();
 public:
 	bool fire_ = false;
 };

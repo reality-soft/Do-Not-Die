@@ -73,6 +73,7 @@ void InGameScene::OnInit()
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_A }, idle, KEY_UP);
 
 	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, std::bind(&Player::Fire, character_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_G }, std::bind(&Player::ThrowGrenade, character_actor), KEY_PUSH);
 	//INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
 
 	level.Create("DNDLevel_WithCollision_01.stmesh", "LevelVS.cso");
@@ -157,8 +158,8 @@ void InGameScene::OnUpdate()
 
 	ingame_ui.OnUpdate();
 
-	if (DINPUT->GetKeyState(DIK_G) == KeyState::KEY_PUSH)
-		CreateExplosionEffectFromRay();
+	//if (DINPUT->GetKeyState(DIK_G) == KeyState::KEY_PUSH)
+		//CreateExplosionEffectFromRay();
 
 	CursorStateUpdate();
 }
