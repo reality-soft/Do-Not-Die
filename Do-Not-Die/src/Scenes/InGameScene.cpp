@@ -15,7 +15,8 @@ void InGameScene::OnInit()
 	GUI->AddWidget<PropertyWidget>("property");
 
 	WRITER->Init();
-	//reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
+	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
+
 	//FbxImportOption option;
 	//option.import_scale = 10.0f;
 	//option.recalculate_normal = true;
@@ -28,14 +29,14 @@ void InGameScene::OnInit()
 	sys_render.OnCreate(reg_scene_);
 	sys_camera.OnCreate(reg_scene_);
 	sys_ui.OnCreate(reg_scene_);
-	sys_camera.SetSpeed(1000);
 	sys_camera.SetFarZ(10000.f);
 	sys_camera.SetFov(XMConvertToRadians(45));
+	sys_camera.mouse_sensivity = 0.5f;
 	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
 	sys_light.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
 	sys_sound.OnCreate(reg_scene_);
-
+	
 	ingame_ui.OnInit(reg_scene_);
 
 	// LOADING : LOADING_MAP
@@ -96,7 +97,7 @@ void InGameScene::OnInit()
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(0.2f, 0.2f);
 
-
+	
 	//EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 
 	// LOADING FINISH
@@ -110,12 +111,17 @@ void InGameScene::OnInit()
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("FPS", &TIMER->fps);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Time Countdown", &sys_wave_.countdown_timer_);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Waves", &sys_wave_.wave_count_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Jump", &character_actor->GetMovementComponent()->jump_pulse);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Gravity", &character_actor->GetMovementComponent()->gravity_pulse);
 }
 
 void InGameScene::OnUpdate()
 {
-	static float cur_time = 0.0f;
+	QUADTREE->Frame(&sys_camera);
+	QUADTREE->UpdatePhysics("PhysicsCS.cso");
 
+	static float cur_time = 0.0f;
+	
 	cur_time += TM_DELTATIME;
 	const auto npc_guidlines = QUADTREE->GetGuideLines("DND_NpcTrack_1");
 
@@ -141,7 +147,7 @@ void InGameScene::OnUpdate()
 		cur_zombie_created++;
 	}
 
-
+	
 	sys_camera.OnUpdate(reg_scene_);
 	sys_animation.OnUpdate(reg_scene_);
 	sys_light.OnUpdate(reg_scene_);
@@ -153,16 +159,12 @@ void InGameScene::OnUpdate()
 	sys_trigger_.OnUpdate(reg_scene_);
 	sys_wave_.OnUpdate(reg_scene_);
 
-	QUADTREE->Frame(&sys_camera);
-	QUADTREE->UpdatePhysics("PhysicsCS.cso");
-
 	environment_.Update(&sys_camera, &sys_light);
-
 	ingame_ui.OnUpdate();
-
+	
 	//if (DINPUT->GetKeyState(DIK_G) == KeyState::KEY_PUSH)
 		//CreateExplosionEffectFromRay();
-
+	
 	CursorStateUpdate();
 }
 
