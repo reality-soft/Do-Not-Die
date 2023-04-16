@@ -19,13 +19,4 @@ float4 PS(PS_OUT output) : SV_Target
     float4 skycolor = sky_color;
     
     return skycolor;
-    //if (output.origin.y >= 0)
-    //{        
-    //    skycolor.x -= pow(output.origin.y, strength.w) * 0.5;
-    //    skycolor.y -= pow(output.origin.y, strength.w) * 0.5;
-    //    skycolor.z -= pow(output.origin.y, strength.w) * 0.5;
-    //}
-    
-    //return ApplyDistanceFog(skycolor, output.origin);
-    //return skycolor;
 }
