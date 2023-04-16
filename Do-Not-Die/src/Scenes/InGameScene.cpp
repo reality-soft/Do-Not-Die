@@ -17,12 +17,6 @@ void InGameScene::OnInit()
 	WRITER->Init();
 	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
 
-	//FbxImportOption option;
-	//option.import_scale = 10.0f;
-	//option.recalculate_normal = true;
-	//FBX->ImportAndSaveFbx("../../Contents/FBX/DNDLevel_WithCollision_01.fbx", option, FbxVertexOption::BY_POLYGON_VERTEX);
-	
-
 	// LOADING : LOADING_SYSTEM
 	loading_progress = LOADING_SYSTEM;
 
@@ -205,10 +199,19 @@ void InGameScene::CursorStateUpdate()
 {
 	if (DINPUT->GetKeyState(DIK_T) == KeyState::KEY_PUSH)
 	{
+		RECT clrect;
+		GetWindowRect(ENGINE->GetWindowHandle(), &clrect);
+
 		if (b_show_cursor)
+		{
 			SetCursorInvisible();
+			ClipCursor(&clrect);
+		}
 		else
+		{
 			SetCursorVisible();
+			ClipCursor(nullptr);
+		}
 	}
 }
 

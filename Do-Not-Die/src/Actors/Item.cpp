@@ -17,6 +17,8 @@ void Item::OnInit(entt::registry& registry)
 	stm.world = XMMatrixIdentity();
 	stm.vertex_shader_id = "StaticMeshVS.cso";
 
+	item_type_ = ItemType::eGrenade;
+
 	switch (item_type_)
 	{
 	case ItemType::eHealKit:
@@ -36,6 +38,9 @@ void Item::OnInit(entt::registry& registry)
 		break;
 	case ItemType::ePistol_Ammo:
 		stm.static_mesh_id = "Pistol_Ammo.stmesh";
+		break;
+	case ItemType::eGrenade:
+		stm.static_mesh_id = "Grenade.stmesh";
 		break;
 	}
 

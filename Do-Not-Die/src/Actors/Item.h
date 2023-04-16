@@ -9,6 +9,7 @@ enum class ItemType
 	eDrug,			// stronger damage
 	eAR_Ammo,		// rifle ammo (30)
 	ePistol_Ammo,	// pistol ammo (8)
+	eGrenade,
 };
 
 class Item : public reality::Actor

@@ -36,7 +36,7 @@ void reality::WaveSystem::SetWorldEnv(Environment* env)
 {
 	world_env_ = shared_ptr<Environment>(env);
 	countdown_timer_ = fabs(world_env_->GetTimeLimits().x * 2);
-	for (auto node : item_spawns_->at(0).line_nodes)
+	for (const auto& node : item_spawns_->at(0).line_nodes)
 	{
 		item_table_.insert(make_pair(node.first, false));
 	}
@@ -47,7 +47,7 @@ void reality::WaveSystem::RandomSpawnItem(float trigger_radius)
 	srand(time(NULL));
 
 	list<UINT> empty_item_index;
-	for (auto index : item_table_)
+	for (const auto& index : item_table_)
 	{
 		if (index.second == false)
 			empty_item_index.push_back(index.first);
@@ -55,7 +55,7 @@ void reality::WaveSystem::RandomSpawnItem(float trigger_radius)
 
 	for (UINT index : empty_item_index)
 	{
-		ItemType item_type = (ItemType)(rand() % 6);
+		ItemType item_type = (ItemType)(rand() % 7);
 
 		const auto& spawn = item_spawns_->at(0).line_nodes[index];
 		SCENE_MGR->AddActor<Item>(item_type, _XMFLOAT3(spawn), trigger_radius);
