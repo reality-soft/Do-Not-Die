@@ -1,4 +1,5 @@
 #include "TriggerSystem.h"
+#include "TriggerEvent.h"
 
 using namespace reality;
 
