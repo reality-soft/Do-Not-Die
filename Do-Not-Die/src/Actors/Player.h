@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine_include.h"
 #include "AnimationStateMachine.h"
+#include "Item.h"
 
 #define INVENTORY_MAX 4
 
@@ -57,6 +58,8 @@ private:
 	vector<shared_ptr<ItemBase>>	inventory_;
 	vector<float>					inventory_timer_;
 public:
+	map<float, Item*> selectable_items_;
+	UINT selectable_counts_ = 0;
 	bool AcquireItem(shared_ptr<ItemBase> item);
 	void UseItem(int slot);
 	vector<shared_ptr<ItemBase>>&	GetInventory();
