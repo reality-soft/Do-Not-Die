@@ -36,19 +36,16 @@ VS_OUT VS(VS_IN input)
     float4 animated_local = mul(local, animation_matrix);
     animated_local = mul(animated_local, owner_local);
 
-    float4 normal = float4(input.n, 1.0f);
-    normal = mul(normal, local_matrix);
-    normal = mul(normal, local_offset);
-    float4 animated_normal = mul(normal, animation_matrix);
+    float3 animated_normal = mul(input.n, animation_matrix);
     animated_normal = mul(animated_normal, owner_local);
-
+    
     float4 world = mul(animated_local, world_matrix);
     float4 projection = mul(world, ViewProjection());
 
     output.lod = GetLod(input.p);
 
     output.p = projection;
-    output.n = animated_normal;  
+    output.n = animated_normal;
     output.t = input.t;
     
     output.lod = GetLod(input.p);
