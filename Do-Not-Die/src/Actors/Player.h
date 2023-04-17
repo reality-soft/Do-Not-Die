@@ -62,6 +62,7 @@ public:
 	UINT selectable_counts_ = 0;
 	bool AcquireItem(shared_ptr<ItemBase> item);
 	void UseItem(int slot);
+	void PickClosestItem();
 	vector<shared_ptr<ItemBase>>&	GetInventory();
 	vector<float>&					GetInventoryTimer();
 private:

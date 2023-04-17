@@ -419,6 +419,16 @@ void Player::UseItem(int slot)
 	}
 }
 
+void Player::PickClosestItem()
+{
+	if (selectable_items_.empty())
+		return;
+
+	auto closest_item = selectable_items_.begin();
+	EVENT->PushEvent<DeleteActorEvent>(closest_item->second->entity_id_);
+	selectable_items_.erase(closest_item);
+}
+
 vector<shared_ptr<ItemBase>>& Player::GetInventory()
 {
 	return inventory_;
