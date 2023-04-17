@@ -1,8 +1,7 @@
 // Camera View-Proj
 cbuffer CbCameraInfo : register(b0)
 {
-    matrix view_matrix;
-    matrix projection_matrix;
+    matrix view_proj;
     matrix camera_translation;
     float4 camera_world;
     float4 camera_look;
@@ -11,7 +10,7 @@ cbuffer CbCameraInfo : register(b0)
 // Returns View X Projection
 float4x4 ViewProjection()
 {
-    return mul(view_matrix, projection_matrix);
+    return view_proj;
 }
 
 // Identity Matrix

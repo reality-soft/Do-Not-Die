@@ -30,16 +30,16 @@ VS_OUT VS(VS_IN input)
     VS_OUT output = (VS_OUT) 0;
     
     float4 local = float4(input.p, 1.0f);
-    float4 world = mul(local, IdentityMatrix());
-    float4 project = mul(world, ViewProjection());
+    //float4 world = mul(local, IdentityMatrix());
+    float4 project = mul(local, ViewProjection());
 
     output.p = project;
     output.n = input.n;
     output.t = input.t;
     
-    output.lod = GetLod(input.p);
-    output.view_dir = normalize(camera_world - world).xyz;
-    output.origin = world;
+    //output.lod = GetLod(input.p);
+    output.view_dir = normalize(camera_world - local).xyz;
+    output.origin = local;
     
     //output.shadow_tex = mul(world, mul(shadow_view, shadow_proj));
     return output;
