@@ -165,6 +165,9 @@ void InGameScene::OnUpdate()
 		//CreateExplosionEffectFromRay();
 	
 	CursorStateUpdate();
+
+	// TEST
+	SCENE_MGR->GetPlayer<Player>(0)->PickClosestItem();
 }
 
 void InGameScene::OnRender()
