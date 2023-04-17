@@ -112,6 +112,7 @@ void InGameScene::OnInit()
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("RaycastTri", &QUADTREE->raycast_calculated);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Jump", &character_actor->GetMovementComponent()->jump_pulse);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Gravity", &character_actor->GetMovementComponent()->gravity_pulse);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Selectable Items", &character_actor->selectable_counts_);
 }
 
 void InGameScene::OnUpdate()
