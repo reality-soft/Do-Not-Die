@@ -8,7 +8,7 @@ class ItemBase;
 
 using namespace reality;
 
-class Player : public Character
+class Player : public reality::Character
 {
 public:
 	virtual void OnInit(entt::registry& registry) override;

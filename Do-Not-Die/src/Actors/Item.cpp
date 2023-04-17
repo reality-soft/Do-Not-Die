@@ -37,6 +37,9 @@ void Item::OnInit(entt::registry& registry)
 	case ItemType::ePistol_Ammo:
 		stm.static_mesh_id = "Pistol_Ammo.stmesh";
 		break;
+	case ItemType::eGrenade:
+		stm.static_mesh_id = "Grenade.stmesh";
+		break;
 	}
 
 	registry.emplace_or_replace<reality::C_StaticMesh>(entity_id_, stm);
