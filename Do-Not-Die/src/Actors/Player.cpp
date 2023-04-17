@@ -76,8 +76,6 @@ void Player::OnInit(entt::registry& registry)
 	// FlashLight
 	AddFlashLight();
 
-	fire_timer_ = 0.0f;
-
 	// Inventory
 	inventory_.resize(INVENTORY_MAX);
 	inventory_timer_.resize(INVENTORY_MAX);
@@ -187,14 +185,9 @@ void Player::Idle()
 
 void Player::Fire()
 {
-	if (is_aiming_) {
+	if (is_aiming_ && !is_firing_) {
 
-		if (fire_timer_ < fire_cooltime_)
-			return;
-
-		fire_timer_ -= fire_cooltime_;
-
-		fire_ = true;
+		is_firing_ = true;
 
 		// Make Muzzle when Shot
 		auto player_transform = GetTransformMatrix();
@@ -353,10 +346,6 @@ void Player::UpdateFlashLight()
 
 void Player::UpdateTimer()
 {
-	// Fire Timer
-	if(fire_timer_ < fire_cooltime_)
-		fire_timer_ += TIMER->GetDeltaTime();
-
 	// Grenade Timer
 	if (grenade_timer_ < grenade_cooltime_)
 		grenade_timer_ += TIMER->GetDeltaTime();

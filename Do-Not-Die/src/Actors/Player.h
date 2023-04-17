@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine_include.h"
 #include "AnimationStateMachine.h"
+#include "AnimationState.h"
 
 #define INVENTORY_MAX 4
 
@@ -44,27 +45,31 @@ public:
 private:
 	void AddFlashLight();
 	void UpdateFlashLight();
+
 private:
 	int max_hp_;
 	int cur_hp_;
 	bool is_aiming_ = false;
+
+public:
+	bool is_firing_ = false;
+
 private:
-	float fire_cooltime_ = 0.2f;
-	float fire_timer_ = 0.0f;
 	float grenade_cooltime_ = 3.0f;
 	float grenade_timer_ = 0.0f;
+
 private:
 	vector<shared_ptr<ItemBase>>	inventory_;
 	vector<float>					inventory_timer_;
+
 public:
 	bool AcquireItem(shared_ptr<ItemBase> item);
 	void UseItem(int slot);
 	vector<shared_ptr<ItemBase>>&	GetInventory();
 	vector<float>&					GetInventoryTimer();
+
 private:
 	void UpdateTimer();
-public:
-	bool fire_ = false;
 };
 
 class PlayerUpperBodyAnimationStateMachine : public AnimationStateMachine {
@@ -103,7 +108,7 @@ public:
 		});
 		transitions_.insert({ AIM_POSE, Transition(FIRE,[this](const AnimationBase* animation_base) {
 				Player* player = SCENE_MGR->GetActor<Player>(owner_id_);
-				if (player->fire_ == true) {
+				if (player->is_firing_ == true) {
 					return true;
 				}
 				else {
@@ -114,7 +119,6 @@ public:
 		transitions_.insert({ FIRE, Transition(AIM_POSE,[this](const AnimationBase* animation_base) {
 				Player* player = SCENE_MGR->GetActor<Player>(owner_id_);
 				if (this->IsAnimationEnded()) {
-					player->fire_ = false;
 					return true;
 				}
 				else {
@@ -134,15 +138,15 @@ public:
 	public:
 		BasePose() : AnimationState(BASE_POSE) {}
 	public:
-		virtual void Enter(AnimationBase* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 			animation_base->SetAnimation("", 0.2f);
 		}
-		virtual void Exit(AnimationBase* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
 		}
 
-		virtual void OnUpdate(AnimationBase* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
 		}
 	};
@@ -151,14 +155,14 @@ public:
 	public:
 		AimPose() : AnimationState(AIM_POSE) {}
 	public:
-		virtual void Enter(AnimationBase* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 			animation_base->SetAnimation("A_TP_CH_Handgun_Aim_Pose_Retargeted_Unreal Take.anim", 0.2f);
 		}
-		virtual void Exit(AnimationBase* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
 		}
-		virtual void OnUpdate(AnimationBase* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
 		}
 	};
@@ -167,14 +171,16 @@ public:
 	public:
 		Fire() : AnimationState(FIRE) {}
 	public:
-		virtual void Enter(AnimationBase* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 			animation_base->SetAnimation("A_TP_CH_Handgun_Fire_Retargeted_Unreal Take.anim", 0.0f);
 		}
-		virtual void Exit(AnimationBase* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
+			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+			player->is_firing_ = false;
 		}
-		virtual void OnUpdate(AnimationBase* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
 		}
 	};
