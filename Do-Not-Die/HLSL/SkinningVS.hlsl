@@ -60,8 +60,7 @@ VS_OUT VS(VS_IN input)
 	matrix world_matrix = mul(local, world);
 
 	float4 world_vector = mul(animation_vector, world_matrix);
-	float4 view_vector = mul(world_vector, view_matrix);
-	float4 proj_vector = mul(view_vector, projection_matrix);
+    float4 proj_vector = mul(world_vector, ViewProjection());
 
 	output.lod = 0;
 	output.p = proj_vector;
