@@ -81,16 +81,20 @@ void InGameScene::OnInit()
 
 	QUADTREE->ImportGuideLines("DND_Blocking_1.mapdat", GuideType::eBlocking);
 	QUADTREE->ImportGuideLines("DND_NpcTrack_1.mapdat", GuideType::eNpcTrack);
+	QUADTREE->ImportGuideLines("DND_PlayerStart_1.mapdat", GuideType::eSpawnPoint);
+
+	QUADTREE->SetBlockingFields("DND_Blocking_1");
+	QUADTREE->SetPlayerStart("DND_PlayerStart_1", character_actor, 45);
 	
 	// LOADING : LOADING_ACTOR
 	loading_progress = LOADING_ACTOR;
-
+	
 	environment_.CreateEnvironment();
 	environment_.SetWorldTime(180, 360);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(0.2f, 0.2f);
-
+	
 	
 	//EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 
@@ -105,6 +109,7 @@ void InGameScene::OnInit()
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("FPS", &TIMER->fps);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Time Countdown", &sys_wave_.countdown_timer_);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Waves", &sys_wave_.wave_count_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("RaycastTri", &QUADTREE->raycast_calculated);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Jump", &character_actor->GetMovementComponent()->jump_pulse);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Gravity", &character_actor->GetMovementComponent()->gravity_pulse);
 }
@@ -113,12 +118,12 @@ void InGameScene::OnUpdate()
 {
 	QUADTREE->Frame(&sys_camera);
 	QUADTREE->UpdatePhysics("PhysicsCS.cso");
-
+	
 	static float cur_time = 0.0f;
 	
 	cur_time += TM_DELTATIME;
 	const auto npc_guidlines = QUADTREE->GetGuideLines("DND_NpcTrack_1");
-
+	
 	if (cur_time >= 10.0f) {
 		auto enemy_entity = SCENE_MGR->AddActor<Enemy>();
 		auto enemy_actor = SCENE_MGR->GetActor<Enemy>(enemy_entity);
@@ -141,7 +146,6 @@ void InGameScene::OnUpdate()
 		cur_zombie_created++;
 	}
 
-	
 	sys_camera.OnUpdate(reg_scene_);
 	sys_animation.OnUpdate(reg_scene_);
 	sys_light.OnUpdate(reg_scene_);

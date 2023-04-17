@@ -44,13 +44,13 @@ void UI_Minimap::UpdateThisUI()
 		// if player, continue;
 		if (entity == player->GetEntityId())
 		{
-			XMMATRIX player_world = player->GetTranformMatrix();
+			XMMATRIX player_world = player->GetTransformMatrix();
 			RenderPlayerIcon(player_world);
 		}
 		else
 		{
 			auto zombie = SCENE_MGR->GetActor<Enemy>(entity);
-			XMMATRIX zombie_world = zombie->GetTranformMatrix();
+			XMMATRIX zombie_world = zombie->GetTransformMatrix();
 			RenderZombieIcon(zombie_world);
 		}
 	}
