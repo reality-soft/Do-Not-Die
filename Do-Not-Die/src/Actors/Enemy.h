@@ -32,6 +32,9 @@ private:
 private:
 	reality::BehaviorTree behavior_tree_;
 
+public:
+	bool is_hit_ = false;
+
 private:
 	bool is_moving_ = false;
 

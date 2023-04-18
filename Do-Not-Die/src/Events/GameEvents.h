@@ -7,6 +7,20 @@
 #include "FX_ConcreteImpact.h"
 using namespace reality;
 
+class TakeDamageEvent : public reality::Event
+{
+public:
+	TakeDamageEvent(float damage, entt::entity actor_hit) : damage_(damage), actor_hit_(actor_hit) {}
+
+	virtual void Process() override {
+		GameCharacter* character = SCENE_MGR->GetActor<GameCharacter>(actor_hit_);
+		character->TakeDamage(damage_);
+	};
+private:
+	float damage_;
+	entt::entity actor_hit_;
+};
+
 class AttackEvent : public Event
 {
 public:
@@ -39,19 +53,5 @@ private:
 
 	vector<RayShape> rays_;
 	entt::entity actor_id_;
-};
-
-class TakeDamageEvent : public reality::Event
-{
-public:
-	TakeDamageEvent(float damage, entt::entity actor_hit) : damage_(damage), actor_hit_(actor_hit) {}
-
-	virtual void Process() override {
-		GameCharacter* character = SCENE_MGR->GetActor<GameCharacter>(actor_hit_);
-		character->TakeDamage(damage_);
-	};
-private:
-	float damage_;
-	entt::entity actor_hit_;
 };
 
