@@ -11,5 +11,8 @@ public:
 	void SetDir(FXMVECTOR dir, float speed);
 private:
 	XMFLOAT3	dir_;
+	bool		exploded_;
+	float		timer_;
+	float		explosion_time_;
 };
 
