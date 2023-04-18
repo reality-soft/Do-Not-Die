@@ -83,6 +83,7 @@ void Enemy::SetCurHp(int hp)
 
 void Enemy::TakeDamage(int damage)
 {
+	
 }
 
 void Enemy::SetDirection(const XMVECTOR& direction)

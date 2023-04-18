@@ -9,6 +9,7 @@
 #include "FX_Flame.h"
 #include "FX_Muzzle.h"
 #include "FX_Explosion.h"
+#include "GameEvents.h"
 
 using namespace reality;
 
@@ -198,13 +199,7 @@ void Player::Fire()
 		// Make Shot Impact Effect
 		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
  		RayShape ray = ingame_scene->GetCameraSystem().CreateFrontRay();
-		RayCallback raycallback = QUADTREE->Raycast(ray);
-
-		if (raycallback.success && raycallback.is_actor)
-			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback.point, raycallback.normal);
-
-		else if (raycallback.success && !raycallback.is_actor)
-			EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback.point, raycallback.normal);
+		EVENT->PushEvent<
 	}
 }
 

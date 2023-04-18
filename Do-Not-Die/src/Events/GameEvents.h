@@ -3,6 +3,8 @@
 #include "Engine_include.h"
 #include "Shape.h"
 #include "GameCharacter.h"
+#include "FX_BloodImpact.h"
+#include "FX_ConcreteImpact.h"
 using namespace reality;
 
 class AttackEvent : public Event
@@ -21,6 +23,12 @@ public:
 			if (raycallback.is_actor) {
 				actors_hit.insert(raycallback.ent);
 			}
+
+			if (raycallback.success && raycallback.is_actor)
+				EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback.point, raycallback.normal);
+
+			else if (raycallback.success && !raycallback.is_actor)
+				EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback.point, raycallback.normal);
 		}
 		
 		for (const auto& actor_hit : actors_hit) {
