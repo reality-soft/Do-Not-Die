@@ -66,10 +66,10 @@ void Player::OnInit(entt::registry& registry)
 	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
 
 	// create anim slot
-	AnimationBase animation_base;
-	C_Animation animation(&animation_base);
-	animation.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6, entity_id_);
-	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+	C_Animation animation_component;
+	animation_component.SetBaseAnimObject<AnimationBase>();
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6, entity_id_);
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
 	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
 
