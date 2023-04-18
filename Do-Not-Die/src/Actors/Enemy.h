@@ -78,6 +78,7 @@ namespace reality {
 		enum States {
 			IDLE,
 			MOVE,
+			HIT,
 		};
 
 		ZombieAnimationStateMachine(entt::entity owner_id) : AnimationStateMachine(owner_id) {};
@@ -85,6 +86,7 @@ namespace reality {
 		virtual void OnInit() override {
 			states_.insert({ IDLE, make_shared<Idle>() });
 			states_.insert({ MOVE, make_shared<Move>() });
+			states_.insert({ HIT, make_shared<Hit>() });
 			transitions_.insert({ IDLE, Transition(MOVE,[this](const AnimationBase* animation_base) {
 					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 					if (enemy->IsMoving()) {
@@ -98,6 +100,46 @@ namespace reality {
 			transitions_.insert({ MOVE, Transition(IDLE,[this](const AnimationBase* animation_base) {
 					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 					if (enemy->IsMoving() == false) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				})
+				});
+			transitions_.insert({ IDLE, Transition(HIT,[this](const AnimationBase* animation_base) {
+					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+					if (enemy->is_hit_) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				})
+				});
+			transitions_.insert({ HIT, Transition(IDLE,[this](const AnimationBase* animation_base) {
+					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+					if (IsAnimationEnded()) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				})
+				});
+			transitions_.insert({ MOVE, Transition(HIT,[this](const AnimationBase* animation_base) {
+					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+					if (enemy->is_hit_) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				})
+				});
+			transitions_.insert({ HIT, Transition(MOVE,[this](const AnimationBase* animation_base) {
+					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+					if (IsAnimationEnded() == false) {
 						return true;
 					}
 					else {
@@ -136,10 +178,27 @@ namespace reality {
 		public:
 			virtual void Enter(AnimationStateMachine* animation_base) override
 			{
-				animation_base->SetAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim", 0.3f);
+				animation_base->SetAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim", 0.8f);
 			}
 			virtual void Exit(AnimationStateMachine* animation_base) override
 			{
+			}
+			virtual void OnUpdate(AnimationStateMachine* animation_base) override
+			{
+			}
+		};
+
+		class Hit : public AnimationState {
+		public:
+			Hit() : AnimationState(HIT) {}
+		public:
+			virtual void Enter(AnimationStateMachine* animation_base) override
+			{
+				animation_base->SetAnimation("Zombie_Atk_KnockBack_1_IPC_Anim_Unreal Take.anim", 0.3f);
+			}
+			virtual void Exit(AnimationStateMachine* animation_base) override
+			{
+				SCENE_MGR->GetActor<Enemy>(animation_base->GetOwnerId())->is_hit_ = false;
 			}
 			virtual void OnUpdate(AnimationStateMachine* animation_base) override
 			{
