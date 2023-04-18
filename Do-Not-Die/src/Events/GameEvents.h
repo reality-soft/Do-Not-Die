@@ -8,22 +8,28 @@ using namespace reality;
 class AttackEvent : public Event
 {
 public:
-	AttackEvent(RayShape ray, entt::entity actor_id) : ray_(ray), actor_id_(actor_id) {};
+	AttackEvent(vector<RayShape> rays, entt::entity actor_id) : rays_(rays), actor_id_(actor_id) {};
 
 	virtual void Process() override {
-		RayCallback raycallback = QUADTREE->Raycast(ray_);
-		
+		set<entt::entity> actors_hit;
 		GameCharacter* character = SCENE_MGR->GetActor<GameCharacter>(actor_id_);
-
 		float damage = character->GetCharacterDamage();
 
-		if (raycallback.is_actor == true) {
-			EVENT->PushEvent<TakeDamageEvent>(damage, raycallback.ent);
+		for (const auto& cur_ray : rays_) {
+			RayCallback raycallback = QUADTREE->Raycast(cur_ray);
+			
+			if (raycallback.is_actor) {
+				actors_hit.insert(raycallback.ent);
+			}
+		}
+		
+		for (const auto& actor_hit : actors_hit) {
+			EVENT->PushEvent<TakeDamageEvent>(damage, actor_hit);	
 		}
 	};
 private:
 
-	RayShape ray_;
+	vector<RayShape> rays_;
 	entt::entity actor_id_;
 };
 
