@@ -199,7 +199,7 @@ void Player::Fire()
 		// Make Shot Impact Effect
 		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
  		RayShape ray = ingame_scene->GetCameraSystem().CreateFrontRay();
-		EVENT->PushEvent<
+		EVENT->PushEvent<AttackEvent>(vector<RayShape>{ray}, entity_id_);
 	}
 }
 
