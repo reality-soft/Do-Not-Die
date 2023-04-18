@@ -94,7 +94,9 @@ void InGameScene::OnInit()
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(0.2f, 0.2f);
-	
+	//single_shadow.Init({ 5000,15000 }, { 8192,8192 }, { 1024,1024 }, "DepthMapVS.cso", "ShadowVS.cso", "ShadowPS.cso");
+	//single_shadow.static_mesh_level_ = &level;
+	//single_shadow.RenderDepthMap(XMVectorSet(5000, 5000, -5000, 0), XMVectorZero());
 	
 	//EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
 
@@ -174,6 +176,9 @@ void InGameScene::OnRender()
 {
 	environment_.Render();
 	
+	//single_shadow.RenderShadowMap();
+	//single_shadow.SetShadowMapSRV();
+
 	level.Update();
 	level.Render();
 
