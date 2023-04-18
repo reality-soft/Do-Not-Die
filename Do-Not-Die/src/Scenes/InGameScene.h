@@ -1,11 +1,10 @@
 #pragma once
 #include "Engine_Include.h"
+#include "StaticShadows.h"
 #include "TestWidget.h"
 #include "UI_Actor_Ingame.h"
-#include "StaticShadowMap.h"
 #include "TriggerSystem.h"
 #include "WaveSystem.h"
-
 using namespace reality;
 
 enum E_IngameLoading
@@ -39,8 +38,8 @@ private:
 	};
 
 	Environment environment_;
-	StaticShadowMap ssm;
 	StaticMeshLevel level;
+	//SingleShadow single_shadow;
 
 	reality::LightingSystem sys_light;
 	reality::AnimationSystem sys_animation;
