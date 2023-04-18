@@ -72,9 +72,9 @@ void Enemy::Attack()
 {
 }
 
-int Enemy::GetMaxHp() const
+float Enemy::GetMaxHp() const
 {
-	return 0;
+	return max_hp_;
 }
 
 void Enemy::SetCurHp(int hp)
@@ -108,7 +108,7 @@ void Enemy::SetMeshId(const string& mesh_id)
 	skm->skeletal_mesh_id = mesh_id;
 }
 
-int Enemy::GetCurHp() const
+float Enemy::GetCurHp() const
 {
-	return 0;
+	return cur_hp_;
 }

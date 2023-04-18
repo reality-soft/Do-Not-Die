@@ -1,7 +1,5 @@
 #pragma once
-#include "Engine_include.h"
-#include "AnimationStateMachine.h"
-#include "AnimationState.h"
+#include "GameCharacter.h"
 
 #define INVENTORY_MAX 4
 
@@ -9,7 +7,7 @@ class ItemBase;
 
 using namespace reality;
 
-class Player : public reality::Character
+class Player : public GameCharacter
 {
 public:
 	virtual void OnInit(entt::registry& registry) override;
@@ -37,18 +35,16 @@ public:
 	void SetPos(const XMVECTOR& position = { 0.f, 100.f, 0.f, 0.f });
 
 public:
-	int GetMaxHp() const;
-	void SetCurHp(int hp);
-	void TakeDamage(int damage);
-	int GetCurHp() const;
+	virtual float GetMaxHp() const override;
+	virtual void SetCurHp(int hp) override;
+	virtual void TakeDamage(int damage) override;
+	virtual float GetCurHp() const override;
 
 private:
 	void AddFlashLight();
 	void UpdateFlashLight();
 
 private:
-	int max_hp_;
-	int cur_hp_;
 	bool is_aiming_ = false;
 
 public:

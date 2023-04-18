@@ -1,9 +1,7 @@
 #pragma once
-#include "Engine_include.h"
-#include "AnimationStateMachine.h"
-#include "AnimationState.h"
+#include "GameCharacter.h"
 
-class Enemy : public reality::Character
+class Enemy : public GameCharacter
 {
 public:
 	virtual void OnInit(entt::registry& registry) override;
@@ -17,17 +15,15 @@ public:
 	void Attack();
 
 public:
-	int	 GetMaxHp() const;
-	int	 GetCurHp() const;
-	void SetCurHp(int hp);
-	void TakeDamage(int damage);
+	float	 GetMaxHp() const override;
+	float	 GetCurHp() const override;
+	void SetCurHp(int hp) override;
+	void TakeDamage(int damage) override;
+
+public:
 	void SetDirection(const XMVECTOR& direction);
 	void SetRoute(const vector<XMVECTOR>& target_poses);
 	void SetMeshId(const string& mesh_id);
-
-private:
-	int max_hp_;
-	int cur_hp_;
 
 private:
 	string mesh_id_;

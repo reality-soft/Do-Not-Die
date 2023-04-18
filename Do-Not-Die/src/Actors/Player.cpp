@@ -257,7 +257,7 @@ void Player::SetPos(const XMVECTOR& position)
 	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, transform_matrix_);
 }
 
-int Player::GetMaxHp() const
+float Player::GetMaxHp() const
 {
 	return max_hp_;
 }
@@ -272,7 +272,7 @@ void Player::TakeDamage(int damage)
 	cur_hp_ -= damage;
 }
 
-int Player::GetCurHp() const
+float Player::GetCurHp() const
 {
 	return cur_hp_;
 }
