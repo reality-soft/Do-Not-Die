@@ -3,7 +3,6 @@
 #include "AnimationStateMachine.h"
 #include "AnimationState.h"
 #include "GameCharacter.h"
-
 #include "Item.h"
 
 #define INVENTORY_MAX 4

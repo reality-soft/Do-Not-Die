@@ -166,7 +166,9 @@ void Player::MoveBack()
 
 void Player::Jump()
 {
-	movement_component_->jump_pulse = 500.0f;
+	if (movement_component_->jump_pulse <= 0 && movement_component_->gravity_pulse <= 0) {
+		movement_component_->jump_pulse = 300.0f;
+	}
 }
 
 void Player::Idle()

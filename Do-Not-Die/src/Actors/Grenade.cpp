@@ -2,6 +2,7 @@
 #include "Engine_include.h"
 #include "FX_Explosion.h"
 #include "EventMgr.h"
+#include "Player.h"
 
 using namespace reality;
 
@@ -16,7 +17,7 @@ void Grenade::OnInit(entt::registry& registry)
 	reality::C_StaticMesh stm;
 	stm.local = XMMatrixIdentity();
 	stm.world = XMMatrixIdentity();
-	stm.static_mesh_id = "grenade.stmesh";
+	stm.static_mesh_id = "Grenade.stmesh";
 	stm.vertex_shader_id = "StaticMeshVS.cso";
 	registry.emplace_or_replace<reality::C_StaticMesh>(entity_id_, stm);
 
@@ -40,6 +41,11 @@ void Grenade::OnUpdate()
 	{
 		exploded_ = true;
 		EFFECT_MGR->SpawnEffect<FX_Explosion>(T);
+
+		auto player = SCENE_MGR->GetPlayer<Player>(0);
+		player->GetPos();
+		EVENT->PushEvent<CameraShakeEvent>(player->GetEntityId(), 0.3f, 10.0f, 0.2f);
+
 		EVENT->PushEvent<DeleteActorEvent>(GetEntityId());
 	}
 	else 
