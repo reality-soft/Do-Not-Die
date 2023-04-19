@@ -232,7 +232,8 @@ bool Player::IsAiming()
 
 void Player::ResetPos()
 {
-	transform_matrix_ = XMMatrixTranslationFromVector({ 0.f, 100.f, 0.f, 0.f });
+	spawn_point.m128_f32[1] += 100.f;
+	transform_matrix_ = XMMatrixTranslationFromVector(spawn_point);
 	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, transform_matrix_);
 }
 
@@ -421,4 +422,10 @@ vector<shared_ptr<ItemBase>>& Player::GetInventory()
 vector<float>& Player::GetInventoryTimer()
 {
 	return inventory_timer_;
+}
+
+void Player::SetSpawnPoint(XMVECTOR point)
+{
+	spawn_point = point;
+	ResetPos();
 }
