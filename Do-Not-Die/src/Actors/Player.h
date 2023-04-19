@@ -1,6 +1,6 @@
 #pragma once
 #include "GameCharacter.h"
-
+#include "Item.h"
 
 #define INVENTORY_MAX 4
 
