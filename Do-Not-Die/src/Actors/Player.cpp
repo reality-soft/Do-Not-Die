@@ -32,6 +32,10 @@ void Player::OnInit(entt::registry& registry)
 	camera.SetLocalFrom(capsule, 50);
 	registry.emplace<C_Camera>(entity_id_, camera);
 
+	C_SoundGenerator sound_generator;
+	sound_generator.local;
+	registry.emplace<C_SoundGenerator>(entity_id_, sound_generator);
+
 	C_SoundListener sound_listener;
 	sound_listener.local = camera.local;
 	registry.emplace<C_SoundListener>(entity_id_, sound_listener);
@@ -57,6 +61,7 @@ void Player::OnInit(entt::registry& registry)
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SkeletalMesh));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_Camera));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SoundListener));
+	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SoundGenerator));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_SkeletalMesh), TYPE_ID(C_Socket));
 
 	transform_matrix_ = XMMatrixTranslation(0, 100, 0);
@@ -187,6 +192,15 @@ void Player::Fire()
 		XMVECTOR s, r, t;
 		XMMatrixDecompose(&s, &r, &t, player_transform);
 		EFFECT_MGR->SpawnEffect<FX_Muzzle>(t);
+
+		// Make Shot Sound when Shot
+		auto& generator = reg_scene_->get<C_SoundGenerator>(GetEntityId());
+		SoundQueue queue;
+		queue.sound_filename = "S_WEP_Fire_001.wav";
+		queue.sound_type = SoundType::SFX;
+		queue.sound_volume = 0.5f;
+		queue.is_looping = false;
+		generator.sound_queue_list.push(queue);
 
 		// Make Shot Impact Effect
 		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
