@@ -10,9 +10,9 @@ namespace reality
 		virtual void OnUpdate(entt::registry& reg) override;
 
 		void AddTriggerAtActor(entt::entity ent, float radius);
+		bool IsActorInTrigger(entt::entity ent, const C_TriggerVolume& trigger);
 
 	private:
-		bool IsActorInTrigger(entt::entity ent, const C_TriggerVolume& trigger);
 		map<entt::entity, entt::entity> current_triggers;
 	};
 }

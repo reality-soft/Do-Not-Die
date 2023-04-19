@@ -8,23 +8,24 @@ namespace reality
 	enum class TriggerType
 	{
 		ITEM_TO_PLAYER,
+		REPAIR_PART_EXTRACT,
 		ZOMBIE_ACTIVITY,
 	};
 
 	class TriggerEvent : public Event
 	{
 	public:
-		TriggerEvent(entt::entity target_actor, entt::entity trigger_actor, bool begin_or_end);
+		TriggerEvent(entt::entity target_actor, entt::entity trigger_actor, bool is_begin);
 
 		virtual void Process() override;
 
 	private:
-		entt::entity target_actor_;
 		entt::entity trigger_actor_;
-		bool begin_or_end_;
+		entt::entity target_actor_;
 		TriggerType trigger_type_;
-		Item* item_actor_ = nullptr;
+		bool is_begin_;
 
 		void PlayerSelectable(Item* item_actor, bool selectable);
+		void PlayerCanExtract(bool can_extract);
 	};
 }
