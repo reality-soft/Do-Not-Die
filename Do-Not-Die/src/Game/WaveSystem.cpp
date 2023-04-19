@@ -4,10 +4,7 @@
 
 void reality::WaveSystem::OnCreate(entt::registry& reg)
 {
-	QUADTREE->ImportGuideLines("ItemSpawn.mapdat", GuideType::eSpawnPoint);
-	QUADTREE->ImportGuideLines("DND_RepairPart_1.mapdat", GuideType::eSpawnPoint);
-
-	item_spawns_ = QUADTREE->GetGuideLines("ItemSpawn")->at(0);
+	item_spawns_ = QUADTREE->GetGuideLines("DND_ItemSpawn_1")->at(0);
 	repair_spawns_ = QUADTREE->GetGuideLines("DND_RepairPart_1")->at(0);
 }
 
@@ -24,7 +21,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 		{
 		case Day::eNoon:
 			countdown_timer_ = fabs(world_env_->GetTimeLimits().x * 2);
-			RandomSpawnItem(15.0f);
+			RandomSpawnItem(30);
 			break;
 		case Day::eNight:
 			countdown_timer_ = fabs(world_env_->GetTimeLimits().y * 2);
