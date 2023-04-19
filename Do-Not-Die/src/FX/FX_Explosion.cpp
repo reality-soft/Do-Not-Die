@@ -16,7 +16,7 @@ void FX_Explosion::OnInit(entt::registry& registry)
 
 	AddSoundGeneratorComponent();
 
-	AddSoundQueue("S_Explosion_01.wav", SFX, false, 30.0f);
+	AddSoundQueue("S_Explosion_01.wav", SFX, false, 0.5f);
 }
 
 void FX_Explosion::OnUpdate()

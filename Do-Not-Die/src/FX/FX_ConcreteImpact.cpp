@@ -13,6 +13,5 @@ void FX_ConcreteImpact::OnInit(entt::registry& registry)
 
 	AddSoundGeneratorComponent();
 
-	AddSoundQueue("S_WEP_Fire_001.wav", SoundType::SFX, false, 10.0f);
 }
 
