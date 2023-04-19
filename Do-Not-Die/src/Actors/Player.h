@@ -2,6 +2,8 @@
 #include "Engine_include.h"
 #include "AnimationStateMachine.h"
 #include "AnimationState.h"
+#include "GameCharacter.h"
+
 #include "Item.h"
 
 #define INVENTORY_MAX 4
@@ -10,7 +12,7 @@ class ItemBase;
 
 using namespace reality;
 
-class Player : public reality::Character
+class Player : public GameCharacter
 {
 public:
 	virtual void OnInit(entt::registry& registry) override;
@@ -38,26 +40,29 @@ public:
 	void SetPos(const XMVECTOR& position = { 0.f, 100.f, 0.f, 0.f });
 
 public:
-	int GetMaxHp() const;
-	void SetCurHp(int hp);
-	void TakeDamage(int damage);
-	int GetCurHp() const;
+	virtual float GetMaxHp() const override;
+	virtual void SetCurHp(int hp) override;
+	virtual void TakeDamage(int damage) override;
+	virtual float GetCurHp() const override;
 
 private:
 	void AddFlashLight();
 	void UpdateFlashLight();
+
 private:
-	int max_hp_;
-	int cur_hp_;
 	bool is_aiming_ = false;
+
+public:
+	bool is_firing_ = false;
+
 private:
-	float fire_cooltime_ = 0.2f;
-	float fire_timer_ = 0.0f;
 	float grenade_cooltime_ = 3.0f;
 	float grenade_timer_ = 0.0f;
+
 private:
 	vector<shared_ptr<ItemBase>>	inventory_;
 	vector<float>					inventory_timer_;
+
 public:
 	map<float, Item*> selectable_items_;
 	UINT selectable_counts_ = 0;
@@ -66,10 +71,9 @@ public:
 	void PickClosestItem();
 	vector<shared_ptr<ItemBase>>&	GetInventory();
 	vector<float>&					GetInventoryTimer();
+
 private:
 	void UpdateTimer();
-public:
-	bool fire_ = false;
 };
 
 class PlayerUpperBodyAnimationStateMachine : public AnimationStateMachine {
@@ -108,7 +112,7 @@ public:
 		});
 		transitions_.insert({ AIM_POSE, Transition(FIRE,[this](const AnimationStateMachine* animation_base) {
 				Player* player = SCENE_MGR->GetActor<Player>(owner_id_);
-				if (player->fire_ == true) {
+				if (player->is_firing_ == true) {
 					return true;
 				}
 				else {
@@ -119,7 +123,6 @@ public:
 		transitions_.insert({ FIRE, Transition(AIM_POSE,[this](const AnimationStateMachine* animation_base) {
 				Player* player = SCENE_MGR->GetActor<Player>(owner_id_);
 				if (this->IsAnimationEnded()) {
-					player->fire_ = false;
 					return true;
 				}
 				else {
@@ -178,6 +181,8 @@ public:
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
+			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+			player->is_firing_ = false;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{

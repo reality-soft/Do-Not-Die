@@ -8,7 +8,7 @@ void Enemy::OnInit(entt::registry& registry)
 	Character::OnInit(registry);
 
 	// setting character data
-	movement_component_->speed = 100;
+	movement_component_->speed = 60;
 	max_hp_ = cur_hp_ = 100;
 
 	// setting character objects
@@ -33,9 +33,9 @@ void Enemy::OnInit(entt::registry& registry)
 	reality::C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
 	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180.f));
 
-	AnimationBase animation_base;
-	C_Animation animation(&animation_base);
-	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+	C_Animation animation_component;
+	animation_component.SetBaseAnimObject<ZombieAnimationStateMachine>(entity_id_);
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 	SetCharacterAnimation("Zombie_Idle_1_v2_IPC_Anim_Unreal Take.anim");
 
 	// setting a character into quad tree
@@ -57,6 +57,7 @@ void Enemy::SetCharacterAnimation(string anim_id) const
 
 void Enemy::Move()
 {
+	is_moving_ = true;
 }
 
 void Enemy::Jump()
@@ -71,9 +72,9 @@ void Enemy::Attack()
 {
 }
 
-int Enemy::GetMaxHp() const
+float Enemy::GetMaxHp() const
 {
-	return 0;
+	return max_hp_;
 }
 
 void Enemy::SetCurHp(int hp)
@@ -82,6 +83,10 @@ void Enemy::SetCurHp(int hp)
 
 void Enemy::TakeDamage(int damage)
 {
+	if (is_hit_ == false) {
+		is_hit_ = true;
+		cur_hp_ -= damage;
+	}
 }
 
 void Enemy::SetDirection(const XMVECTOR& direction)
@@ -107,7 +112,7 @@ void Enemy::SetMeshId(const string& mesh_id)
 	skm->skeletal_mesh_id = mesh_id;
 }
 
-int Enemy::GetCurHp() const
+float Enemy::GetCurHp() const
 {
-	return 0;
+	return cur_hp_;
 }

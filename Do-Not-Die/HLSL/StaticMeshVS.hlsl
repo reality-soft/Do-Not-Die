@@ -24,6 +24,8 @@ struct VS_OUT
     float lod : TEXCOORD1;
     float3 view_dir : TEXCOORD2;
     float3 origin : NORMAL1;
+
+    float4x4 normal_transform : TEXCOORD3;
 };
 
 VS_OUT VS(VS_IN input)
@@ -36,18 +38,17 @@ VS_OUT VS(VS_IN input)
     float4 animated_local = mul(local, animation_matrix);
     animated_local = mul(animated_local, owner_local);
 
-    float3 animated_normal = mul(input.n, animation_matrix);
-    animated_normal = mul(animated_normal, owner_local);
-    
+    output.normal_transform = IdentityMatrix();
+
     float4 world = mul(animated_local, world_matrix);
     float4 projection = mul(world, ViewProjection());
 
     output.lod = GetLod(input.p);
 
     output.p = projection;
-    output.n = animated_normal;
+    output.n = input.n;
     output.t = input.t;
-    
+
     output.lod = GetLod(input.p);
     output.view_dir = normalize(camera_world - world).xyz;
     output.origin = world;
