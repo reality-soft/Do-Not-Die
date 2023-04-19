@@ -1,9 +1,10 @@
 #pragma once
 #include "Engine_Include.h"
+#include "StaticShadows.h"
 #include "TestWidget.h"
 #include "UI_Actor_Ingame.h"
-#include "StaticShadowMap.h"
-
+#include "TriggerSystem.h"
+#include "WaveSystem.h"
 using namespace reality;
 
 enum E_IngameLoading
@@ -37,8 +38,8 @@ private:
 	};
 
 	Environment environment_;
-	StaticShadowMap ssm;
 	StaticMeshLevel level;
+	//SingleShadow single_shadow;
 
 	reality::LightingSystem sys_light;
 	reality::AnimationSystem sys_animation;
@@ -49,13 +50,15 @@ private:
 	reality::MovementSystem  sys_movement;
 	reality::UISystem		sys_ui;
 
-	StaticObject test_object;
+	TriggerSystem sys_trigger_;
+	WaveSystem sys_wave_;
 
+public:
+	reality::CameraSystem GetCameraSystem() { return sys_camera; }
 private:
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
 	UI_Actor_Ingame ingame_ui;
-	void CreateImpactEffectFromRay();
 	void CreateExplosionEffectFromRay();
 	void CursorStateUpdate();
 

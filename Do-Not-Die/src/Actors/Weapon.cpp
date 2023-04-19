@@ -26,7 +26,7 @@ void Weapon::OnInit(entt::registry& registry)
 
 void Weapon::OnUpdate()
 {
-	Character* owner_character = SCENE_MGR->GetActor<Character>(owner_id_);
+	reality::Character* owner_character = SCENE_MGR->GetActor<reality::Character>(owner_id_);
 
 	if (owner_character == nullptr) {
 		return;

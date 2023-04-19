@@ -1,5 +1,14 @@
 #include "Player.h"
 #include "Weapon.h"
+#include "InGameScene.h"
+#include "ItemObjects.h"
+#include "Grenade.h"
+#include "FX_BloodImpact.h"
+#include "FX_ConcreteImpact.h"
+#include "FX_Flame.h"
+#include "FX_Muzzle.h"
+#include "FX_Explosion.h"
+#include "GameEvents.h"
 
 using namespace reality;
 
@@ -9,7 +18,7 @@ void Player::OnInit(entt::registry& registry)
 
 	movement_component_->speed = 150;
 	max_hp_ = cur_hp_ = 100;
-
+	
 	reality::C_SkeletalMesh skm;
 	skm.skeletal_mesh_id = "SM_Chr_Biker_Male_01.skmesh";
 	skm.vertex_shader_id = "SkinningVS.cso";
@@ -57,15 +66,24 @@ void Player::OnInit(entt::registry& registry)
 	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
 
 	// create anim slot
-	AnimationBase animation_base;
-	C_Animation animation(&animation_base);
-	animation.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6, entity_id_);
-	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+	C_Animation animation_component;
+	animation_component.SetBaseAnimObject<AnimationBase>();
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6, entity_id_);
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
 	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
 
 	// FlashLight
 	AddFlashLight();
+
+	// Inventory
+	inventory_.resize(INVENTORY_MAX);
+	inventory_timer_.resize(INVENTORY_MAX);
+
+	cur_hp_ = 0;
+
+	// true means : this actor causes trigger event when overlaped at trigger 
+	trigger_sensor = true;
 }
 
 void Player::OnUpdate()
@@ -80,6 +98,8 @@ void Player::OnUpdate()
 
 	// FlashLight Update
 	UpdateFlashLight();
+
+	UpdateTimer();
 }
 
 void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
@@ -146,8 +166,7 @@ void Player::MoveBack()
 
 void Player::Jump()
 {
-	movement_component_->jump_scale = 1000.0f;
-	movement_state_ = MovementState::GRAVITY_FALL;
+	movement_component_->jump_pulse = 500.0f;
 }
 
 void Player::Idle()
@@ -157,8 +176,20 @@ void Player::Idle()
 
 void Player::Fire()
 {
-	if (is_aiming_) {
-		fire_ = true;
+	if (is_aiming_ && !is_firing_) {
+
+		is_firing_ = true;
+
+		// Make Muzzle when Shot
+		auto player_transform = GetTransformMatrix();
+		XMVECTOR s, r, t;
+		XMMatrixDecompose(&s, &r, &t, player_transform);
+		EFFECT_MGR->SpawnEffect<FX_Muzzle>(t);
+
+		// Make Shot Impact Effect
+		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+ 		RayShape ray = ingame_scene->GetCameraSystem().CreateFrontRay();
+		EVENT->PushEvent<AttackEvent>(vector<RayShape>{ray}, entity_id_);
 	}
 }
 
@@ -175,6 +206,23 @@ void Player::Aim()
 		camera->target_rotation = 0;
 		reg_scene_->emplace_or_replace<C_Camera>(entity_id_, *camera);
 	}
+}
+
+void Player::ThrowGrenade()
+{
+	if (grenade_timer_ < grenade_cooltime_)
+		return;
+
+	grenade_timer_ -= grenade_cooltime_;
+
+	auto grenade_entity = SCENE_MGR->AddActor<Grenade>();
+	auto grenade_actor = SCENE_MGR->GetActor<Grenade>(grenade_entity); 
+	XMVECTOR s, r, t;
+	XMMatrixDecompose(&s, &r, &t, transform_matrix_);
+	XMVECTOR pos = XMVectorAdd(t, XMVectorSet(0.0f, 50.0f, 0.0f, 0.0f));
+	grenade_actor->SetPos(pos);
+	XMVECTOR dir = XMVectorAdd(front_, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+	grenade_actor->SetDir(dir, 4.0f);
 }
 
 bool Player::IsAiming()
@@ -194,7 +242,7 @@ void Player::SetPos(const XMVECTOR& position)
 	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, transform_matrix_);
 }
 
-int Player::GetMaxHp() const
+float Player::GetMaxHp() const
 {
 	return max_hp_;
 }
@@ -209,7 +257,7 @@ void Player::TakeDamage(int damage)
 	cur_hp_ -= damage;
 }
 
-int Player::GetCurHp() const
+float Player::GetCurHp() const
 {
 	return cur_hp_;
 }
@@ -279,4 +327,98 @@ void Player::UpdateFlashLight()
 		spot_light_comp.spot_light.range = 0.0f;
 	}
 	
+}
+
+void Player::UpdateTimer()
+{
+	// Grenade Timer
+	if (grenade_timer_ < grenade_cooltime_)
+		grenade_timer_ += TIMER->GetDeltaTime();
+
+	// Inventory Timer
+	for (int i = 0; i < inventory_.size(); i++)
+	{
+		if (inventory_[i] == NULL)
+			continue;
+		if (inventory_[i]->GetCooltime() > inventory_timer_[i])
+		{
+			inventory_timer_[i] += TIMER->GetDeltaTime();
+		}
+
+	}
+}
+
+bool Player::AcquireItem(shared_ptr<ItemBase> item)
+{
+	string item_id = typeid(*item.get()).name();
+	
+	// 1. If item exists in inventory.
+	for (int i = 0; i < inventory_.size(); i++)
+	{
+		if (inventory_[i] == NULL)
+			continue;
+
+		if (item_id == typeid(*inventory_[i].get()).name())
+		{
+			inventory_[i]->AddCount(item->GetCount());
+			return true;
+		}
+	}
+
+	// 2. if Item doesn't exist in inventory, Check Inventory
+	for (int i = 0; i < inventory_.size(); i++)
+	{
+		if (inventory_[i] == NULL)
+		{
+			inventory_[i] = item;
+			item->SetOwner(this);
+			inventory_timer_[i] = 0;
+			return true;
+		}
+			
+	}
+
+	// 3. If Inventory was full, Can't Acquire Item
+	return false;
+}
+
+void Player::UseItem(int slot)
+{
+	if (INVENTORY_MAX <= slot)
+		return;
+
+	if (inventory_[slot] == NULL)
+		return;
+
+	if (inventory_timer_[slot] < inventory_[slot]->GetCooltime())
+		return;
+
+	inventory_[slot]->Use();
+
+	inventory_timer_[slot] = 0;
+
+	if (inventory_[slot]->GetCount() == 0)
+	{
+		inventory_[slot] = NULL;
+	}
+}
+
+void Player::PickClosestItem()
+{
+	if (selectable_items_.empty())
+		return;
+
+	auto closest_item = selectable_items_.begin();
+	EVENT->PushEvent<DeleteActorEvent>(closest_item->second->entity_id_);
+	selectable_items_.erase(closest_item);
+}
+
+vector<shared_ptr<ItemBase>>& Player::GetInventory()
+{
+	return inventory_;
+}
+
+vector<float>& Player::GetInventoryTimer()
+{
+	return inventory_timer_;
 }

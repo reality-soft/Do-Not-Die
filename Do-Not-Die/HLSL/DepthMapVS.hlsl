@@ -10,26 +10,24 @@ struct VS_IN
 struct VS_OUT
 {
     float4 p : SV_POSITION; 
-    float3 n : NORMAL;
-    float2 d : TEXCOORD;
+    float3 n : NORMAL0;
+    float2 d : NORMAL1;    
 };
 
 cbuffer CbShadowMatrix : register(b1)
 {
-    matrix shadow_view;
-    matrix shadow_proj;
+    matrix shadow_view_proj;
 };
 
 VS_OUT VS(VS_IN input)
 {
     VS_OUT output = (VS_OUT)0;
     float4 local = float4(input.p, 1.0f);
-    float4 world = mul(local, IdentityMatrix());
-    float4 project = mul(world, mul(shadow_view, shadow_proj));
+    float4 light_project = mul(local, shadow_view_proj);
     
-    output.p = project;
+    output.p = light_project;
     output.d = output.p.zw;
     output.n = input.n;
-    
+ 
     return output;
 }

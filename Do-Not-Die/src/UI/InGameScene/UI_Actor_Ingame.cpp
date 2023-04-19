@@ -2,6 +2,7 @@
 #include "UI_Actor_Ingame.h"
 #include "SceneMgr.h"
 #include "InGameScene.h"
+#include "ItemBase.h"
 
 using namespace reality;
 
@@ -19,7 +20,7 @@ void UI_Actor_Ingame::OnInit(entt::registry& registry)
 
 void UI_Actor_Ingame::OnUpdate()
 {
-	UIActor::OnUpdate();
+ 	UIActor::OnUpdate();
 
 	UpdateIngameUI();
 
@@ -37,13 +38,57 @@ void UI_Actor_Ingame::CreateIngameUI()
 	weapon_ui_->SetLocalRectByMin({ 100.0f, win_size_1920_height - 200.0f }, 512.0f, 179.0f);
 	ammo_text_ = make_shared<UI_Text>();
 	weapon_ui_->AddChildUI(ammo_text_);
-	ammo_text_->InitText("30", BASIC, { 320.0f, 72.0f }, 1.5f);
+	ammo_text_->InitText("30", BASIC, { 320.0f, 65.0f }, 1.3f);
 	ui_comp_->ui_list.insert({ "Weapon UI", weapon_ui_ });
 
 	// 상태 + 아이템 UI
 	status_ui = make_shared<UI_Image>();
 	status_ui->InitImage("T_ItemUI.png");
 	status_ui->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height - 150.0f }, 512.0f, 200.0f);
+
+	inven_[0] = make_shared<UI_Image>();
+	inven_[0]->InitImage("");
+	inven_[0]->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
+	inven_text_[0] = make_shared<UI_Text>();
+	inven_text_[0]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+	inven_[0]->AddChildUI(inven_text_[0]);
+	inven_cooltime_img_[0] = make_shared<UI_Image>();
+	inven_cooltime_img_[0]->InitImage("T_ItemCoolTime.png");
+	inven_[0]->AddChildUI(inven_cooltime_img_[0]);
+	inven_cooltime_img_[0]->SetLocalRectByMin({0.0f, 0.0f}, 90.0f, 90.0f);
+
+	inven_[1] = make_shared<UI_Image>();
+	inven_[1]->InitImage("");
+	inven_[1]->SetLocalRectByCenter({ 203.5f, 76.5f }, 90.0f, 90.0f);
+	inven_text_[1] = make_shared<UI_Text>();
+	inven_text_[1]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+	inven_[1]->AddChildUI(inven_text_[1]);
+	inven_cooltime_img_[1] = make_shared<UI_Image>();
+	inven_cooltime_img_[1]->InitImage("T_ItemCoolTime.png");
+	inven_[1]->AddChildUI(inven_cooltime_img_[1]);
+	inven_cooltime_img_[1]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
+
+	inven_[2] = make_shared<UI_Image>();
+	inven_[2]->InitImage("");
+	inven_[2]->SetLocalRectByCenter({ 306.5f, 76.5f }, 90.0f, 90.0f);
+	inven_text_[2] = make_shared<UI_Text>();
+	inven_text_[2]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+	inven_[2]->AddChildUI(inven_text_[2]);
+	inven_cooltime_img_[2] = make_shared<UI_Image>();
+	inven_cooltime_img_[2]->InitImage("T_ItemCoolTime.png");
+	inven_[2]->AddChildUI(inven_cooltime_img_[2]);
+	inven_cooltime_img_[2]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
+
+	inven_[3] = make_shared<UI_Image>();
+	inven_[3]->InitImage("");
+	inven_[3]->SetLocalRectByCenter({ 410.5f, 76.5f }, 90.0f, 90.0f);
+	inven_text_[3] = make_shared<UI_Text>();
+	inven_text_[3]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+	inven_[3]->AddChildUI(inven_text_[3]);
+	inven_cooltime_img_[3] = make_shared<UI_Image>();
+	inven_cooltime_img_[3]->InitImage("T_ItemCoolTime.png");
+	inven_[3]->AddChildUI(inven_cooltime_img_[3]);
+	inven_cooltime_img_[3]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
 
 	hp_img_ = make_shared<UI_Image>();
 	status_ui->AddChildUI(hp_img_);
@@ -184,6 +229,32 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	{
 		if (player_->IsAiming())
 			ui_comp_->ui_list.insert(make_pair("CrossHair UI", crosshair_ui_));
+	}
+
+	// Item UI Update
+	if (player_ != nullptr)
+	{
+		auto& inventory = player_->GetInventory();
+		auto& inventory_timer = player_->GetInventoryTimer();
+		for (int i = 0; i < INVENTORY_MAX; i++)
+		{
+			if (inventory[i] == NULL)
+			{
+				status_ui->DeleteChildUI(inven_[i]);
+			}
+			else
+			{
+				status_ui->AddChildUI(inven_[i]);
+				inven_[i]->SetImage(inventory[i]->GetIcon());
+				inven_text_[i]->SetText(to_string(inventory[i]->GetCount()));
+
+				auto& cooltime_local_rect = inven_cooltime_img_[i]->rect_transform_[E_Resolution::R1920x1080].local_rect;
+				float percentage = (inventory[i]->GetCooltime() - inventory_timer[i]) / inventory[i]->GetCooltime();
+				static float first_height = inven_[i]->rect_transform_[E_Resolution::R1920x1080].local_rect.height;
+				inven_cooltime_img_[i]->SetLocalRectByMax(cooltime_local_rect.max, cooltime_local_rect.width, 
+					first_height * percentage);
+			}
+		}
 	}
 	
 }
