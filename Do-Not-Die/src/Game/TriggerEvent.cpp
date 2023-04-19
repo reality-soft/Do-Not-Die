@@ -3,21 +3,23 @@
 
 using namespace reality;
 
-TriggerEvent::TriggerEvent(entt::entity target_actor, entt::entity trigger_actor, bool begin_or_end)
+TriggerEvent::TriggerEvent(entt::entity target_actor, entt::entity trigger_actor, bool is_begin)
 {
 	target_actor_ = target_actor;
 	trigger_actor_ = trigger_actor;
-	begin_or_end_ = begin_or_end;
+	is_begin_ = is_begin;
 
-	Item* item_actor = SCENE_MGR->GetActor<Item>(trigger_actor);
-	if (item_actor)
+	auto trigger_component = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_TriggerVolume>(trigger_actor_);
+	if (trigger_component == nullptr)
+		return;
+
+	if (trigger_component->tag == "item")
 	{
 		trigger_type_ = TriggerType::ITEM_TO_PLAYER;
-		item_actor_ = item_actor;
 	}
-	else
+	if (trigger_component->tag == "extract")
 	{
-		item_actor_ = nullptr;
+		trigger_type_ = TriggerType::REPAIR_PART_EXTRACT;
 	}
 }
 
@@ -26,7 +28,7 @@ void TriggerEvent::Process()
 	switch (trigger_type_)
 	{
 	case TriggerType::ITEM_TO_PLAYER:
-		if (begin_or_end_)
+		if (is_begin_)
 		{
 			auto item = SCENE_MGR->GetActor<Item>(trigger_actor_);
 			if (item == nullptr)
@@ -41,8 +43,21 @@ void TriggerEvent::Process()
 			PlayerSelectable(item, false);
 		}
 		break;
+
+	case TriggerType::REPAIR_PART_EXTRACT:	
+		if (is_begin_)
+		{
+			PlayerCanExtract(true);
+		}
+		else
+		{
+			PlayerCanExtract(false);
+		}
+
+		break;	
 	}
 }
+
 void reality::TriggerEvent::PlayerSelectable(Item* item_actor, bool selectable)
 {
 	// ITEM TEST CODE
@@ -135,4 +150,14 @@ void reality::TriggerEvent::PlayerSelectable(Item* item_actor, bool selectable)
 	//	break;
 	//}
 	
+}
+
+void reality::TriggerEvent::PlayerCanExtract(bool can_extract)
+{
+	auto player = SCENE_MGR->GetPlayer<Player>(0);
+	if (player == nullptr)
+		return;
+
+	player->can_extract_repair = can_extract;
+	player->repair_extract_trigger = trigger_actor_;
 }
