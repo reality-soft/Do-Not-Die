@@ -67,7 +67,7 @@ public:
 	map<float, Item*> selectable_items_;
 	UINT selectable_counts_ = 0;
 	bool AcquireItem(shared_ptr<ItemBase> item);
-	void UseItem(int slot);
+	void UseOrDropItem(int slot);
 	
 	vector<shared_ptr<ItemBase>>&	GetInventory();
 	vector<float>&					GetInventoryTimer();

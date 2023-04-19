@@ -385,7 +385,7 @@ bool Player::AcquireItem(shared_ptr<ItemBase> item)
 	return false;
 }
 
-void Player::UseItem(int slot)
+void Player::UseOrDropItem(int slot)
 {
 	if (INVENTORY_MAX <= slot)
 		return;
@@ -396,13 +396,34 @@ void Player::UseItem(int slot)
 	if (inventory_timer_[slot] < inventory_[slot]->GetCooltime())
 		return;
 
-	inventory_[slot]->Use();
+	static float drop_time = 0.0f;
+	drop_time += TM_DELTATIME;
 
-	inventory_timer_[slot] = 0;
-
-	if (inventory_[slot]->GetCount() == 0)
+	if ((slot == 1 && DINPUT->GetKeyState(DIK_1) == KEY_UP) ||
+		(slot == 2 && DINPUT->GetKeyState(DIK_2) == KEY_UP) || 
+		(slot == 3 && DINPUT->GetKeyState(DIK_3) == KEY_UP) || 
+		(slot == 3 && DINPUT->GetKeyState(DIK_3) == KEY_UP))
 	{
-		inventory_[slot] = NULL;
+		inventory_[slot]->Use();
+
+		inventory_timer_[slot] = 0;
+
+		if (inventory_[slot]->GetCount() == 0)
+		{
+			inventory_[slot] = NULL;
+		}
+		drop_time = 0.0f;
+	}
+	else if (drop_time >= 1.5)
+	{
+		SCENE_MGR->AddActor<Item>(inventory_[slot]->item_type_, _XMFLOAT3(GetPos()), 30);
+		inventory_[slot]->Drop();
+		inventory_timer_[slot] = 0;
+		if (inventory_[slot]->GetCount() == 0)
+		{
+			inventory_[slot] = NULL;
+		}
+		drop_time = 0.0f;
 	}
 }
 
@@ -412,6 +433,82 @@ void Player::PickClosestItem()
 		return;
 
 	auto closest_item = selectable_items_.begin();
+	switch (closest_item->second->item_type_)
+	{
+	case ItemType::eMedicalBox:
+	{
+		shared_ptr<MedicalBoxItem> medical_box = make_shared<MedicalBoxItem>();
+		medical_box->OnCreate();
+		medical_box->AddCount(1);
+		medical_box->item_type_ = closest_item->second->item_type_;
+		AcquireItem(medical_box);
+		break;
+	}
+	case ItemType::eHealKit:
+	{
+		shared_ptr<HealKitItem> heal_kit = make_shared<HealKitItem>();
+		heal_kit->OnCreate();
+		heal_kit->AddCount(1);
+		heal_kit->item_type_ = closest_item->second->item_type_;
+		AcquireItem(heal_kit);
+		break;
+	}
+	case ItemType::eEnergyDrink:
+	{
+		shared_ptr<EnergyDrinkItem> energy_drink = make_shared<EnergyDrinkItem>();
+		energy_drink->OnCreate();
+		energy_drink->AddCount(1);
+		energy_drink->item_type_ = closest_item->second->item_type_;
+		AcquireItem(energy_drink);
+		break;
+	}
+	case ItemType::eDrug:
+	{
+		shared_ptr<DrugItem> drug = make_shared<DrugItem>();
+		drug->OnCreate();
+		drug->AddCount(1);
+		drug->item_type_ = closest_item->second->item_type_;
+		AcquireItem(drug);
+		break;
+	}
+	case ItemType::eAR_Ammo:
+	{
+		shared_ptr<ARAmmoItem> ar_ammo = make_shared<ARAmmoItem>();
+		ar_ammo->OnCreate();
+		ar_ammo->AddCount(1);
+		ar_ammo->item_type_ = closest_item->second->item_type_;
+		AcquireItem(ar_ammo);
+		break;
+	}
+	case ItemType::ePistol_Ammo:
+	{
+		shared_ptr<PistolAmmoItem> pistol_ammo = make_shared<PistolAmmoItem>();
+		pistol_ammo->OnCreate();
+		pistol_ammo->AddCount(1);
+		pistol_ammo->item_type_ = closest_item->second->item_type_;
+		AcquireItem(pistol_ammo);
+		break;
+	}
+	case ItemType::eGrenade:
+	{
+		shared_ptr<GrenadeItem> grenade = make_shared<GrenadeItem>();
+		grenade->OnCreate();
+		grenade->AddCount(1);
+		grenade->item_type_ = closest_item->second->item_type_;
+		AcquireItem(grenade);
+		break;
+	}
+	case ItemType::eRepairPart:
+	{
+		shared_ptr<RepairPartItem> repair_part = make_shared<RepairPartItem>();
+		repair_part->OnCreate();
+		repair_part->AddCount(1);
+		repair_part->item_type_ = closest_item->second->item_type_;
+		AcquireItem(repair_part);
+		break;
+	}
+	}
+
 	EVENT->PushEvent<DeleteActorEvent>(closest_item->second->entity_id_);
 	selectable_items_.erase(closest_item);
 }

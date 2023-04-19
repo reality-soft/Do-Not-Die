@@ -53,10 +53,10 @@ void InGameScene::OnInit()
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_E }, std::bind(&Player::PickClosestItem, player_actor), KEY_PUSH);
 
 	// Item Use
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_1 }, std::bind(&Player::UseItem, player_actor, 0), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_2 }, std::bind(&Player::UseItem, player_actor, 1), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_3 }, std::bind(&Player::UseItem, player_actor, 2), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_4 }, std::bind(&Player::UseItem, player_actor, 3), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_1 }, std::bind(&Player::UseOrDropItem, player_actor, 0), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_2 }, std::bind(&Player::UseOrDropItem, player_actor, 1), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_3 }, std::bind(&Player::UseOrDropItem, player_actor, 2), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_4 }, std::bind(&Player::UseOrDropItem, player_actor, 3), KEY_HOLD);
 
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_SPACE }, std::bind(&Player::Jump, player_actor), KEY_PUSH);
 	
@@ -78,6 +78,10 @@ void InGameScene::OnInit()
 	QUADTREE->ImportGuideLines("DND_Blocking_1.mapdat", GuideType::eBlocking);
 	QUADTREE->ImportGuideLines("DND_NpcTrack_1.mapdat", GuideType::eNpcTrack);
 	QUADTREE->ImportGuideLines("DND_PlayerStart_1.mapdat", GuideType::eSpawnPoint);
+	QUADTREE->ImportGuideLines("DND_ItemSpawn_1.mapdat", GuideType::eSpawnPoint);
+	QUADTREE->ImportGuideLines("DND_RepairPart_1.mapdat", GuideType::eSpawnPoint);
+	QUADTREE->ImportGuideLines("DND_CarAttack_1.mapdat", GuideType::eNpcTrack);
+	QUADTREE->ImportGuideLines("DND_CarEvent_1.mapdat", GuideType::eSpawnPoint);
 
 	QUADTREE->Init(&level, reg_scene_);
 	QUADTREE->ImportQuadTreeData("QuadTreeData_01.mapdat");
