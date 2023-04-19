@@ -124,14 +124,14 @@ void InGameScene::OnUpdate()
 	
 	static float cur_time = 0.0f;
 	
-	cur_time += TM_DELTATIME;
+	cur_time += 1.0f;
 	const auto npc_guidlines = QUADTREE->GetGuideLines("DND_NpcTrack_1");
 	
-	if (cur_time >= 10.0f) {
+	if (cur_time <= 1.0f) {
 		auto enemy_entity = SCENE_MGR->AddActor<Enemy>();
 		auto enemy_actor = SCENE_MGR->GetActor<Enemy>(enemy_entity);
 
-		int guidline_index = rand() % npc_guidlines->size();
+		int guidline_index = 3; // rand() % npc_guidlines->size();
 		int mesh_index = rand() % enemy_meshes.size();
 
 		vector<XMVECTOR> target_poses;
@@ -144,7 +144,7 @@ void InGameScene::OnUpdate()
 		//auto player = SCENE_MGR->GetPlayer<Player>(0);
 		//player->SetPos(level.GetGuideLines()->at(guidline_index).line_nodes[0]);
 		
-		cur_time = 0.0f;
+		//cur_time = 0.0f;
 
 		cur_zombie_created++;
 	}

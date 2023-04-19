@@ -1,5 +1,5 @@
 #define e 2.71828182846
-
+#define EPSILON 0.001f
 // Global Directional Lighting
 cbuffer CbGlobalLight : register(b0)
 {

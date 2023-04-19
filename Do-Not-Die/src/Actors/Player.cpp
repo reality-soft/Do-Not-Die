@@ -8,6 +8,7 @@
 #include "FX_Flame.h"
 #include "FX_Muzzle.h"
 #include "FX_Explosion.h"
+#include "GameEvents.h"
 
 using namespace reality;
 
@@ -65,17 +66,15 @@ void Player::OnInit(entt::registry& registry)
 	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
 
 	// create anim slot
-	AnimationBase animation_base;
-	C_Animation animation(&animation_base);
-	animation.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6, entity_id_);
-	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation);
+	C_Animation animation_component;
+	animation_component.SetBaseAnimObject<AnimationBase>();
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6, entity_id_);
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
 	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
 
 	// FlashLight
 	AddFlashLight();
-
-	fire_timer_ = 0.0f;
 
 	// Inventory
 	inventory_.resize(INVENTORY_MAX);
@@ -177,14 +176,9 @@ void Player::Idle()
 
 void Player::Fire()
 {
-	if (is_aiming_) {
+	if (is_aiming_ && !is_firing_) {
 
-		if (fire_timer_ < fire_cooltime_)
-			return;
-
-		fire_timer_ -= fire_cooltime_;
-
-		fire_ = true;
+		is_firing_ = true;
 
 		// Make Muzzle when Shot
 		auto player_transform = GetTransformMatrix();
@@ -195,13 +189,7 @@ void Player::Fire()
 		// Make Shot Impact Effect
 		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
  		RayShape ray = ingame_scene->GetCameraSystem().CreateFrontRay();
-		RayCallback raycallback = QUADTREE->Raycast(ray);
-
-		if (raycallback.success && raycallback.is_actor)
-			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback.point, raycallback.normal);
-
-		else if (raycallback.success && !raycallback.is_actor)
-			EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback.point, raycallback.normal);
+		EVENT->PushEvent<AttackEvent>(vector<RayShape>{ray}, entity_id_);
 	}
 }
 
@@ -254,7 +242,7 @@ void Player::SetPos(const XMVECTOR& position)
 	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, transform_matrix_);
 }
 
-int Player::GetMaxHp() const
+float Player::GetMaxHp() const
 {
 	return max_hp_;
 }
@@ -269,7 +257,7 @@ void Player::TakeDamage(int damage)
 	cur_hp_ -= damage;
 }
 
-int Player::GetCurHp() const
+float Player::GetCurHp() const
 {
 	return cur_hp_;
 }
@@ -343,10 +331,6 @@ void Player::UpdateFlashLight()
 
 void Player::UpdateTimer()
 {
-	// Fire Timer
-	if(fire_timer_ < fire_cooltime_)
-		fire_timer_ += TIMER->GetDeltaTime();
-
 	// Grenade Timer
 	if (grenade_timer_ < grenade_cooltime_)
 		grenade_timer_ += TIMER->GetDeltaTime();
