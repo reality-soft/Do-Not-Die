@@ -1,8 +1,7 @@
 #include "Player.h"
 #include "Weapon.h"
 #include "InGameScene.h"
-#include "HealKit.h"
-#include "HealFood.h"
+#include "ItemObjects.h"
 #include "Grenade.h"
 #include "FX_BloodImpact.h"
 #include "FX_ConcreteImpact.h"
@@ -81,15 +80,6 @@ void Player::OnInit(entt::registry& registry)
 	inventory_.resize(INVENTORY_MAX);
 	inventory_timer_.resize(INVENTORY_MAX);
 
-	// ITEM TEST CODE
-	shared_ptr<HealKit> heal_kit = make_shared<HealKit>();
-	heal_kit->OnCreate();
-	heal_kit->AddCount(1);
-	AcquireItem(heal_kit);
-	shared_ptr<HealFood> heal_food = make_shared<HealFood>();
-	heal_food->OnCreate();
-	heal_food->AddCount(2);
-	AcquireItem(heal_food);
 	cur_hp_ = 0;
 
 	// true means : this actor causes trigger event when overlaped at trigger 
@@ -411,6 +401,16 @@ void Player::UseItem(int slot)
 	{
 		inventory_[slot] = NULL;
 	}
+}
+
+void Player::PickClosestItem()
+{
+	if (selectable_items_.empty())
+		return;
+
+	auto closest_item = selectable_items_.begin();
+	EVENT->PushEvent<DeleteActorEvent>(closest_item->second->entity_id_);
+	selectable_items_.erase(closest_item);
 }
 
 vector<shared_ptr<ItemBase>>& Player::GetInventory()

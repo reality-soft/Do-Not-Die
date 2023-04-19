@@ -1,6 +1,7 @@
 #pragma once
 #include "GameCharacter.h"
 
+
 #define INVENTORY_MAX 4
 
 class ItemBase;
@@ -59,8 +60,11 @@ private:
 	vector<float>					inventory_timer_;
 
 public:
+	map<float, Item*> selectable_items_;
+	UINT selectable_counts_ = 0;
 	bool AcquireItem(shared_ptr<ItemBase> item);
 	void UseItem(int slot);
+	void PickClosestItem();
 	vector<shared_ptr<ItemBase>>&	GetInventory();
 	vector<float>&					GetInventoryTimer();
 

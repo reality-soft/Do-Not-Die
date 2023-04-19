@@ -38,7 +38,7 @@ void UI_Actor_Ingame::CreateIngameUI()
 	weapon_ui_->SetLocalRectByMin({ 100.0f, win_size_1920_height - 200.0f }, 512.0f, 179.0f);
 	ammo_text_ = make_shared<UI_Text>();
 	weapon_ui_->AddChildUI(ammo_text_);
-	ammo_text_->InitText("30", BASIC, { 320.0f, 72.0f }, 1.5f);
+	ammo_text_->InitText("30", BASIC, { 320.0f, 65.0f }, 1.3f);
 	ui_comp_->ui_list.insert({ "Weapon UI", weapon_ui_ });
 
 	// 상태 + 아이템 UI
