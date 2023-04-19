@@ -79,6 +79,7 @@ namespace reality {
 			IDLE,
 			MOVE,
 			HIT,
+			DIE
 		};
 
 		ZombieAnimationStateMachine(entt::entity owner_id) : AnimationStateMachine(owner_id) {};
@@ -87,7 +88,8 @@ namespace reality {
 			states_.insert({ IDLE, make_shared<Idle>() });
 			states_.insert({ MOVE, make_shared<Move>() });
 			states_.insert({ HIT, make_shared<Hit>() });
-			transitions_.insert({ IDLE, Transition(MOVE,[this](const AnimationBase* animation_base) {
+			states_.insert({ DIE, make_shared<Die>() });
+			transitions_.insert({ IDLE, Transition(MOVE,[this](const AnimationStateMachine* animation_state_machine) {
 					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 					if (enemy->IsMoving()) {
 						return true;
@@ -97,7 +99,7 @@ namespace reality {
 					}
 				})
 				});
-			transitions_.insert({ MOVE, Transition(IDLE,[this](const AnimationBase* animation_base) {
+			transitions_.insert({ MOVE, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 					if (enemy->IsMoving() == false) {
 						return true;
@@ -107,7 +109,7 @@ namespace reality {
 					}
 				})
 				});
-			transitions_.insert({ IDLE, Transition(HIT,[this](const AnimationBase* animation_base) {
+			transitions_.insert({ IDLE, Transition(HIT,[this](const AnimationStateMachine* animation_state_machine) {
 					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 					if (enemy->is_hit_) {
 						return true;
@@ -117,9 +119,9 @@ namespace reality {
 					}
 				})
 				});
-			transitions_.insert({ HIT, Transition(IDLE,[this](const AnimationBase* animation_base) {
+			transitions_.insert({ HIT, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
-					if (IsAnimationEnded()) {
+					if (IsAnimationEnded() && enemy->GetCurHp() >= 0) {
 						return true;
 					}
 					else {
@@ -127,7 +129,7 @@ namespace reality {
 					}
 				})
 				});
-			transitions_.insert({ MOVE, Transition(HIT,[this](const AnimationBase* animation_base) {
+			transitions_.insert({ MOVE, Transition(HIT,[this](const AnimationStateMachine* animation_state_machine) {
 					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 					if (enemy->is_hit_) {
 						return true;
@@ -137,9 +139,20 @@ namespace reality {
 					}
 				})
 				});
-			transitions_.insert({ HIT, Transition(MOVE,[this](const AnimationBase* animation_base) {
+
+			transitions_.insert({ HIT, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
 					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
-					if (IsAnimationEnded() == false) {
+					if (IsAnimationEnded() == true && enemy->GetCurHp() <= 0) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				})
+				});
+			transitions_.insert({ DIE, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
+					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+					if (IsAnimationEnded() == true) {
 						return true;
 					}
 					else {
@@ -159,15 +172,15 @@ namespace reality {
 		public:
 			Idle() : AnimationState(IDLE) {}
 		public:
-			virtual void Enter(AnimationStateMachine* animation_base) override
+			virtual void Enter(AnimationStateMachine* animation_state_machine) override
 			{
-				animation_base->SetAnimation("Zombie_Idle_1_v2_IPC_Anim.anim", 0.3f);
+				animation_state_machine->SetAnimation("Zombie_Idle_1_v2_IPC_Anim.anim", 0.3f);
 			}
-			virtual void Exit(AnimationStateMachine* animation_base) override
+			virtual void Exit(AnimationStateMachine* animation_state_machine) override
 			{
 			}
 
-			virtual void OnUpdate(AnimationStateMachine* animation_base) override
+			virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 			{
 			}
 		};
@@ -176,14 +189,14 @@ namespace reality {
 		public:
 			Move() : AnimationState(MOVE) {}
 		public:
-			virtual void Enter(AnimationStateMachine* animation_base) override
+			virtual void Enter(AnimationStateMachine* animation_state_machine) override
 			{
-				animation_base->SetAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim", 0.8f);
+				animation_state_machine->SetAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim", 0.8f);
 			}
-			virtual void Exit(AnimationStateMachine* animation_base) override
+			virtual void Exit(AnimationStateMachine* animation_state_machine) override
 			{
 			}
-			virtual void OnUpdate(AnimationStateMachine* animation_base) override
+			virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 			{
 			}
 		};
@@ -192,15 +205,32 @@ namespace reality {
 		public:
 			Hit() : AnimationState(HIT) {}
 		public:
-			virtual void Enter(AnimationStateMachine* animation_base) override
+			virtual void Enter(AnimationStateMachine* animation_state_machine) override
 			{
-				animation_base->SetAnimation("Zombie_Atk_KnockBack_1_IPC_Anim_Unreal Take.anim", 0.3f);
+				animation_state_machine->SetAnimation("Zombie_Atk_KnockBack_1_IPC_Anim_Unreal Take.anim", 0.3f);
 			}
-			virtual void Exit(AnimationStateMachine* animation_base) override
+			virtual void Exit(AnimationStateMachine* animation_state_machine) override
 			{
-				SCENE_MGR->GetActor<Enemy>(animation_base->GetOwnerId())->is_hit_ = false;
+				SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId())->is_hit_ = false;
 			}
-			virtual void OnUpdate(AnimationStateMachine* animation_base) override
+			virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+			{
+			}
+		};
+
+		class Die : public AnimationState {
+		public:
+			Die() : AnimationState(DIE) {}
+		public:
+			virtual void Enter(AnimationStateMachine* animation_state_machine) override
+			{
+				animation_state_machine->SetAnimation("Zombie_Death_Back_Mid_1_IPC_Anim_Unreal Take.anim", 0.3f);
+			}
+			virtual void Exit(AnimationStateMachine* animation_state_machine) override
+			{
+				EVENT->PushEvent<DeleteActorEvent>(animation_state_machine->GetOwnerId());
+			}
+			virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 			{
 			}
 		};

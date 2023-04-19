@@ -7,7 +7,7 @@ class GameCharacter : public reality::Character
 {
 public:
 	virtual float GetCharacterDamage() {
-		return 0.0f;
+		return 50.0f;
 	};
 
 public:
