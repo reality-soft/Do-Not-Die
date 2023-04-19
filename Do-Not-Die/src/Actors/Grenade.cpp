@@ -16,7 +16,7 @@ void Grenade::OnInit(entt::registry& registry)
 	reality::C_StaticMesh stm;
 	stm.local = XMMatrixIdentity();
 	stm.world = XMMatrixIdentity();
-	stm.static_mesh_id = "grenade.stmesh";
+	stm.static_mesh_id = "Grenade.stmesh";
 	stm.vertex_shader_id = "StaticMeshVS.cso";
 	registry.emplace_or_replace<reality::C_StaticMesh>(entity_id_, stm);
 
