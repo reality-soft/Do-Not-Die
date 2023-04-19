@@ -121,7 +121,17 @@ namespace reality {
 				});
 			transitions_.insert({ HIT, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
-					if (IsAnimationEnded() && enemy->GetCurHp() >= 0) {
+					if (IsAnimationEnded() && enemy->GetCurHp() >= 0 && enemy->IsMoving() == false) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				})
+				});
+			transitions_.insert({ HIT, Transition(MOVE,[this](const AnimationStateMachine* animation_state_machine) {
+					Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+					if (IsAnimationEnded() && enemy->GetCurHp() >= 0 && enemy->IsMoving() == true) {
 						return true;
 					}
 					else {
@@ -191,7 +201,7 @@ namespace reality {
 		public:
 			virtual void Enter(AnimationStateMachine* animation_state_machine) override
 			{
-				animation_state_machine->SetAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim", 0.8f);
+				animation_state_machine->SetAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim", 0.2f);
 			}
 			virtual void Exit(AnimationStateMachine* animation_state_machine) override
 			{
