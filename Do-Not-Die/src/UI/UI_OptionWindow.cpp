@@ -53,8 +53,8 @@ void UI_OptionWindow::UpdateThisUI()
 {
 	UIBase::UpdateThisUI();
 
-	FMOD_MGR->SetMusicVolume(option_volume_slider_->GetValue() / 10.0f);
-	FMOD_MGR->SetSFXVolume(option_volume_slider_->GetValue() / 10.0f);
+	FMOD_MGR->SetMusicVolume(option_volume_slider_->GetValue() / 100.0f);
+	FMOD_MGR->SetSFXVolume(option_volume_slider_->GetValue() / 100.0f);
 }
 
 E_UIState UI_OptionWindow::GetCloseButtonState()
