@@ -11,9 +11,10 @@ namespace reality
 
 		void AddTriggerAtActor(entt::entity ent, float radius);
 		bool IsActorInTrigger(entt::entity ent, const C_TriggerVolume& trigger);
-
+		void CheckCurrentTriggerValid(entt::registry& reg);
+		bool IsAlreadyTrigged(entt::entity target_actor, entt::entity trigger_actor);
 	private:
-		map<entt::entity, entt::entity> current_triggers;
+		multiset<pair<entt::entity, entt::entity>> current_triggers;
 	};
 }
 
