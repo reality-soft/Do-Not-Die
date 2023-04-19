@@ -2,6 +2,7 @@
 #include "Engine_include.h"
 #include "FX_Explosion.h"
 #include "EventMgr.h"
+#include "Player.h"
 
 using namespace reality;
 
@@ -40,6 +41,11 @@ void Grenade::OnUpdate()
 	{
 		exploded_ = true;
 		EFFECT_MGR->SpawnEffect<FX_Explosion>(T);
+
+		auto player = SCENE_MGR->GetPlayer<Player>(0);
+		player->GetPos();
+		EVENT->PushEvent<CameraShakeEvent>(player->GetEntityId(), 0.3f, 10.0f, 0.2f);
+
 		EVENT->PushEvent<DeleteActorEvent>(GetEntityId());
 	}
 	else 
