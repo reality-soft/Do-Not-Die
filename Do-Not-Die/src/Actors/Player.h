@@ -1,5 +1,9 @@
 #pragma once
+#include "Engine_include.h"
+#include "AnimationStateMachine.h"
+#include "AnimationState.h"
 #include "GameCharacter.h"
+
 #include "Item.h"
 
 #define INVENTORY_MAX 4
@@ -86,7 +90,7 @@ public:
 		states_.insert({ BASE_POSE, make_shared<BasePose>() });
 		states_.insert({ AIM_POSE, make_shared<AimPose>()});
 		states_.insert({ FIRE, make_shared<Fire>()});
-		transitions_.insert({ BASE_POSE, Transition(AIM_POSE,[this](const AnimationBase* animation_base) {
+		transitions_.insert({ BASE_POSE, Transition(AIM_POSE,[this](const AnimationStateMachine* animation_base) {
 				Player* player = SCENE_MGR->GetActor<Player>(owner_id_);
 				if (player->IsAiming()) {
 					return true;
@@ -96,7 +100,7 @@ public:
 				}
 			})
 		});
-		transitions_.insert({ AIM_POSE, Transition(BASE_POSE,[this](const AnimationBase* animation_base) {
+		transitions_.insert({ AIM_POSE, Transition(BASE_POSE,[this](const AnimationStateMachine* animation_base) {
 				Player* player = SCENE_MGR->GetActor<Player>(owner_id_);
 				if (player->IsAiming() == false) {
 					return true;
@@ -106,7 +110,7 @@ public:
 				}
 			})
 		});
-		transitions_.insert({ AIM_POSE, Transition(FIRE,[this](const AnimationBase* animation_base) {
+		transitions_.insert({ AIM_POSE, Transition(FIRE,[this](const AnimationStateMachine* animation_base) {
 				Player* player = SCENE_MGR->GetActor<Player>(owner_id_);
 				if (player->is_firing_ == true) {
 					return true;
@@ -116,7 +120,7 @@ public:
 				}
 			})
 		});
-		transitions_.insert({ FIRE, Transition(AIM_POSE,[this](const AnimationBase* animation_base) {
+		transitions_.insert({ FIRE, Transition(AIM_POSE,[this](const AnimationStateMachine* animation_base) {
 				Player* player = SCENE_MGR->GetActor<Player>(owner_id_);
 				if (this->IsAnimationEnded()) {
 					return true;
