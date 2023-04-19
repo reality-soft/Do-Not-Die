@@ -191,6 +191,9 @@ void Player::Fire()
 		auto player_transform = GetTransformMatrix();
 		XMVECTOR s, r, t;
 		XMMatrixDecompose(&s, &r, &t, player_transform);
+		t = XMVectorAdd(t, front_ * 30.0f);
+		t = XMVectorAdd(t, right_ * 6.0f);
+		t = XMVectorAdd(t, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) * 40.0f);
 		EFFECT_MGR->SpawnEffect<FX_Muzzle>(t);
 
 		// Make Shot Sound when Shot
