@@ -39,53 +39,55 @@ void InGameScene::OnInit()
 	auto player_entity = Scene::AddPlayer<Player>();
 	sys_camera.TargetTag(reg_scene_, "Player");
 
-	auto character_actor = Scene::GetPlayer<Player>(0);
+	auto player_actor = Scene::GetPlayer<Player>(0);
 	// Key Settings
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_D }, std::bind(&Player::MoveRight, character_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_W, DIK_D }, std::bind(&Player::MoveRightForward, character_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_S, DIK_D }, std::bind(&Player::MoveRightBack, character_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_A }, std::bind(&Player::MoveLeft, character_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_W, DIK_A }, std::bind(&Player::MoveLeftForward, character_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_S, DIK_A }, std::bind(&Player::MoveLeftBack, character_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_W }, std::bind(&Player::MoveForward, character_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_S }, std::bind(&Player::MoveBack, character_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_RETURN }, std::bind(&Player::ResetPos, character_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_D }, std::bind(&Player::MoveRight, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_W, DIK_D }, std::bind(&Player::MoveRightForward, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_S, DIK_D }, std::bind(&Player::MoveRightBack, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_A }, std::bind(&Player::MoveLeft, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_W, DIK_A }, std::bind(&Player::MoveLeftForward, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_S, DIK_A }, std::bind(&Player::MoveLeftBack, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_W }, std::bind(&Player::MoveForward, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_S }, std::bind(&Player::MoveBack, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_RETURN }, std::bind(&Player::ResetPos, player_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_E }, std::bind(&Player::PickClosestItem, player_actor), KEY_PUSH);
 
 	// Item Use
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_1 }, std::bind(&Player::UseItem, character_actor, 0), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_2 }, std::bind(&Player::UseItem, character_actor, 1), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_3 }, std::bind(&Player::UseItem, character_actor, 2), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_4 }, std::bind(&Player::UseItem, character_actor, 3), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_1 }, std::bind(&Player::UseItem, player_actor, 0), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_2 }, std::bind(&Player::UseItem, player_actor, 1), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_3 }, std::bind(&Player::UseItem, player_actor, 2), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_4 }, std::bind(&Player::UseItem, player_actor, 3), KEY_PUSH);
 
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_SPACE }, std::bind(&Player::Jump, character_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_SPACE }, std::bind(&Player::Jump, player_actor), KEY_PUSH);
 	
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_Q }, std::bind(&Player::Aim, character_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_Q }, std::bind(&Player::Aim, player_actor), KEY_PUSH);
 
-	std::function<void()> idle = std::bind(&Player::Idle, character_actor);
+	std::function<void()> idle = std::bind(&Player::Idle, player_actor);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_D }, idle, KEY_UP);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_S }, idle, KEY_UP);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_W }, idle, KEY_UP);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_A }, idle, KEY_UP);
 
-	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, std::bind(&Player::Fire, character_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_G }, std::bind(&Player::ThrowGrenade, character_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, std::bind(&Player::Fire, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_G }, std::bind(&Player::ThrowGrenade, player_actor), KEY_PUSH);
 	//INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
 
 	level.Create("DNDLevel_WithCollision_01.stmesh", "LevelVS.cso");
 
 	//QUADTREE->Init(&level, 3, reg_scene_);
-	QUADTREE->Init(&level, reg_scene_);
-	QUADTREE->ImportQuadTreeData("QuadTreeData_01.mapdat");
-	QUADTREE->CreatePhysicsCS();
-	QUADTREE->InitCollisionMeshes();
-
 	QUADTREE->ImportGuideLines("DND_Blocking_1.mapdat", GuideType::eBlocking);
 	QUADTREE->ImportGuideLines("DND_NpcTrack_1.mapdat", GuideType::eNpcTrack);
 	QUADTREE->ImportGuideLines("DND_PlayerStart_1.mapdat", GuideType::eSpawnPoint);
 
+	QUADTREE->Init(&level, reg_scene_);
+	QUADTREE->ImportQuadTreeData("QuadTreeData_01.mapdat");
+	QUADTREE->CreatePhysicsCS();
+	QUADTREE->InitCollisionMeshes();
 	QUADTREE->SetBlockingFields("DND_Blocking_1");
-	QUADTREE->SetPlayerStart("DND_PlayerStart_1", character_actor, 45);
-	
+
+	XMVECTOR plyer_spawn = QUADTREE->GetGuideLines("DND_PlayerStart_1")->begin()->line_nodes.begin()->second;
+	player_actor->SetSpawnPoint(plyer_spawn);
+
 	// LOADING : LOADING_ACTOR
 	loading_progress = LOADING_ACTOR;
 	
@@ -107,14 +109,15 @@ void InGameScene::OnInit()
 	sys_trigger_.OnCreate(reg_scene_);
 	sys_wave_.OnCreate(reg_scene_);
 	sys_wave_.SetWorldEnv(&environment_);
+	sys_wave_.CreateExtractPoints(reg_scene_);
 
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("FPS", &TIMER->fps);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Time Countdown", &sys_wave_.countdown_timer_);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Waves", &sys_wave_.wave_count_);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("RaycastTri", &QUADTREE->raycast_calculated);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Jump", &character_actor->GetMovementComponent()->jump_pulse);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Gravity", &character_actor->GetMovementComponent()->gravity_pulse);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Selectable Items", &character_actor->selectable_counts_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Jump", &player_actor->GetMovementComponent()->jump_pulse);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Gravity", &player_actor->GetMovementComponent()->gravity_pulse);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Selectable Items", &player_actor->selectable_counts_);
 }
 
 void InGameScene::OnUpdate()
@@ -168,9 +171,6 @@ void InGameScene::OnUpdate()
 		//CreateExplosionEffectFromRay();
 	
 	CursorStateUpdate();
-
-	// TEST
-	SCENE_MGR->GetPlayer<Player>(0)->PickClosestItem();
 }
 
 void InGameScene::OnRender()

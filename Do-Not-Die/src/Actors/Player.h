@@ -31,6 +31,7 @@ public:
 	void Fire();
 	void Aim();
 	void ThrowGrenade();
+	void PickClosestItem();
 public:
 	bool IsAiming();
 
@@ -67,9 +68,16 @@ public:
 	UINT selectable_counts_ = 0;
 	bool AcquireItem(shared_ptr<ItemBase> item);
 	void UseItem(int slot);
-	void PickClosestItem();
+	
 	vector<shared_ptr<ItemBase>>&	GetInventory();
 	vector<float>&					GetInventoryTimer();
+
+	bool can_extract_repair = false;
+	float extract_time_takes = 5.0f;
+	entt::entity repair_extract_trigger;
+
+	void SetSpawnPoint(XMVECTOR point);
+	XMVECTOR spawn_point;
 
 private:
 	void UpdateTimer();
