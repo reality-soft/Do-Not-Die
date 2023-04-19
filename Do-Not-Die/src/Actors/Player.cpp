@@ -166,7 +166,7 @@ void Player::MoveBack()
 
 void Player::Jump()
 {
-	movement_component_->jump_pulse = 500.0f;
+	movement_component_->jump_pulse = 300.0f;
 }
 
 void Player::Idle()
