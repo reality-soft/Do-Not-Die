@@ -27,6 +27,11 @@ void UI_Actor_Ingame::OnUpdate()
 	UpdateMenuUI();
 }
 
+void reality::UI_Actor_Ingame::SetGameTimer(float timer)
+{
+	wave_timer_ = timer;
+}
+
 void UI_Actor_Ingame::CreateIngameUI()
 {
 	float win_size_1920_width = E_Resolution_Size[E_Resolution::R1920x1080].x;
@@ -142,6 +147,14 @@ void UI_Actor_Ingame::CreateIngameUI()
 	crosshair_ui_->InitImage("T_DotCrossHair.png");
 	crosshair_ui_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f }, 8.0f, 8.0f);
 	ui_comp_->ui_list.insert({ "CrossHair UI", crosshair_ui_ });
+
+	// Interaction UI
+	interaction_ui_ = make_shared<UI_Image>();
+	interaction_ui_->InitImage("T_Interaction.png");
+	interaction_ui_->SetLocalRectByMin({win_size_1920_width * 3.0f / 5.0f, win_size_1920_height / 2.0f }, 200.0f, 40.0f);
+	interaction_text_ = make_shared<UI_Text>();
+	interaction_text_->InitText("", E_Font::BASIC, { 40.0f, 6.0f }, 0.5f);
+	interaction_ui_->AddChildUI(interaction_text_);
 }
 
 void UI_Actor_Ingame::CreateMenuUI()
@@ -198,9 +211,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	hp_img_->SetLocalRectByMin({ status_ui->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f - 200.0f, 150.0f}, 400.0f * hp_ratio, 30.0f);
 
 	// Time Update
-	static float time = 1000.0f;
-	time -= TIMER->GetDeltaTime();
-	string time_str = to_string(time);
+	string time_str = to_string(wave_timer_);
 	time_str = time_str.substr(0, time_str.find('.') + 2 + 1);
 	time_text_->SetText(time_str);
 
@@ -257,6 +268,54 @@ void UI_Actor_Ingame::UpdateIngameUI()
 		}
 	}
 	
+	// Interaction UI Update
+	if (player_ != nullptr)
+	{
+		if ((player_->selectable_counts_ != 0 || player_->can_extract_repair)  && ui_comp_->ui_list.find("Interaction UI") == ui_comp_->ui_list.end())
+		{
+			ui_comp_->ui_list.insert({ "Interaction UI", interaction_ui_ });
+			// Item Interaction
+			if (player_->selectable_counts_ != 0)
+			{
+				string item = "";
+				switch (player_->selectable_items_.begin()->second->item_type_)
+				{
+				case ItemType::eHealKit:
+					item = "Heal Kit";
+					break;
+				case ItemType::eMedicalBox:
+					item = "Medical Box";
+					break;
+				case ItemType::eEnergyDrink:
+					item = "Energy Drink";
+					break;
+				case ItemType::eDrug:
+					item = "Drug";
+					break;
+				case ItemType::eAR_Ammo:
+					item = "AR Ammo";
+					break;
+				case ItemType::ePistol_Ammo:
+					item = "Pistol Ammo";
+					break;
+				case ItemType::eGrenade:
+					item = "Grenade";
+					break;
+				case ItemType::eRepairPart:
+					item = "Repair Part";
+					break;
+				}
+				interaction_text_->SetText("Get " + item);
+
+			}
+			if (player_->can_extract_repair)
+			{
+				interaction_text_->SetText("Push to Extract");
+			}
+		}
+		else if((player_->selectable_counts_ == 0 && !player_->can_extract_repair) && ui_comp_->ui_list.find("Interaction UI") != ui_comp_->ui_list.end())
+			ui_comp_->ui_list.erase("Interaction UI");
+	}
 }
 
 void UI_Actor_Ingame::UpdateMenuUI()
