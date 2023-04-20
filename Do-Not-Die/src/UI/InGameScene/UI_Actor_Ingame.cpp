@@ -152,8 +152,19 @@ void UI_Actor_Ingame::CreateIngameUI()
 	interaction_ui_ = make_shared<UI_Image>();
 	interaction_ui_->InitImage("T_Interaction.png");
 	interaction_ui_->SetLocalRectByMin({win_size_1920_width * 3.0f / 5.0f, win_size_1920_height / 2.0f }, 200.0f, 40.0f);
+
+	interaction_progressbar_ = make_shared<UI_Image>();
+	interaction_progressbar_->InitImage("T_Interaction_Progress.png");
+	interaction_progressbar_->SetLocalRectByMin({ 0.0f, 0.0f }, 200.0f, 40.0f);
+	//interaction_ui_->AddChildUI(interaction_progressbar_);
+
+	interaction_icon_ = make_shared<UI_Image>();
+	interaction_icon_->InitImage("T_E_Icon.png");
+	interaction_icon_->SetLocalRectByMin({ 2.5f, 2.5f }, 35.0f, 35.0f);
+	interaction_ui_->AddChildUI(interaction_icon_);
+
 	interaction_text_ = make_shared<UI_Text>();
-	interaction_text_->InitText("", E_Font::BASIC, { 40.0f, 6.0f }, 0.5f);
+	interaction_text_->InitText("", E_Font::BASIC, { 40.0f, 8.0f }, 0.5f);
 	interaction_ui_->AddChildUI(interaction_text_);
 }
 
@@ -306,11 +317,17 @@ void UI_Actor_Ingame::UpdateIngameUI()
 					break;
 				}
 				interaction_text_->SetText("Get " + item);
+				interaction_ui_->DeleteChildUI(interaction_progressbar_);
 
 			}
 			if (player_->can_extract_repair)
 			{
 				interaction_text_->SetText("Push to Extract");
+				interaction_ui_->AddChildUI(interaction_progressbar_);
+				auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+				auto& wave_sys = ingame_scene->GetWaveSystem();
+				float width = 200.0f;// *wave_sys.
+				interaction_progressbar_->SetLocalRectByMin({ 0.0f, 0.0f }, width, 40.0f);
 			}
 		}
 		else if((player_->selectable_counts_ == 0 && !player_->can_extract_repair) && ui_comp_->ui_list.find("Interaction UI") != ui_comp_->ui_list.end())
