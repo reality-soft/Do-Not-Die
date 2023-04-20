@@ -14,43 +14,36 @@ void reality::TriggerSystem::OnUpdate(entt::registry& reg)
 	if (trigger_view.empty())
 		return;
 
-	auto scene_actors = SCENE_MGR->GetScene(E_SceneType::INGAME)->GetActors();
+	const auto& scene_actors = SCENE_MGR->GetScene(E_SceneType::INGAME)->GetActors();
 
-	for (auto target_actor : scene_actors)
+	CheckCurrentTriggerValid(reg);
+
+	for (const auto& target_actor : scene_actors)
 	{
 		if (target_actor.second.get()->trigger_sensor == false)
 			continue;
 
-		for (auto trigger_entity : trigger_view)
+		for (const auto& trigger_entity : trigger_view)
 		{
 			const auto& c_trigger = reg.get<C_TriggerVolume>(trigger_entity);
 			if (IsActorInTrigger(target_actor.first, c_trigger))
 			{
-				if (current_triggers.find(target_actor.first) != current_triggers.end())
-				{
-					if (current_triggers.at(target_actor.first) == trigger_entity) // already trigged
-					{
-						continue;
-					}
-				}
+				if (IsAlreadyTrigged(target_actor.first, trigger_entity))
+					continue;
 
 				current_triggers.insert(make_pair(target_actor.first, trigger_entity));
 				EVENT->PushEvent<TriggerEvent>(target_actor.first, trigger_entity, true);
 			}
 			else
 			{
-				if (current_triggers.find(target_actor.first) != current_triggers.end())
+				if (IsAlreadyTrigged(target_actor.first, trigger_entity))
 				{
-					if (current_triggers.at(target_actor.first) == trigger_entity) // already trigged
-					{
-						EVENT->PushEvent<TriggerEvent>(target_actor.first, trigger_entity, false);
-						current_triggers.erase(target_actor.first);
-					}
+					EVENT->PushEvent<TriggerEvent>(target_actor.first, trigger_entity, false);
+					current_triggers.erase(make_pair(target_actor.first, trigger_entity));
 				}
 			}
 		}
 	}
-
 }
 
 void reality::TriggerSystem::AddTriggerAtActor(entt::entity ent, float radius)
@@ -73,4 +66,36 @@ bool reality::TriggerSystem::IsActorInTrigger(entt::entity ent, const C_TriggerV
 		return true;
 
 	return false;
+}
+
+void reality::TriggerSystem::CheckCurrentTriggerValid(entt::registry& reg)
+{
+	vector<pair<entt::entity, entt::entity>> to_erase;
+
+	for (auto& pair : current_triggers)
+	{
+		if (reg.valid(pair.second))
+			continue;
+		else
+		{
+			EVENT->PushEvent<TriggerEvent>(pair.first, pair.second, false);
+			to_erase.push_back(pair);
+		}
+	}
+
+	for (auto pair : to_erase)
+	{
+		current_triggers.erase(pair);
+	}
+}
+
+bool reality::TriggerSystem::IsAlreadyTrigged(entt::entity target_actor, entt::entity trigger_actor)
+{
+	for (const auto& pair : current_triggers)
+	{
+		if (pair.first == target_actor && pair.second == trigger_actor)
+			return true;
+	}
+
+	return false;	
 }
