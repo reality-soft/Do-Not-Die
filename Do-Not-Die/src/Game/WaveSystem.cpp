@@ -183,13 +183,13 @@ void reality::WaveSystem::PlayerRepairCar()
 	if (player->can_repair_car_ == false || player->HasRepairPart() == false)
 		return;
 
-	if (DINPUT->GetKeyState(DIK_R) == KEY_UP)
+	if (DINPUT->GetKeyState(DIK_E) == KEY_UP)
 	{
 		player->controller_enable_ = true;
 		player->repair_during_time_ = 0.0f;
 	}
 
-	if (DINPUT->GetKeyState(DIK_R) == KEY_HOLD)
+	if (DINPUT->GetKeyState(DIK_E) == KEY_HOLD)
 	{
 		player->repair_during_time_ += TM_DELTATIME;
 		player->InterectionRotate(car_event_.line_nodes.begin()->second);		
