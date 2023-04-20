@@ -28,8 +28,7 @@ namespace reality
 			shared_ptr<UI_Image>	hp_img_;
 
 		shared_ptr<UI_Image>	objective_ui_;
-			shared_ptr<UI_Text>		tire_text_;
-			shared_ptr<UI_Text>		steel_text_;
+			shared_ptr<UI_Text>		repair_text_;
 
 		shared_ptr<UI_Image>	time_ui_;
 			shared_ptr<UI_Text>		time_text_;

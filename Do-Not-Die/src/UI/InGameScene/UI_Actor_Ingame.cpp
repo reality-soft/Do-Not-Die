@@ -132,13 +132,10 @@ void UI_Actor_Ingame::CreateIngameUI()
 	objective_ui_->InitImage("T_ObjectiveUI.png");
 	objective_ui_->SetLocalRectByMin({ win_size_1920_width * 4.0f / 5.0f, win_size_1920_height * 4.0f / 10.0f }, 323.0f, 387.0f);
 
-	tire_text_ = make_shared<UI_Text>();
-	tire_text_->InitText("TIRE : 10 / 30", E_Font::ROTUNDA, { 50.0f, 140.0f });
-	objective_ui_->AddChildUI(tire_text_);
+	repair_text_ = make_shared<UI_Text>();
+	repair_text_->InitText("Repair Count : 0 / 5", E_Font::BASIC, { 50.0f, 140.0f }, 0.7f);
+	objective_ui_->AddChildUI(repair_text_);
 
-	steel_text_ = make_shared<UI_Text>();
-	steel_text_->InitText("STEEL : 10 / 30", E_Font::ROTUNDA, { 50.0f, 200.0f });
-	objective_ui_->AddChildUI(steel_text_);
 
 	ui_comp_->ui_list.insert({ "Objective UI", objective_ui_ });
 
@@ -156,7 +153,6 @@ void UI_Actor_Ingame::CreateIngameUI()
 	interaction_progressbar_ = make_shared<UI_Image>();
 	interaction_progressbar_->InitImage("T_Interaction_Progress.png");
 	interaction_progressbar_->SetLocalRectByMin({ 0.0f, 0.0f }, 200.0f, 40.0f);
-	//interaction_ui_->AddChildUI(interaction_progressbar_);
 
 	interaction_icon_ = make_shared<UI_Image>();
 	interaction_icon_->InitImage("T_E_Icon.png");
@@ -232,14 +228,12 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	kill_text_->SetText(to_string(kill));
 
 	// Vehicle Item Update
-	string tire_str = "Tire : ";
-	string tire_count = "10";
-	string tire_max_count = " / 30";
-	tire_text_->SetText(tire_str + tire_count + tire_max_count);
-	string steel_str = "Steel : ";
-	string steel_count = "10";
-	string steel_max_count = " / 30";
-	steel_text_->SetText(steel_str + steel_count + steel_max_count);
+	string repair_str = "Repair Count : ";
+	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+	auto wave_sys = ingame_scene->GetWaveSystem();
+	string repair_count = to_string(wave_sys.car_repaired);
+	string repair_max_count = " / 5";
+	repair_text_->SetText(repair_str + repair_count + repair_max_count);
 
 	// Cross Hair Update
 	if (ui_comp_->ui_list.find("CrossHair UI") != ui_comp_->ui_list.end())
