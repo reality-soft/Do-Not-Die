@@ -55,6 +55,7 @@ private:
 
 public:
 	reality::CameraSystem GetCameraSystem() { return sys_camera; }
+	reality::WaveSystem& GetWaveSystem() { return sys_wave_; }
 private:
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
