@@ -11,6 +11,7 @@ Item::Item(ItemType item_type, XMFLOAT3 spawn_point, float trigger_radius)
 void Item::OnInit(entt::registry& registry)
 {
 	Actor::OnInit(registry);
+	visible = true;
 
 	reality::C_StaticMesh stm;
 	stm.local = XMMatrixIdentity();
