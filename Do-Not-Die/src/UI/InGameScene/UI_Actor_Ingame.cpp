@@ -282,9 +282,11 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	// Interaction UI Update
 	if (player_ != nullptr)
 	{
-		if ((player_->selectable_counts_ != 0 || player_->can_extract_repair_)  && ui_comp_->ui_list.find("Interaction UI") == ui_comp_->ui_list.end())
+		if (player_->selectable_counts_ != 0 || player_->can_extract_repair_ || player_->can_repair_car_)
 		{
-			ui_comp_->ui_list.insert({ "Interaction UI", interaction_ui_ });
+			if(ui_comp_->ui_list.find("Interaction UI") == ui_comp_->ui_list.end())
+				ui_comp_->ui_list.insert({ "Interaction UI", interaction_ui_ });
+
 			// Item Interaction
 			if (player_->selectable_counts_ != 0)
 			{
@@ -320,13 +322,20 @@ void UI_Actor_Ingame::UpdateIngameUI()
 				interaction_ui_->DeleteChildUI(interaction_progressbar_);
 
 			}
+			// Extract Car Interaction
 			if (player_->can_extract_repair_)
 			{
 				interaction_text_->SetText("Push to Extract");
 				interaction_ui_->AddChildUI(interaction_progressbar_);
-				auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
-				auto& wave_sys = ingame_scene->GetWaveSystem();
-				float width = 200.0f;// *wave_sys.
+				float width = 200.0f * player_->extract_during_time_ / player_->extract_time_takes_;
+				interaction_progressbar_->SetLocalRectByMin({ 0.0f, 0.0f }, width, 40.0f);
+			}
+			// Repair Car Interaction
+			if (player_->can_repair_car_)
+			{
+				interaction_text_->SetText("Push to Repair");
+				interaction_ui_->AddChildUI(interaction_progressbar_);
+				float width = 200.0f * player_->repair_during_time_ / player_->repair_time_takes_;
 				interaction_progressbar_->SetLocalRectByMin({ 0.0f, 0.0f }, width, 40.0f);
 			}
 		}
