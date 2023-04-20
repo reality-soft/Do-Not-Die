@@ -44,7 +44,13 @@ namespace reality
 			shared_ptr<UI_Button>	menu_exit_button_;
 
 		shared_ptr<UI_OptionWindow> menu_option_window_;
-	
+
+		shared_ptr<UI_Image>	interaction_ui_;
+			shared_ptr<UI_Text>		interaction_text_;
+	private:
+		float wave_timer_ = 0.0f;
+	public:
+		void SetGameTimer(float timer);
 	private:
 		void CreateIngameUI();
 		void CreateMenuUI();
