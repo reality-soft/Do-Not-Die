@@ -10,7 +10,7 @@ void FX_Muzzle::OnInit(entt::registry& registry)
 {
 	FX_BaseEffectActor::OnInit(registry);
 
-	AddEffectComponent("muzzle_effect", 1.0f);
+	AddEffectComponent("muzzle_effect", 0.5f);
 
 	AddPointLightComponent("PL_Muzzle", 1.0f);
 

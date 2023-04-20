@@ -1,48 +1,107 @@
 #include "TriggerEvent.h"
 #include "ItemObjects.h"
-
+#include "Enemy.h"
 using namespace reality;
 
-TriggerEvent::TriggerEvent(entt::entity target_actor, entt::entity trigger_actor, bool begin_or_end)
+TriggerEvent::TriggerEvent(entt::entity target_actor, entt::entity trigger_actor, bool is_begin)
 {
 	target_actor_ = target_actor;
 	trigger_actor_ = trigger_actor;
-	begin_or_end_ = begin_or_end;
+	is_begin_ = is_begin;
 
-	Item* item_actor = SCENE_MGR->GetActor<Item>(trigger_actor);
-	if (item_actor)
+	if (SCENE_MGR->GetActor<Player>(target_actor_) != nullptr)
+		is_actor_player_ = true;
+	else
+		is_actor_player_ = false;
+
+	if (SCENE_MGR->GetActor<Enemy>(target_actor_) != nullptr)
+		is_actor_zombie_ = true;
+	else
+		is_actor_zombie_ = false;
+
+
+	auto trigger_component = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_TriggerVolume>(trigger_actor_);
+	if (trigger_component == nullptr)
+		return;
+
+	if (trigger_component->tag == "item")
 	{
 		trigger_type_ = TriggerType::ITEM_TO_PLAYER;
-		item_actor_ = item_actor;
 	}
-	else
+	if (trigger_component->tag == "extract")
 	{
-		item_actor_ = nullptr;
+		trigger_type_ = TriggerType::REPAIR_PART_EXTRACT;
+	}
+	if (trigger_component->tag == "repair")
+	{
+		trigger_type_ = TriggerType::CAR_REPAIR;
+	}
+	if (trigger_component->tag == "defense")
+	{
+		trigger_type_ = TriggerType::CAR_DEFENSE;
 	}
 }
 
 void TriggerEvent::Process()
 {
+	PlayerProcess();
+	ZombiePeocess();
+}
+
+void reality::TriggerEvent::PlayerProcess()
+{
+	if (is_actor_player_ == false)
+		return;
+
 	switch (trigger_type_)
 	{
 	case TriggerType::ITEM_TO_PLAYER:
-		if (begin_or_end_)
+		if (is_begin_)
 		{
 			auto item = SCENE_MGR->GetActor<Item>(trigger_actor_);
-			if (item == nullptr)
-				return;
-			PlayerSelectable(item, true);
+			if (item != nullptr)
+				PlayerSelectable(item, true);			
 		}
 		else
 		{
 			auto item = SCENE_MGR->GetActor<Item>(trigger_actor_);
 			if (item == nullptr)
-				return;
-			PlayerSelectable(item, false);
+				PlayerSelectable(item, false);			
 		}
+		break;
+
+	case TriggerType::REPAIR_PART_EXTRACT:
+		if (is_begin_)
+			PlayerCanExtract(true);		
+		else
+			PlayerCanExtract(false);
+		break;
+
+	case TriggerType::CAR_REPAIR:
+		if (is_begin_)
+			PlayerCanRepair(true);
+		else
+			PlayerCanRepair(false);
 		break;
 	}
 }
+
+void reality::TriggerEvent::ZombiePeocess()
+{
+	if (is_actor_zombie_ == true)
+		return;
+
+	switch (trigger_type_)
+	{
+	case TriggerType::CAR_DEFENSE:
+		if (is_begin_)
+			ZombieDefense(true);
+		else
+			ZombieDefense(false);
+		break;
+	}
+}
+
 void reality::TriggerEvent::PlayerSelectable(Item* item_actor, bool selectable)
 {
 	// ITEM TEST CODE
@@ -75,64 +134,31 @@ void reality::TriggerEvent::PlayerSelectable(Item* item_actor, bool selectable)
 			++iter;
 		}
 	}
+}
 
-	//switch (item_type)
-	//{
-	//case ItemType::eMedicalBox:
-	//{
-	//	shared_ptr<MedicalBoxItem> medical_box = make_shared<MedicalBoxItem>();
-	//	medical_box->OnCreate();
-	//	medical_box->AddCount(1);
-	//	player->AcquireItem(medical_box);
-	//	break;
-	//}
-	//case ItemType::eHealKit:
-	//{
-	//	shared_ptr<HealKitItem> heal_kit = make_shared<HealKitItem>();
-	//	heal_kit->OnCreate();
-	//	heal_kit->AddCount(1);
-	//	player->AcquireItem(heal_kit);
-	//	break;
-	//}
-	//case ItemType::eEnergyDrink:
-	//{
-	//	shared_ptr<EnergyDrinkItem> energy_drink = make_shared<EnergyDrinkItem>();
-	//	energy_drink->OnCreate();
-	//	energy_drink->AddCount(1);
-	//	player->AcquireItem(energy_drink);
-	//	break;
-	//}
-	//case ItemType::eDrug:
-	//{
-	//	shared_ptr<DrugItem> drug = make_shared<DrugItem>();
-	//	drug->OnCreate();
-	//	drug->AddCount(1);
-	//	player->AcquireItem(drug);
-	//	break;
-	//}
-	//case ItemType::eAR_Ammo:
-	//{
-	//	shared_ptr<ARAmmoItem> ar_ammo = make_shared<ARAmmoItem>();
-	//	ar_ammo->OnCreate();
-	//	ar_ammo->AddCount(1);
-	//	player->AcquireItem(ar_ammo);
-	//	break;
-	//}
-	//case ItemType::ePistol_Ammo:
-	//{
-	//	shared_ptr<PistolAmmoItem> pistol_ammo = make_shared<PistolAmmoItem>();
-	//	pistol_ammo->OnCreate();
-	//	pistol_ammo->AddCount(1);
-	//	player->AcquireItem(pistol_ammo);
-	//	break;
-	//}
-	//case ItemType::eGrenade:
-	//{
-	//	shared_ptr<GrenadeItem> grenade = make_shared<GrenadeItem>();
-	//	grenade->OnCreate();
-	//	grenade->AddCount(1);
-	//	player->AcquireItem(grenade);
-	//	break;
-	//}
-	
+void reality::TriggerEvent::PlayerCanExtract(bool can_extract)
+{
+	auto player = SCENE_MGR->GetPlayer<Player>(0);
+	if (player == nullptr)
+		return;
+
+	player->can_extract_repair = can_extract;
+	player->repair_extract_trigger = trigger_actor_;
+}
+
+void reality::TriggerEvent::PlayerCanRepair(bool can_repair)
+{
+	auto player = SCENE_MGR->GetPlayer<Player>(0);
+	if (player == nullptr)
+		return;
+
+	player->can_repair_car = can_repair;
+}
+
+void reality::TriggerEvent::ZombieDefense(bool can_defense)
+{
+	auto zombie = SCENE_MGR->GetActor<Enemy>(target_actor_);
+	if (zombie == nullptr)
+		return;
+
 }

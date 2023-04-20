@@ -32,6 +32,10 @@ void Player::OnInit(entt::registry& registry)
 	camera.SetLocalFrom(capsule, 50);
 	registry.emplace<C_Camera>(entity_id_, camera);
 
+	C_SoundGenerator sound_generator;
+	sound_generator.local;
+	registry.emplace<C_SoundGenerator>(entity_id_, sound_generator);
+
 	C_SoundListener sound_listener;
 	sound_listener.local = camera.local;
 	registry.emplace<C_SoundListener>(entity_id_, sound_listener);
@@ -57,6 +61,7 @@ void Player::OnInit(entt::registry& registry)
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SkeletalMesh));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_Camera));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SoundListener));
+	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SoundGenerator));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_SkeletalMesh), TYPE_ID(C_Socket));
 
 	transform_matrix_ = XMMatrixTranslation(0, 100, 0);
@@ -88,13 +93,16 @@ void Player::OnInit(entt::registry& registry)
 
 void Player::OnUpdate()
 {
-	C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-	XMVECTOR scale, rotation, translation;
-	XMMatrixDecompose(&scale, &rotation, &translation, transform_matrix_);
-	XMMATRIX rotation_matrix = XMMatrixRotationY(camera->pitch_yaw.y);
-	transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, translation, rotation_matrix);
-	front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
-	right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
+	if (controller_enable_)
+	{
+		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
+		XMVECTOR scale, rotation, translation;
+		XMMatrixDecompose(&scale, &rotation, &translation, transform_matrix_);
+		XMMATRIX rotation_matrix = XMMatrixRotationY(camera->pitch_yaw.y);
+		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, translation, rotation_matrix);
+		front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
+		right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
+	}
 
 	// FlashLight Update
 	UpdateFlashLight();
@@ -186,7 +194,19 @@ void Player::Fire()
 		auto player_transform = GetTransformMatrix();
 		XMVECTOR s, r, t;
 		XMMatrixDecompose(&s, &r, &t, player_transform);
+		t = XMVectorAdd(t, front_ * 30.0f);
+		t = XMVectorAdd(t, right_ * 6.0f);
+		t = XMVectorAdd(t, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) * 40.0f);
 		EFFECT_MGR->SpawnEffect<FX_Muzzle>(t);
+
+		// Make Shot Sound when Shot
+		auto& generator = reg_scene_->get<C_SoundGenerator>(GetEntityId());
+		SoundQueue queue;
+		queue.sound_filename = "S_WEP_Fire_001.wav";
+		queue.sound_type = SoundType::SFX;
+		queue.sound_volume = 0.5f;
+		queue.is_looping = false;
+		generator.sound_queue_list.push(queue);
 
 		// Make Shot Impact Effect
 		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
@@ -234,7 +254,8 @@ bool Player::IsAiming()
 
 void Player::ResetPos()
 {
-	transform_matrix_ = XMMatrixTranslationFromVector({ 0.f, 100.f, 0.f, 0.f });
+	spawn_point.m128_f32[1] += 100.f;
+	transform_matrix_ = XMMatrixTranslationFromVector(spawn_point);
 	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, transform_matrix_);
 }
 
@@ -384,6 +405,31 @@ bool Player::AcquireItem(shared_ptr<ItemBase> item)
 	return false;
 }
 
+void Player::DropItem(int slot)
+{
+	if (INVENTORY_MAX <= slot)
+		return;
+
+	if (inventory_[slot] == NULL)
+		return;
+
+	if (inventory_timer_[slot] < inventory_[slot]->GetCooltime())
+		return;
+
+	drop_time += TM_DELTATIME;
+
+	if (drop_time >= 0.5)
+	{
+		SCENE_MGR->AddActor<Item>(inventory_[slot]->item_type_, _XMFLOAT3(GetPos()), 30);
+		inventory_[slot]->Drop();
+		inventory_timer_[slot] = 0;
+		if (inventory_[slot]->GetCount() == 0)
+		{
+			inventory_[slot] = NULL;
+		}
+		drop_time = 0.0f;
+	}
+}
 void Player::UseItem(int slot)
 {
 	if (INVENTORY_MAX <= slot)
@@ -403,6 +449,20 @@ void Player::UseItem(int slot)
 	{
 		inventory_[slot] = NULL;
 	}
+	
+	drop_time = 0.0f;
+}
+
+bool Player::HasRepairPart()
+{
+	bool has_repair_part = false;
+	for (int i = 0; i < 4; ++i)
+	{
+		RepairPartItem* repair_part = dynamic_cast<RepairPartItem*>(inventory_[i].get());
+		if (repair_part)
+			has_repair_part = true;
+	}
+	return has_repair_part;
 }
 
 void Player::PickClosestItem()
@@ -410,9 +470,92 @@ void Player::PickClosestItem()
 	if (selectable_items_.empty())
 		return;
 
+	bool getting_item_success = false;;
+
 	auto closest_item = selectable_items_.begin();
-	EVENT->PushEvent<DeleteActorEvent>(closest_item->second->entity_id_);
-	selectable_items_.erase(closest_item);
+	switch (closest_item->second->item_type_)
+	{
+	case ItemType::eMedicalBox:
+	{
+		shared_ptr<MedicalBoxItem> medical_box = make_shared<MedicalBoxItem>();
+		medical_box->OnCreate();
+		medical_box->AddCount(1);
+		medical_box->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(medical_box);
+		break;
+	}
+	case ItemType::eHealKit:
+	{
+		shared_ptr<HealKitItem> heal_kit = make_shared<HealKitItem>();
+		heal_kit->OnCreate();
+		heal_kit->AddCount(1);
+		heal_kit->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(heal_kit);
+		break;
+	}
+	case ItemType::eEnergyDrink:
+	{
+		shared_ptr<EnergyDrinkItem> energy_drink = make_shared<EnergyDrinkItem>();
+		energy_drink->OnCreate();
+		energy_drink->AddCount(1);
+		energy_drink->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(energy_drink);
+		break;
+	}
+	case ItemType::eDrug:
+	{
+		shared_ptr<DrugItem> drug = make_shared<DrugItem>();
+		drug->OnCreate();
+		drug->AddCount(1);
+		drug->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(drug);
+		break;
+	}
+	case ItemType::eAR_Ammo:
+	{
+		shared_ptr<ARAmmoItem> ar_ammo = make_shared<ARAmmoItem>();
+		ar_ammo->OnCreate();
+		ar_ammo->AddCount(1);
+		ar_ammo->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(ar_ammo);
+		break;
+	}
+	case ItemType::ePistol_Ammo:
+	{
+		shared_ptr<PistolAmmoItem> pistol_ammo = make_shared<PistolAmmoItem>();
+		pistol_ammo->OnCreate();
+		pistol_ammo->AddCount(1);
+		pistol_ammo->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(pistol_ammo);
+		break;
+	}
+	case ItemType::eGrenade:
+	{
+		shared_ptr<GrenadeItem> grenade = make_shared<GrenadeItem>();
+		grenade->OnCreate();
+		grenade->AddCount(1);
+		grenade->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(grenade);
+		break;
+	}
+	case ItemType::eRepairPart:
+	{
+		shared_ptr<RepairPartItem> repair_part = make_shared<RepairPartItem>();
+		repair_part->OnCreate();
+		repair_part->AddCount(1);
+		repair_part->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(repair_part);
+		break;
+	}
+	}
+
+	if (getting_item_success)
+	{
+		EVENT->PushEvent<DeleteActorEvent>(closest_item->second->entity_id_);
+		selectable_items_.erase(closest_item);
+		selectable_counts_--;
+	}
+	
 }
 
 vector<shared_ptr<ItemBase>>& Player::GetInventory()
@@ -423,4 +566,10 @@ vector<shared_ptr<ItemBase>>& Player::GetInventory()
 vector<float>& Player::GetInventoryTimer()
 {
 	return inventory_timer_;
+}
+
+void Player::SetSpawnPoint(XMVECTOR point)
+{
+	spawn_point = point;
+	ResetPos();
 }

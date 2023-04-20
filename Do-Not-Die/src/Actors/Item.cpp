@@ -40,12 +40,16 @@ void Item::OnInit(entt::registry& registry)
 	case ItemType::eGrenade:
 		stm.static_mesh_id = "Grenade.stmesh";
 		break;
+	case ItemType::eRepairPart:
+		stm.static_mesh_id = "RepairPart.stmesh";
+		break;
 	}
 
 	registry.emplace_or_replace<reality::C_StaticMesh>(entity_id_, stm);
 
 	reality::C_TriggerVolume item_trigger;
 	item_trigger.sphere_volume = trigger_sphere_;
+	item_trigger.tag = "item";
 	registry.emplace_or_replace<reality::C_TriggerVolume>(entity_id_, item_trigger);
 
 	transform_tree_.root_node = make_shared<reality::TransformTreeNode>(TYPE_ID(reality::C_StaticMesh));
