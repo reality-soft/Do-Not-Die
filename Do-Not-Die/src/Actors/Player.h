@@ -29,11 +29,13 @@ public:
 	void Jump();
 	void Idle();
 	void Fire();
-	void Aim();
+	void Aim(bool active);
 	void ThrowGrenade();
 	void PickClosestItem();
+
 public:
 	bool IsAiming();
+	void InterectionRotate(XMVECTOR direction);
 
 public:
 	void ResetPos();
@@ -66,22 +68,28 @@ private:
 public:
 	map<float, Item*> selectable_items_;
 	UINT selectable_counts_ = 0;
+	int selected_slot = 0;
 	bool AcquireItem(shared_ptr<ItemBase> item);
-	void UseItem(int slot);
-	void DropItem(int slot);
+	void SelectSlot(int slot);
+	void UseItem();
+	void DropItem();
 	bool HasRepairPart();
-	
+	void UseRepairPart();
 	vector<shared_ptr<ItemBase>>&	GetInventory();
 	vector<float>&					GetInventoryTimer();
 
-	float drop_time = 0.0f;
+	float drop_during_time_ = 0.0f;
+	float extract_during_time_ = 0.0f;
+	float repair_during_time_ = 0.0f;
 
-	bool can_extract_repair = false;
-	float extract_time_takes = 5.0f;
+	const float drop_time_takes_ = 0.5f;
+	const float extract_time_takes_ = 5.0f;
+	const float repair_time_takes_ = 5.0f;
+
+	bool can_extract_repair_ = false;
+	bool can_repair_car_ = false;
+	
 	entt::entity repair_extract_trigger;
-
-	bool can_repair_car = false;
-	int car_durability = 0;
 
 	void SetSpawnPoint(XMVECTOR point);
 	XMVECTOR spawn_point;

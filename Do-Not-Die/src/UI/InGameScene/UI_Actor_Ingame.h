@@ -28,8 +28,7 @@ namespace reality
 			shared_ptr<UI_Image>	hp_img_;
 
 		shared_ptr<UI_Image>	objective_ui_;
-			shared_ptr<UI_Text>		tire_text_;
-			shared_ptr<UI_Text>		steel_text_;
+			shared_ptr<UI_Text>		repair_text_;
 
 		shared_ptr<UI_Image>	time_ui_;
 			shared_ptr<UI_Text>		time_text_;
@@ -46,6 +45,8 @@ namespace reality
 		shared_ptr<UI_OptionWindow> menu_option_window_;
 
 		shared_ptr<UI_Image>	interaction_ui_;
+			shared_ptr<UI_Image>	interaction_icon_;
+			shared_ptr<UI_Image>	interaction_progressbar_;
 			shared_ptr<UI_Text>		interaction_text_;
 	private:
 		float wave_timer_ = 0.0f;

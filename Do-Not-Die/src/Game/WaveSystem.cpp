@@ -1,21 +1,26 @@
 #include "WaveSystem.h"
+#include "GameEvents.h"
 #include "Player.h"
+#include "Enemy.h"
 #include "Item.h"
+
+using namespace reality;
 
 void reality::WaveSystem::OnCreate(entt::registry& reg)
 {
 	item_spawns_ = QUADTREE->GetGuideLines("DND_ItemSpawn_1")->at(0);
 	repair_spawns_ = QUADTREE->GetGuideLines("DND_RepairPart_1")->at(0);
 	car_event_ = QUADTREE->GetGuideLines("DND_CarEvent_1")->at(0);
+	zomebie_tracks_ = QUADTREE->GetGuideLines("DND_NpcTrack_1");
 
-	CreateCarEventTriggers(_XMFLOAT3(car_event_.line_nodes.begin()->second), 200, 500);
+	CreateCarEventTriggers(_XMFLOAT3(car_event_.line_nodes.begin()->second), 250, 500);
 }
 
 void reality::WaveSystem::OnUpdate(entt::registry& reg)
 {
-	static int i = 1;
-	if (i)
-		RandomSpawnItem(15.0f); i = 0;
+	//static int i = 1;
+	//if (i)
+	//	RandomSpawnItem(30.0f); i = 0;
 
 	float counting_time = world_env_->GetCountingTime();
 	if (world_env_->IsDayChanged())
@@ -23,10 +28,11 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 		switch (world_env_->GetCurrentDay())
 		{
 		case Day::eNoon:
+			WaveFinish();
 			countdown_timer_ = fabs(world_env_->GetTimeLimits().x * 2);
-			RandomSpawnItem(30);
 			break;
 		case Day::eNight:
+			WaveStart();
 			countdown_timer_ = fabs(world_env_->GetTimeLimits().y * 2);
 			wave_count_++;
 			break;
@@ -36,6 +42,12 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
+	SpawnZombies(3.0f, 30);
+
+	if (car_repaired >= 5)
+	{
+		EVENT->PushEvent<GameOverEvent>();
+	}
 }
 
 void reality::WaveSystem::SetWorldEnv(Environment* env)
@@ -125,18 +137,26 @@ void reality::WaveSystem::PlayerExtractRepair()
 	if (player == nullptr)
 		return;
 
-	if (player->can_extract_repair == false)
+	if (player->can_extract_repair_ == false)
 		return;
 
-	static float extract_time = 0.0f;
+	auto trigger_comp = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_TriggerVolume>(player->repair_extract_trigger);
+	if (trigger_comp == nullptr)
+		return;
 
 	if (DINPUT->GetKeyState(DIK_E) == KEY_HOLD)
-		extract_time += TM_DELTATIME;
+	{
+		player->extract_during_time_ += TM_DELTATIME;
+		player->InterectionRotate(_XMVECTOR3(trigger_comp->sphere_volume.center));
+	}
 
 	if (DINPUT->GetKeyState(DIK_E) == KEY_UP)
-		extract_time = 0.0f;
+	{
+		player->extract_during_time_ = 0.0f;
+		player->controller_enable_ = true;
+	}
 
-	if (extract_time >= player->extract_time_takes)
+	if (player->extract_during_time_ >= player->extract_time_takes_)
 	{
 		if (repair_parts.find(player->repair_extract_trigger) != repair_parts.end())
 		{
@@ -154,8 +174,9 @@ void reality::WaveSystem::PlayerExtractRepair()
 
 		}
 		DeleteExtractPoint(player->repair_extract_trigger);
-		extract_time = 0.0f;
-		player->can_extract_repair = false;
+		player->extract_during_time_ = 0.0f;
+		player->can_extract_repair_ = false;
+		player->controller_enable_ = true;
 	}
 }
 
@@ -165,36 +186,27 @@ void reality::WaveSystem::PlayerRepairCar()
 	if (player == nullptr)
 		return;
 
-	if (player->can_repair_car == false && player->HasRepairPart() == false)
+	if (player->can_repair_car_ == false || player->HasRepairPart() == false)
 		return;
 
-	static float repair_time = 0.0f;
-
-	if (DINPUT->GetKeyState(DIK_R) == KEY_UP)
+	if (DINPUT->GetKeyState(DIK_E) == KEY_UP)
 	{
 		player->controller_enable_ = true;
-		repair_time = 0.0f;
+		player->repair_during_time_ = 0.0f;
 	}
 
-	if (DINPUT->GetKeyState(DIK_R) == KEY_HOLD)
+	if (DINPUT->GetKeyState(DIK_E) == KEY_HOLD)
 	{
-		repair_time += TM_DELTATIME;
-
-		player->controller_enable_ = false;
-		XMVECTOR player_trans = player->GetTransformMatrix().r[3];
-		XMVECTOR car_pos = car_event_.line_nodes.begin()->second;
-		float angle = XMVector3AngleBetweenVectors(XMVectorSet(0, 0, 1, 0), XMVector3Normalize(car_pos - player_trans)).m128_f32[0];
-		if (XMVectorGetX(XMVector3Dot(XMVectorSet(1, 0, 0, 0), XMVector3Normalize(car_pos - player_trans))) < 0)
-			angle *= -1.0f;
-
-		XMMATRIX rotation_matrix = XMMatrixRotationY(angle);
-		player->transform_tree_.root_node->Rotate(*player->reg_scene_, player->entity_id_, player_trans, rotation_matrix);
+		player->repair_during_time_ += TM_DELTATIME;
+		player->InterectionRotate(car_event_.line_nodes.begin()->second);		
 	}
 
-	if (repair_time >= 5.0f)
+	if (player->repair_during_time_ >= player->repair_time_takes_)
 	{
+		player->controller_enable_ = true;
+		player->UseRepairPart();
 		car_repaired += 1;
-		repair_time = 0.0f;
+		player->repair_during_time_ = 0.0f;
 	}
 }
 
@@ -213,4 +225,57 @@ void reality::WaveSystem::DeleteExtractPoint(entt::entity ent)
 	{
 		SCENE_MGR->GetScene(INGAME)->GetRegistryRef().destroy(ent);
 	}
+}
+
+void reality::WaveSystem::SpawnZombies(float interval, UINT count)
+{
+	if (zombie_spawn_ == false)
+		return;
+
+	static float cur_time = 0.0f;
+
+	cur_time += TM_DELTATIME;
+
+	if (zombie_spawn_count_ > count)
+		return;
+	
+
+	if (cur_time < interval)
+		return;
+
+	auto enemy_entity = SCENE_MGR->AddActor<Enemy>();
+	// setting a character into quad tree
+	if (QUADTREE->RegistDynamicCapsule(enemy_entity) == false)
+	{
+		EVENT->PushEvent<DeleteActorEvent>(enemy_entity);
+	}
+	else
+	{
+		auto enemy_actor = SCENE_MGR->GetActor<Enemy>(enemy_entity);
+
+		int guidline_index = rand() % zomebie_tracks_->size();
+		int mesh_index = rand() % enemy_meshes.size();
+
+		vector<XMVECTOR> target_poses;
+		for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
+			target_poses.push_back(target_pos.second);
+		}
+		enemy_actor->SetRoute(target_poses);
+		enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
+
+		cur_time = 0.0f;
+		zombie_spawn_count_ += 1;
+	}
+	
+}
+
+void reality::WaveSystem::WaveStart()
+{
+	zombie_spawn_ = true;
+}
+
+void reality::WaveSystem::WaveFinish()
+{
+	zombie_spawn_count_ = 0;
+	RandomSpawnItem(30);
 }
