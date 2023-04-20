@@ -282,7 +282,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	// Interaction UI Update
 	if (player_ != nullptr)
 	{
-		if ((player_->selectable_counts_ != 0 || player_->can_extract_repair)  && ui_comp_->ui_list.find("Interaction UI") == ui_comp_->ui_list.end())
+		if ((player_->selectable_counts_ != 0 || player_->can_extract_repair_)  && ui_comp_->ui_list.find("Interaction UI") == ui_comp_->ui_list.end())
 		{
 			ui_comp_->ui_list.insert({ "Interaction UI", interaction_ui_ });
 			// Item Interaction
@@ -320,7 +320,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 				interaction_ui_->DeleteChildUI(interaction_progressbar_);
 
 			}
-			if (player_->can_extract_repair)
+			if (player_->can_extract_repair_)
 			{
 				interaction_text_->SetText("Push to Extract");
 				interaction_ui_->AddChildUI(interaction_progressbar_);
@@ -330,7 +330,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 				interaction_progressbar_->SetLocalRectByMin({ 0.0f, 0.0f }, width, 40.0f);
 			}
 		}
-		else if((player_->selectable_counts_ == 0 && !player_->can_extract_repair) && ui_comp_->ui_list.find("Interaction UI") != ui_comp_->ui_list.end())
+		else if((player_->selectable_counts_ == 0 && !player_->can_extract_repair_) && ui_comp_->ui_list.find("Interaction UI") != ui_comp_->ui_list.end())
 			ui_comp_->ui_list.erase("Interaction UI");
 	}
 }

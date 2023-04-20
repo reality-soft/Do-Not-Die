@@ -142,7 +142,7 @@ void reality::TriggerEvent::PlayerCanExtract(bool can_extract)
 	if (player == nullptr)
 		return;
 
-	player->can_extract_repair = can_extract;
+	player->can_extract_repair_ = can_extract;
 	player->repair_extract_trigger = trigger_actor_;
 }
 
@@ -152,7 +152,7 @@ void reality::TriggerEvent::PlayerCanRepair(bool can_repair)
 	if (player == nullptr)
 		return;
 
-	player->can_repair_car = can_repair;
+	player->can_repair_car_ = can_repair;
 }
 
 void reality::TriggerEvent::ZombieDefense(bool can_defense)

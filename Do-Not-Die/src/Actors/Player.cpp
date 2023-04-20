@@ -122,12 +122,18 @@ void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
 
 void Player::MoveRight()
 {
+	if (controller_enable_ == false)
+		return;
+
 	SetCharacterAnimation("A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->direction += right_;
 }
 
 void Player::MoveRightForward()
 {
+	if (controller_enable_ == false)
+		return;
+
 	SetCharacterAnimation("A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->direction += front_;
 	movement_component_->direction += right_;
@@ -135,6 +141,9 @@ void Player::MoveRightForward()
 
 void Player::MoveRightBack()
 {
+	if (controller_enable_ == false)
+		return;
+
 	SetCharacterAnimation("A_TP_CH_Jog_RB_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->direction -= front_;
 	movement_component_->direction += right_;
@@ -142,12 +151,18 @@ void Player::MoveRightBack()
 
 void Player::MoveLeft()
 {
+	if (controller_enable_ == false)
+		return;
+
 	SetCharacterAnimation("A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->direction -= right_;
 }
 
 void Player::MoveLeftForward()
 {
+	if (controller_enable_ == false)
+		return;
+
 	SetCharacterAnimation("A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->direction += front_;
 	movement_component_->direction -= right_;
@@ -155,6 +170,9 @@ void Player::MoveLeftForward()
 
 void Player::MoveLeftBack()
 {
+	if (controller_enable_ == false)
+		return;
+
 	SetCharacterAnimation("A_TP_CH_Jog_LB_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->direction -= front_;
 	movement_component_->direction -= right_;
@@ -162,18 +180,27 @@ void Player::MoveLeftBack()
 
 void Player::MoveForward()
 {
+	if (controller_enable_ == false)
+		return;
+
 	SetCharacterAnimation("A_TP_CH_Jog_F_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->direction += front_;
 }
 
 void Player::MoveBack()
 {
+	if (controller_enable_ == false)
+		return;
+
 	SetCharacterAnimation("A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->direction -= front_;
 }
 
 void Player::Jump()
 {
+	if (controller_enable_ == false)
+		return;
+
 	if (movement_component_->jump_pulse <= 0 && movement_component_->gravity_pulse <= 0) {
 		movement_component_->jump_pulse = 300.0f;
 	}
@@ -250,6 +277,20 @@ void Player::ThrowGrenade()
 bool Player::IsAiming()
 {
 	return is_aiming_;
+}
+
+void Player::InterectionRotate(XMVECTOR interection_pos)
+{
+	controller_enable_ = false;
+	
+	XMVECTOR player_pos = GetTransformMatrix().r[3];
+	XMVECTOR direction = XMVector3Normalize(interection_pos - player_pos);
+	float angle = XMVector3AngleBetweenVectors(XMVectorSet(0, 0, 1, 0), direction).m128_f32[0];
+	if (XMVectorGetX(XMVector3Dot(XMVectorSet(1, 0, 0, 0), direction)) < 0)
+		angle *= -1.0f;
+
+	XMMATRIX rotation_matrix = XMMatrixRotationY(angle);
+	transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, GetPos(), rotation_matrix);
 }
 
 void Player::ResetPos()
@@ -416,9 +457,9 @@ void Player::DropItem(int slot)
 	if (inventory_timer_[slot] < inventory_[slot]->GetCooltime())
 		return;
 
-	drop_time += TM_DELTATIME;
+	drop_during_time_ += TM_DELTATIME;
 
-	if (drop_time >= 0.5)
+	if (drop_during_time_ >= drop_time_takes_)
 	{
 		SCENE_MGR->AddActor<Item>(inventory_[slot]->item_type_, _XMFLOAT3(GetPos()), 30);
 		inventory_[slot]->Drop();
@@ -427,11 +468,14 @@ void Player::DropItem(int slot)
 		{
 			inventory_[slot] = NULL;
 		}
-		drop_time = 0.0f;
+		drop_during_time_ = 0.0f;
 	}
 }
 void Player::UseItem(int slot)
 {
+	if (inventory_[slot]->item_type_ == ItemType::eRepairPart)
+		return;
+
 	if (INVENTORY_MAX <= slot)
 		return;
 
@@ -450,19 +494,39 @@ void Player::UseItem(int slot)
 		inventory_[slot] = NULL;
 	}
 	
-	drop_time = 0.0f;
+	drop_during_time_ = 0.0f;
 }
 
 bool Player::HasRepairPart()
 {
-	bool has_repair_part = false;
 	for (int i = 0; i < 4; ++i)
 	{
-		RepairPartItem* repair_part = dynamic_cast<RepairPartItem*>(inventory_[i].get());
-		if (repair_part)
-			has_repair_part = true;
+		if (inventory_[i] == nullptr)
+			continue;
+
+		if (inventory_[i]->item_type_ == ItemType::eRepairPart)
+			return true;
 	}
-	return has_repair_part;
+	return false;
+}
+
+void Player::UseRepairPart()
+{
+	for (auto& item : inventory_)
+	{
+		if (item == nullptr)
+			continue;
+
+		if (item.get()->item_type_ == ItemType::eRepairPart)
+		{
+			item->Use();
+			if (item->GetCount() == 0)
+			{
+				item = nullptr;
+			}
+			break;
+		}
+	}
 }
 
 void Player::PickClosestItem()
