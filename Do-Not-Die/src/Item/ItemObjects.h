@@ -67,6 +67,7 @@ public:
 class RepairPartItem : public ItemBase
 {
 public:
+	int repair_influence = 1;
 	void OnCreate() override;
 	void UseItem() override;
 };

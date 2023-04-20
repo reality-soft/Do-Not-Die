@@ -10,24 +10,28 @@ namespace reality
 		virtual void OnUpdate(entt::registry& reg) override;
 
 		void SetWorldEnv(Environment* env);
+		void CreateExtractPoints(entt::registry& reg);
 
 		float countdown_timer_ = 0;
 		UINT wave_count_ = 0;
 
-		void CreateExtractPoints(entt::registry& reg);
-		void PlayerExtractRepair();
-		void SpawnRepairItem(XMFLOAT3 position);
-		void DeleteExtractPoint(entt::entity ent);
 	private:
 		void RandomSpawnItem(float trigger_radius);
+		void CreateCarEventTriggers(XMFLOAT3 point, float repair_radius, float zombie_target_radius);
+		void PlayerExtractRepair();
+		void PlayerRepairCar();
+		void SpawnRepairItem(XMFLOAT3 position);
+		void DeleteExtractPoint(entt::entity ent);
 
 	private:
 
 		shared_ptr<Environment> world_env_;
 		GuideLine item_spawns_;
 		GuideLine repair_spawns_;
+		GuideLine car_event_;
 		map<UINT, bool> item_table_;
 		set<entt::entity> repair_parts;
+		int car_repaired = 0;
 	};
 }
 
