@@ -93,13 +93,16 @@ void Player::OnInit(entt::registry& registry)
 
 void Player::OnUpdate()
 {
-	C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-	XMVECTOR scale, rotation, translation;
-	XMMatrixDecompose(&scale, &rotation, &translation, transform_matrix_);
-	XMMATRIX rotation_matrix = XMMatrixRotationY(camera->pitch_yaw.y);
-	transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, translation, rotation_matrix);
-	front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
-	right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
+	if (controller_enable_)
+	{
+		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
+		XMVECTOR scale, rotation, translation;
+		XMMatrixDecompose(&scale, &rotation, &translation, transform_matrix_);
+		XMMATRIX rotation_matrix = XMMatrixRotationY(camera->pitch_yaw.y);
+		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, translation, rotation_matrix);
+		front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
+		right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
+	}
 
 	// FlashLight Update
 	UpdateFlashLight();
@@ -402,7 +405,7 @@ bool Player::AcquireItem(shared_ptr<ItemBase> item)
 	return false;
 }
 
-void Player::UseOrDropItem(int slot)
+void Player::DropItem(int slot)
 {
 	if (INVENTORY_MAX <= slot)
 		return;
@@ -413,25 +416,9 @@ void Player::UseOrDropItem(int slot)
 	if (inventory_timer_[slot] < inventory_[slot]->GetCooltime())
 		return;
 
-	static float drop_time = 0.0f;
 	drop_time += TM_DELTATIME;
 
-	if ((slot == 1 && DINPUT->GetKeyState(DIK_1) == KEY_UP) ||
-		(slot == 2 && DINPUT->GetKeyState(DIK_2) == KEY_UP) || 
-		(slot == 3 && DINPUT->GetKeyState(DIK_3) == KEY_UP) || 
-		(slot == 3 && DINPUT->GetKeyState(DIK_3) == KEY_UP))
-	{
-		inventory_[slot]->Use();
-
-		inventory_timer_[slot] = 0;
-
-		if (inventory_[slot]->GetCount() == 0)
-		{
-			inventory_[slot] = NULL;
-		}
-		drop_time = 0.0f;
-	}
-	else if (drop_time >= 1.5)
+	if (drop_time >= 0.5)
 	{
 		SCENE_MGR->AddActor<Item>(inventory_[slot]->item_type_, _XMFLOAT3(GetPos()), 30);
 		inventory_[slot]->Drop();
@@ -442,6 +429,40 @@ void Player::UseOrDropItem(int slot)
 		}
 		drop_time = 0.0f;
 	}
+}
+void Player::UseItem(int slot)
+{
+	if (INVENTORY_MAX <= slot)
+		return;
+
+	if (inventory_[slot] == NULL)
+		return;
+
+	if (inventory_timer_[slot] < inventory_[slot]->GetCooltime())
+		return;
+
+	inventory_[slot]->Use();
+
+	inventory_timer_[slot] = 0;
+
+	if (inventory_[slot]->GetCount() == 0)
+	{
+		inventory_[slot] = NULL;
+	}
+	
+	drop_time = 0.0f;
+}
+
+bool Player::HasRepairPart()
+{
+	bool has_repair_part = false;
+	for (int i = 0; i < 4; ++i)
+	{
+		RepairPartItem* repair_part = dynamic_cast<RepairPartItem*>(inventory_[i].get());
+		if (repair_part)
+			has_repair_part = true;
+	}
+	return has_repair_part;
 }
 
 void Player::PickClosestItem()
