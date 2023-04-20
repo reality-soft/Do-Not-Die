@@ -82,7 +82,7 @@ namespace reality {
 			DIE
 		};
 
-		ZombieAnimationStateMachine(entt::entity owner_id) : AnimationStateMachine(owner_id) {};
+		ZombieAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
 
 		virtual void OnInit() override {
 			states_.insert({ IDLE, make_shared<Idle>() });

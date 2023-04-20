@@ -33,8 +33,9 @@ void Enemy::OnInit(entt::registry& registry)
 	reality::C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
 	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180.f));
 
-	C_Animation animation_component;
-	animation_component.SetBaseAnimObject<ZombieAnimationStateMachine>(entity_id_);
+	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
+	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
+	animation_component.SetBaseAnimObject<ZombieAnimationStateMachine>(entity_id_, skm.skeletal_mesh_id, 0);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 	SetCharacterAnimation("Zombie_Idle_1_v2_IPC_Anim_Unreal Take.anim");
 
@@ -51,7 +52,7 @@ void Enemy::SetCharacterAnimation(string anim_id) const
 {
 	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
 	int base_index = animation_component_ptr->name_to_anim_slot_index["Base"];
-	animation_component_ptr->anim_slots[base_index].second.anim_object_->SetAnimation(anim_id, 0.3);
+	animation_component_ptr->anim_slots[base_index].second->SetAnimation(anim_id, 0.3);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
 }
 
