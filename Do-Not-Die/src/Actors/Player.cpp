@@ -70,10 +70,10 @@ void Player::OnInit(entt::registry& registry)
 	C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
 	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
 
-	// create anim slot
-	C_Animation animation_component;
-	animation_component.SetBaseAnimObject<AnimationBase>();
-	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6, entity_id_);
+	// create anim 
+	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
+	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 5, "Spine_03");
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
 	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
@@ -114,8 +114,8 @@ void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
 {
 	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
 	int slot_index = animation_component_ptr->name_to_anim_slot_index[anim_slot_id];
-	if (animation_component_ptr->anim_slots[slot_index].second.anim_object_->GetCurAnimationId() != anim_id) {
-		animation_component_ptr->anim_slots[slot_index].second.anim_object_->SetAnimation(anim_id, 0.2);
+	if (animation_component_ptr->anim_slots[slot_index].second->GetCurAnimationId() != anim_id) {
+		animation_component_ptr->anim_slots[slot_index].second->SetAnimation(anim_id, 0.2);
 	}
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
 }

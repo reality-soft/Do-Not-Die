@@ -16,7 +16,7 @@ class Player : public GameCharacter
 public:
 	virtual void OnInit(entt::registry& registry) override;
 	virtual void OnUpdate() override;
-	void SetCharacterAnimation(string anim_id, string anim_slot = "");
+	void SetCharacterAnimation(string anim_id, string anim_slot = "Base");
 public:
 	void MoveRight();
 	void MoveRightForward();
@@ -99,7 +99,7 @@ public:
 		FIRE,
 	};
 
-	PlayerUpperBodyAnimationStateMachine(entt::entity owner_id) : AnimationStateMachine(owner_id) {};
+	PlayerUpperBodyAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
 
 	virtual void OnInit() override {
 		states_.insert({ BASE_POSE, make_shared<BasePose>() });
