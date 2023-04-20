@@ -169,6 +169,7 @@ void InGameScene::OnUpdate()
 	sys_wave_.OnUpdate(reg_scene_);
 
 	environment_.Update(&sys_camera, &sys_light);
+	ingame_ui.SetGameTimer(sys_wave_.countdown_timer_);
 	ingame_ui.OnUpdate();
 	
 	//if (DINPUT->GetKeyState(DIK_G) == KeyState::KEY_PUSH)
