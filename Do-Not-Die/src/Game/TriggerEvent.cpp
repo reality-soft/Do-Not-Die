@@ -65,7 +65,7 @@ void reality::TriggerEvent::PlayerProcess()
 		else
 		{
 			auto item = SCENE_MGR->GetActor<Item>(trigger_actor_);
-			if (item == nullptr)
+			if (item != nullptr)
 				PlayerSelectable(item, false);			
 		}
 		break;

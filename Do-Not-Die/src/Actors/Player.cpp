@@ -242,19 +242,18 @@ void Player::Fire()
 	}
 }
 
-void Player::Aim()
+void Player::Aim(bool active)
 {
 	C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-	if (is_aiming_ == false) {
-		is_aiming_ = true;
+	if (camera == nullptr)
+		return;
+
+	if (active)
 		camera->target_rotation = 20;
-		reg_scene_->emplace_or_replace<C_Camera>(entity_id_, *camera);
-	}
-	else {
-		is_aiming_ = false;
+	else
 		camera->target_rotation = 0;
-		reg_scene_->emplace_or_replace<C_Camera>(entity_id_, *camera);
-	}
+
+	is_aiming_ = active;
 }
 
 void Player::ThrowGrenade()
@@ -446,55 +445,53 @@ bool Player::AcquireItem(shared_ptr<ItemBase> item)
 	return false;
 }
 
-void Player::DropItem(int slot)
+void Player::SelectSlot(int slot)
 {
-	if (INVENTORY_MAX <= slot)
-		return;
-
-	if (inventory_[slot] == NULL)
-		return;
-
-	if (inventory_timer_[slot] < inventory_[slot]->GetCooltime())
-		return;
-
-	drop_during_time_ += TM_DELTATIME;
-
-	if (drop_during_time_ >= drop_time_takes_)
-	{
-		SCENE_MGR->AddActor<Item>(inventory_[slot]->item_type_, _XMFLOAT3(GetPos()), 30);
-		inventory_[slot]->Drop();
-		inventory_timer_[slot] = 0;
-		if (inventory_[slot]->GetCount() == 0)
-		{
-			inventory_[slot] = NULL;
-		}
-		drop_during_time_ = 0.0f;
-	}
+	selected_slot = slot;
 }
-void Player::UseItem(int slot)
+
+void Player::DropItem()
 {
-	if (inventory_[slot]->item_type_ == ItemType::eRepairPart)
+	if (INVENTORY_MAX <= selected_slot)
 		return;
 
-	if (INVENTORY_MAX <= slot)
+	ItemBase* item_base = inventory_[selected_slot].get();
+	if (item_base == nullptr)
 		return;
 
-	if (inventory_[slot] == NULL)
-		return;
-
-	if (inventory_timer_[slot] < inventory_[slot]->GetCooltime())
-		return;
-
-	inventory_[slot]->Use();
-
-	inventory_timer_[slot] = 0;
-
-	if (inventory_[slot]->GetCount() == 0)
+	SCENE_MGR->AddActor<Item>(item_base->item_type_, _XMFLOAT3(GetPos()), 30);
+	item_base->Drop();
+	inventory_timer_[selected_slot] = 0;
+	if (item_base->GetCount() == 0)
 	{
-		inventory_[slot] = NULL;
+		inventory_[selected_slot] = NULL;
+	}	
+}
+
+void Player::UseItem()
+{
+	if (INVENTORY_MAX <= selected_slot)
+		return;
+
+	ItemBase* item_base = inventory_[selected_slot].get();
+	if (item_base == nullptr)
+		return;
+
+	if (item_base->item_type_ == ItemType::eRepairPart)
+		return;
+
+	if (inventory_timer_[selected_slot] < item_base->GetCooltime())
+		return;
+
+	item_base->Use();
+
+	inventory_timer_[selected_slot] = 0;
+
+	if (item_base->GetCount() == 0)
+	{
+		inventory_[selected_slot] = NULL;
 	}
-	
-	drop_during_time_ = 0.0f;
+
 }
 
 bool Player::HasRepairPart()
