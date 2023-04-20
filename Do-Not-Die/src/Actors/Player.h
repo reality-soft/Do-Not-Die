@@ -29,7 +29,7 @@ public:
 	void Jump();
 	void Idle();
 	void Fire();
-	void Aim();
+	void Aim(bool active);
 	void ThrowGrenade();
 	void PickClosestItem();
 
@@ -68,9 +68,11 @@ private:
 public:
 	map<float, Item*> selectable_items_;
 	UINT selectable_counts_ = 0;
+	int selected_slot = 0;
 	bool AcquireItem(shared_ptr<ItemBase> item);
-	void UseItem(int slot);
-	void DropItem(int slot);
+	void SelectSlot(int slot);
+	void UseItem();
+	void DropItem();
 	bool HasRepairPart();
 	void UseRepairPart();
 	vector<shared_ptr<ItemBase>>&	GetInventory();
@@ -86,7 +88,7 @@ public:
 
 	bool can_extract_repair_ = false;
 	bool can_repair_car_ = false;
-
+	
 	entt::entity repair_extract_trigger;
 
 	void SetSpawnPoint(XMVECTOR point);

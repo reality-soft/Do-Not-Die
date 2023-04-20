@@ -51,20 +51,20 @@ void InGameScene::OnInit()
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_S }, std::bind(&Player::MoveBack, player_actor), KEY_HOLD);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_RETURN }, std::bind(&Player::ResetPos, player_actor), KEY_PUSH);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_E }, std::bind(&Player::PickClosestItem, player_actor), KEY_PUSH);
-	// Item Use
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_1 }, std::bind(&Player::DropItem, player_actor, 0), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_2 }, std::bind(&Player::DropItem, player_actor, 1), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_3 }, std::bind(&Player::DropItem, player_actor, 2), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_4 }, std::bind(&Player::DropItem, player_actor, 3), KEY_HOLD);
 
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_1 }, std::bind(&Player::UseItem, player_actor, 0), KEY_UP);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_2 }, std::bind(&Player::UseItem, player_actor, 1), KEY_UP);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_3 }, std::bind(&Player::UseItem, player_actor, 2), KEY_UP);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_4 }, std::bind(&Player::UseItem, player_actor, 3), KEY_UP);
+	// Select Slot
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_1 }, std::bind(&Player::SelectSlot, player_actor, 0), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_2 }, std::bind(&Player::SelectSlot, player_actor, 1), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_3 }, std::bind(&Player::SelectSlot, player_actor, 2), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_4 }, std::bind(&Player::SelectSlot, player_actor, 3), KEY_PUSH);
+	
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_Q }, std::bind(&Player::UseItem, player_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_C }, std::bind(&Player::DropItem, player_actor), KEY_PUSH);
 
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_SPACE }, std::bind(&Player::Jump, player_actor), KEY_PUSH);
 	
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_Q }, std::bind(&Player::Aim, player_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::R_BUTTON }, std::bind(&Player::Aim, player_actor, true), KEY_HOLD);
+	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::R_BUTTON }, std::bind(&Player::Aim, player_actor, false), KEY_UP);
 
 	std::function<void()> idle = std::bind(&Player::Idle, player_actor);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_D }, idle, KEY_UP);
