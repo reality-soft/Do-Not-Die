@@ -9,7 +9,8 @@ namespace reality
 	{
 		ITEM_TO_PLAYER,
 		REPAIR_PART_EXTRACT,
-		ZOMBIE_ACTIVITY,
+		CAR_REPAIR,
+		CAR_DEFENSE
 	};
 
 	class TriggerEvent : public Event
@@ -24,8 +25,15 @@ namespace reality
 		entt::entity target_actor_;
 		TriggerType trigger_type_;
 		bool is_begin_;
+		bool is_actor_player_;
+		bool is_actor_zombie_;
+
+		void PlayerProcess();
+		void ZombiePeocess();
 
 		void PlayerSelectable(Item* item_actor, bool selectable);
 		void PlayerCanExtract(bool can_extract);
+		void PlayerCanRepair(bool can_repair);
+		void ZombieDefense(bool can_defense);
 	};
 }

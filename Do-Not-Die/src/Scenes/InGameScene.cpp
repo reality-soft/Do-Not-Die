@@ -51,12 +51,16 @@ void InGameScene::OnInit()
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_S }, std::bind(&Player::MoveBack, player_actor), KEY_HOLD);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_RETURN }, std::bind(&Player::ResetPos, player_actor), KEY_PUSH);
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_E }, std::bind(&Player::PickClosestItem, player_actor), KEY_PUSH);
-
 	// Item Use
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_1 }, std::bind(&Player::UseOrDropItem, player_actor, 0), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_2 }, std::bind(&Player::UseOrDropItem, player_actor, 1), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_3 }, std::bind(&Player::UseOrDropItem, player_actor, 2), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_4 }, std::bind(&Player::UseOrDropItem, player_actor, 3), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_1 }, std::bind(&Player::DropItem, player_actor, 0), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_2 }, std::bind(&Player::DropItem, player_actor, 1), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_3 }, std::bind(&Player::DropItem, player_actor, 2), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_4 }, std::bind(&Player::DropItem, player_actor, 3), KEY_HOLD);
+
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_1 }, std::bind(&Player::UseItem, player_actor, 0), KEY_UP);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_2 }, std::bind(&Player::UseItem, player_actor, 1), KEY_UP);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_3 }, std::bind(&Player::UseItem, player_actor, 2), KEY_UP);
+	INPUT_EVENT->SubscribeKeyEvent({ DIK_4 }, std::bind(&Player::UseItem, player_actor, 3), KEY_UP);
 
 	INPUT_EVENT->SubscribeKeyEvent({ DIK_SPACE }, std::bind(&Player::Jump, player_actor), KEY_PUSH);
 	
@@ -122,6 +126,7 @@ void InGameScene::OnInit()
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Jump", &player_actor->GetMovementComponent()->jump_pulse);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Gravity", &player_actor->GetMovementComponent()->gravity_pulse);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Selectable Items", &player_actor->selectable_counts_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<bool>("In Repair Volume", &player_actor->can_repair_car);
 }
 
 void InGameScene::OnUpdate()

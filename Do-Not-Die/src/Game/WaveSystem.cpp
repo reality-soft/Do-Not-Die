@@ -6,6 +6,9 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 {
 	item_spawns_ = QUADTREE->GetGuideLines("DND_ItemSpawn_1")->at(0);
 	repair_spawns_ = QUADTREE->GetGuideLines("DND_RepairPart_1")->at(0);
+	car_event_ = QUADTREE->GetGuideLines("DND_CarEvent_1")->at(0);
+
+	CreateCarEventTriggers(_XMFLOAT3(car_event_.line_nodes.begin()->second), 200, 500);
 }
 
 void reality::WaveSystem::OnUpdate(entt::registry& reg)
@@ -32,6 +35,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
+	PlayerRepairCar();
 }
 
 void reality::WaveSystem::SetWorldEnv(Environment* env)
@@ -63,6 +67,24 @@ void reality::WaveSystem::RandomSpawnItem(float trigger_radius)
 		SCENE_MGR->AddActor<Item>(item_type, _XMFLOAT3(spawn), trigger_radius);
 		item_table_[index] = true;
 	}
+}
+
+void reality::WaveSystem::CreateCarEventTriggers(XMFLOAT3 point, float repair_radius, float defense_radius)
+{
+	entt::entity reapair_volume_ent = SCENE_MGR->GetScene(INGAME).get()->GetRegistryRef().create();
+	entt::entity defense_volume_ent = SCENE_MGR->GetScene(INGAME).get()->GetRegistryRef().create();
+
+	C_TriggerVolume repair_trigger;
+	repair_trigger.tag = "repair";
+	repair_trigger.sphere_volume.center = point;
+	repair_trigger.sphere_volume.radius = repair_radius;
+	SCENE_MGR->GetScene(INGAME).get()->GetRegistryRef().emplace<C_TriggerVolume>(reapair_volume_ent, repair_trigger);
+	
+	C_TriggerVolume defense_trigger;
+	defense_trigger.tag = "defense";
+	defense_trigger.sphere_volume.center = point;
+	defense_trigger.sphere_volume.radius = defense_radius;
+	SCENE_MGR->GetScene(INGAME).get()->GetRegistryRef().emplace<C_TriggerVolume>(defense_volume_ent, defense_trigger);
 }
 
 void reality::WaveSystem::CreateExtractPoints(entt::registry& reg)
@@ -134,6 +156,45 @@ void reality::WaveSystem::PlayerExtractRepair()
 		DeleteExtractPoint(player->repair_extract_trigger);
 		extract_time = 0.0f;
 		player->can_extract_repair = false;
+	}
+}
+
+void reality::WaveSystem::PlayerRepairCar()
+{
+	auto player = SCENE_MGR->GetPlayer<Player>(0);
+	if (player == nullptr)
+		return;
+
+	if (player->can_repair_car == false && player->HasRepairPart() == false)
+		return;
+
+	static float repair_time = 0.0f;
+
+	if (DINPUT->GetKeyState(DIK_R) == KEY_UP)
+	{
+		player->controller_enable_ = true;
+		repair_time = 0.0f;
+	}
+
+	if (DINPUT->GetKeyState(DIK_R) == KEY_HOLD)
+	{
+		repair_time += TM_DELTATIME;
+
+		player->controller_enable_ = false;
+		XMVECTOR player_trans = player->GetTransformMatrix().r[3];
+		XMVECTOR car_pos = car_event_.line_nodes.begin()->second;
+		float angle = XMVector3AngleBetweenVectors(XMVectorSet(0, 0, 1, 0), XMVector3Normalize(car_pos - player_trans)).m128_f32[0];
+		if (XMVectorGetX(XMVector3Dot(XMVectorSet(1, 0, 0, 0), XMVector3Normalize(car_pos - player_trans))) < 0)
+			angle *= -1.0f;
+
+		XMMATRIX rotation_matrix = XMMatrixRotationY(angle);
+		player->transform_tree_.root_node->Rotate(*player->reg_scene_, player->entity_id_, player_trans, rotation_matrix);
+	}
+
+	if (repair_time >= 5.0f)
+	{
+		car_repaired += 1;
+		repair_time = 0.0f;
 	}
 }
 
