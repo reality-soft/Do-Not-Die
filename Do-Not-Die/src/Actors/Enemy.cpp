@@ -38,9 +38,6 @@ void Enemy::OnInit(entt::registry& registry)
 	animation_component.SetBaseAnimObject<ZombieAnimationStateMachine>(entity_id_, skm.skeletal_mesh_id, 0);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 	SetCharacterAnimation("Zombie_Idle_1_v2_IPC_Anim_Unreal Take.anim");
-
-	// setting a character into quad tree
-	QUADTREE->RegistDynamicCapsule(entity_id_);
 }
 
 void Enemy::OnUpdate()

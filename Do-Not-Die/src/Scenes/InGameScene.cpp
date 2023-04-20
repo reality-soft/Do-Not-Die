@@ -137,31 +137,6 @@ void InGameScene::OnUpdate()
 	QUADTREE->Frame(&sys_camera);
 	QUADTREE->UpdatePhysics("PhysicsCS.cso");
 	
-	static float cur_time = 0.0f;
-	
-	cur_time += TM_DELTATIME;
-	const auto npc_guidlines = QUADTREE->GetGuideLines("DND_NpcTrack_1");
-	
-	if (cur_time >= 1.0f) {
-		auto enemy_entity = SCENE_MGR->AddActor<Enemy>();
-		auto enemy_actor = SCENE_MGR->GetActor<Enemy>(enemy_entity);
-
-		int guidline_index = rand() % npc_guidlines->size();
-		int mesh_index = rand() % enemy_meshes.size();
-
-		vector<XMVECTOR> target_poses;
-		for (const auto& target_pos : npc_guidlines->at(guidline_index).line_nodes) {
-			target_poses.push_back(target_pos.second);
-		}
-		enemy_actor->SetRoute(target_poses);
-		enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
-		
-		//auto player = SCENE_MGR->GetPlayer<Player>(0);
-		//player->SetPos(level.GetGuideLines()->at(guidline_index).line_nodes[0]);
-		
-		cur_time = 0.0f;
-	}
-	
 	cur_zombie_created = SCENE_MGR->GetNumOfActor() - 1;
 
 	sys_camera.OnUpdate(reg_scene_);
