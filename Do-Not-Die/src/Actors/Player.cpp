@@ -416,10 +416,10 @@ void Player::UseOrDropItem(int slot)
 	static float drop_time = 0.0f;
 	drop_time += TM_DELTATIME;
 
-	if ((slot == 1 && DINPUT->GetKeyState(DIK_1) == KEY_UP) ||
-		(slot == 2 && DINPUT->GetKeyState(DIK_2) == KEY_UP) || 
-		(slot == 3 && DINPUT->GetKeyState(DIK_3) == KEY_UP) || 
-		(slot == 3 && DINPUT->GetKeyState(DIK_3) == KEY_UP))
+	if ((slot == 0 && DINPUT->GetKeyState(DIK_1) == KEY_UP) ||
+		(slot == 1 && DINPUT->GetKeyState(DIK_2) == KEY_UP) || 
+		(slot == 2 && DINPUT->GetKeyState(DIK_3) == KEY_UP) || 
+		(slot == 3 && DINPUT->GetKeyState(DIK_4) == KEY_UP))
 	{
 		inventory_[slot]->Use();
 
@@ -449,6 +449,8 @@ void Player::PickClosestItem()
 	if (selectable_items_.empty())
 		return;
 
+	bool getting_item_success = false;;
+
 	auto closest_item = selectable_items_.begin();
 	switch (closest_item->second->item_type_)
 	{
@@ -458,7 +460,7 @@ void Player::PickClosestItem()
 		medical_box->OnCreate();
 		medical_box->AddCount(1);
 		medical_box->item_type_ = closest_item->second->item_type_;
-		AcquireItem(medical_box);
+		getting_item_success = AcquireItem(medical_box);
 		break;
 	}
 	case ItemType::eHealKit:
@@ -467,7 +469,7 @@ void Player::PickClosestItem()
 		heal_kit->OnCreate();
 		heal_kit->AddCount(1);
 		heal_kit->item_type_ = closest_item->second->item_type_;
-		AcquireItem(heal_kit);
+		getting_item_success = AcquireItem(heal_kit);
 		break;
 	}
 	case ItemType::eEnergyDrink:
@@ -476,7 +478,7 @@ void Player::PickClosestItem()
 		energy_drink->OnCreate();
 		energy_drink->AddCount(1);
 		energy_drink->item_type_ = closest_item->second->item_type_;
-		AcquireItem(energy_drink);
+		getting_item_success = AcquireItem(energy_drink);
 		break;
 	}
 	case ItemType::eDrug:
@@ -485,7 +487,7 @@ void Player::PickClosestItem()
 		drug->OnCreate();
 		drug->AddCount(1);
 		drug->item_type_ = closest_item->second->item_type_;
-		AcquireItem(drug);
+		getting_item_success = AcquireItem(drug);
 		break;
 	}
 	case ItemType::eAR_Ammo:
@@ -494,7 +496,7 @@ void Player::PickClosestItem()
 		ar_ammo->OnCreate();
 		ar_ammo->AddCount(1);
 		ar_ammo->item_type_ = closest_item->second->item_type_;
-		AcquireItem(ar_ammo);
+		getting_item_success = AcquireItem(ar_ammo);
 		break;
 	}
 	case ItemType::ePistol_Ammo:
@@ -503,7 +505,7 @@ void Player::PickClosestItem()
 		pistol_ammo->OnCreate();
 		pistol_ammo->AddCount(1);
 		pistol_ammo->item_type_ = closest_item->second->item_type_;
-		AcquireItem(pistol_ammo);
+		getting_item_success = AcquireItem(pistol_ammo);
 		break;
 	}
 	case ItemType::eGrenade:
@@ -512,7 +514,7 @@ void Player::PickClosestItem()
 		grenade->OnCreate();
 		grenade->AddCount(1);
 		grenade->item_type_ = closest_item->second->item_type_;
-		AcquireItem(grenade);
+		getting_item_success = AcquireItem(grenade);
 		break;
 	}
 	case ItemType::eRepairPart:
@@ -521,13 +523,18 @@ void Player::PickClosestItem()
 		repair_part->OnCreate();
 		repair_part->AddCount(1);
 		repair_part->item_type_ = closest_item->second->item_type_;
-		AcquireItem(repair_part);
+		getting_item_success = AcquireItem(repair_part);
 		break;
 	}
 	}
 
-	EVENT->PushEvent<DeleteActorEvent>(closest_item->second->entity_id_);
-	selectable_items_.erase(closest_item);
+	if (getting_item_success)
+	{
+		EVENT->PushEvent<DeleteActorEvent>(closest_item->second->entity_id_);
+		selectable_items_.erase(closest_item);
+		selectable_counts_--;
+	}
+	
 }
 
 vector<shared_ptr<ItemBase>>& Player::GetInventory()
