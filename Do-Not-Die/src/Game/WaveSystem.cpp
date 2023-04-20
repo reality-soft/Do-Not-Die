@@ -1,4 +1,5 @@
 #include "WaveSystem.h"
+#include "GameEvents.h"
 #include "Player.h"
 #include "Item.h"
 
@@ -36,6 +37,11 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
+
+	if (car_repaired >= 5)
+	{
+		EVENT->PushEvent<GameOverEvent>();
+	}
 }
 
 void reality::WaveSystem::SetWorldEnv(Environment* env)
@@ -125,18 +131,26 @@ void reality::WaveSystem::PlayerExtractRepair()
 	if (player == nullptr)
 		return;
 
-	if (player->can_extract_repair == false)
+	if (player->can_extract_repair_ == false)
 		return;
 
-	static float extract_time = 0.0f;
+	auto trigger_comp = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_TriggerVolume>(player->repair_extract_trigger);
+	if (trigger_comp == nullptr)
+		return;
 
 	if (DINPUT->GetKeyState(DIK_E) == KEY_HOLD)
-		extract_time += TM_DELTATIME;
+	{
+		player->extract_during_time_ += TM_DELTATIME;
+		player->InterectionRotate(_XMVECTOR3(trigger_comp->sphere_volume.center));
+	}
 
 	if (DINPUT->GetKeyState(DIK_E) == KEY_UP)
-		extract_time = 0.0f;
+	{
+		player->extract_during_time_ = 0.0f;
+		player->controller_enable_ = true;
+	}
 
-	if (extract_time >= player->extract_time_takes)
+	if (player->extract_during_time_ >= player->extract_time_takes_)
 	{
 		if (repair_parts.find(player->repair_extract_trigger) != repair_parts.end())
 		{
@@ -154,8 +168,9 @@ void reality::WaveSystem::PlayerExtractRepair()
 
 		}
 		DeleteExtractPoint(player->repair_extract_trigger);
-		extract_time = 0.0f;
-		player->can_extract_repair = false;
+		player->extract_during_time_ = 0.0f;
+		player->can_extract_repair_ = false;
+		player->controller_enable_ = true;
 	}
 }
 
@@ -165,36 +180,27 @@ void reality::WaveSystem::PlayerRepairCar()
 	if (player == nullptr)
 		return;
 
-	if (player->can_repair_car == false && player->HasRepairPart() == false)
+	if (player->can_repair_car_ == false || player->HasRepairPart() == false)
 		return;
-
-	static float repair_time = 0.0f;
 
 	if (DINPUT->GetKeyState(DIK_R) == KEY_UP)
 	{
 		player->controller_enable_ = true;
-		repair_time = 0.0f;
+		player->repair_during_time_ = 0.0f;
 	}
 
 	if (DINPUT->GetKeyState(DIK_R) == KEY_HOLD)
 	{
-		repair_time += TM_DELTATIME;
-
-		player->controller_enable_ = false;
-		XMVECTOR player_trans = player->GetTransformMatrix().r[3];
-		XMVECTOR car_pos = car_event_.line_nodes.begin()->second;
-		float angle = XMVector3AngleBetweenVectors(XMVectorSet(0, 0, 1, 0), XMVector3Normalize(car_pos - player_trans)).m128_f32[0];
-		if (XMVectorGetX(XMVector3Dot(XMVectorSet(1, 0, 0, 0), XMVector3Normalize(car_pos - player_trans))) < 0)
-			angle *= -1.0f;
-
-		XMMATRIX rotation_matrix = XMMatrixRotationY(angle);
-		player->transform_tree_.root_node->Rotate(*player->reg_scene_, player->entity_id_, player_trans, rotation_matrix);
+		player->repair_during_time_ += TM_DELTATIME;
+		player->InterectionRotate(car_event_.line_nodes.begin()->second);		
 	}
 
-	if (repair_time >= 5.0f)
+	if (player->repair_during_time_ >= player->repair_time_takes_)
 	{
+		player->controller_enable_ = true;
+		player->UseRepairPart();
 		car_repaired += 1;
-		repair_time = 0.0f;
+		player->repair_during_time_ = 0.0f;
 	}
 }
 

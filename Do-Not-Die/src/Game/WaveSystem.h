@@ -14,6 +14,7 @@ namespace reality
 
 		float countdown_timer_ = 0;
 		UINT wave_count_ = 0;
+		int car_repaired = 0;
 
 	private:
 		void RandomSpawnItem(float trigger_radius);
@@ -31,7 +32,6 @@ namespace reality
 		GuideLine car_event_;
 		map<UINT, bool> item_table_;
 		set<entt::entity> repair_parts;
-		int car_repaired = 0;
 	};
 }
 
