@@ -46,6 +46,7 @@ private:
 public:
 	reality::CameraSystem GetCameraSystem() { return sys_camera; }
 	reality::WaveSystem& GetWaveSystem() { return sys_wave_; }
+	UI_Actor_Ingame& GetUIActor() { return ingame_ui; }
 private:
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
