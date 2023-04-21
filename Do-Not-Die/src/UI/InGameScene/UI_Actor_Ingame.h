@@ -50,8 +50,12 @@ namespace reality
 			shared_ptr<UI_Image>	interaction_icon_;
 			shared_ptr<UI_Image>	interaction_progressbar_;
 			shared_ptr<UI_Text>		interaction_text_;
+
+		shared_ptr<UI_Text>		event_msg_text_;
 	private:
 		float wave_timer_ = 0.0f;
+		float event_msg_time_ = 3.0f;
+		float event_msg_timer_ = 0.0f;
 	public:
 		void SetGameTimer(float timer);
 	private:
@@ -60,6 +64,7 @@ namespace reality
 	public:
 		void UpdateIngameUI();
 		void UpdateMenuUI();
+		void SetEventMsg(string msg);
 	private:
 		void OpenMenu();
 		void CloseMenu();

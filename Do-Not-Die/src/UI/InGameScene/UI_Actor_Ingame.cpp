@@ -179,6 +179,11 @@ void UI_Actor_Ingame::CreateIngameUI()
 	interaction_text_ = make_shared<UI_Text>();
 	interaction_text_->InitText("", E_Font::BASIC, { 40.0f, 8.0f }, 0.5f);
 	interaction_ui_->AddChildUI("2_InteractionText", interaction_text_);
+
+	// Event Message UI
+	event_msg_text_ = make_shared<UI_Text>();
+	event_msg_text_->InitText("Event Test", E_Font::BASIC, { win_size_1920_width / 2.0f - 100.0f, win_size_1920_height - 300.0f });
+	
 }
 
 void UI_Actor_Ingame::CreateMenuUI()
@@ -374,6 +379,17 @@ void UI_Actor_Ingame::UpdateIngameUI()
 		else if((player_->selectable_counts_ == 0 && !player_->can_extract_repair_) && ui_comp_->ui_list.find("Interaction UI") != ui_comp_->ui_list.end())
 			ui_comp_->ui_list.erase("Interaction UI");
 	}
+
+	// EventMessageText Update
+	if (event_msg_timer_ < event_msg_time_)
+	{
+		event_msg_timer_ += TIMER->GetDeltaTime();
+	}
+	else if(ui_comp_->ui_list.find("Event Message UI") != ui_comp_->ui_list.end())
+	{
+		event_msg_text_->SetText("");
+		ui_comp_->ui_list.erase("Event Message UI");
+	}
 }
 
 void UI_Actor_Ingame::UpdateMenuUI()
@@ -428,6 +444,13 @@ void UI_Actor_Ingame::UpdateMenuUI()
 		ENGINE->Resize((E_Resolution)menu_option_window_->option_resolution_list_box_->GetCurrentIndex());
 		CloseOptionWindow();
 	}
+}
+
+void UI_Actor_Ingame::SetEventMsg(string msg)
+{
+	event_msg_text_->SetText(msg);
+	event_msg_timer_ = 0.0f; 
+	ui_comp_->ui_list.insert({ "Event Message UI", event_msg_text_ });
 }
 
 void UI_Actor_Ingame::OpenMenu()
