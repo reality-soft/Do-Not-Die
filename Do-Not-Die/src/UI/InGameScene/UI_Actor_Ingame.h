@@ -22,8 +22,10 @@ namespace reality
 		shared_ptr<UI_Minimap>	minimap_ui;
 
 		shared_ptr<UI_Image>	status_ui;
+			shared_ptr<UI_Image>	inven_select_;
 			shared_ptr<UI_Image>	inven_[4];
-			shared_ptr<UI_Text>		inven_text_[4];
+			shared_ptr<UI_Text>		inven_slot_text_[4];
+			shared_ptr<UI_Text>		inven_count_text_[4];
 			shared_ptr<UI_Image>	inven_cooltime_img_[4];
 			shared_ptr<UI_Image>	hp_img_;
 

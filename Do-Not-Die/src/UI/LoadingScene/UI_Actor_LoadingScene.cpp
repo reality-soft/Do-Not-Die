@@ -33,12 +33,12 @@ void UI_Actor_LoadingScene::CreateUI()
 
 	progress_bar_back_ = make_shared<UI_Image>();
 	progress_bar_back_->InitImage("T_Progressbar_Back_Loading.png");
-	background_->AddChildUI(progress_bar_back_);
+	background_->AddChildUI("1_ProgressBackground", progress_bar_back_);
 	progress_bar_back_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, 872.0f }, 1000.0f, 50.0f);
 	
 	progress_bar_ = make_shared<UI_Image>();
 	progress_bar_->InitImage("T_Progressbar_Loading.png");
-	progress_bar_back_->AddChildUI(progress_bar_);
+	progress_bar_back_->AddChildUI("1_ProgressBar", progress_bar_);
 	progress_bar_->SetLocalRectByCenter({ progress_bar_back_->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f,
 		progress_bar_back_->rect_transform_[E_Resolution::R1920x1080].world_rect.height / 2.0f }, 950.0f, 30.0f);
 
