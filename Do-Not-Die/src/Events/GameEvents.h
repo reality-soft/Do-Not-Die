@@ -5,6 +5,7 @@
 #include "GameCharacter.h"
 #include "FX_BloodImpact.h"
 #include "FX_ConcreteImpact.h"
+#include "InGameScene.h"
 using namespace reality;
 
 class TakeDamageEvent : public reality::Event
@@ -53,6 +54,19 @@ private:
 
 	vector<RayShape> rays_;
 	entt::entity actor_id_;
+};
+
+class MakeTextEvent : public Event
+{
+public:
+	MakeTextEvent(string text) : text_(text) {};
+	virtual void Process() override {
+		auto ingamescene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		auto& ui_actor = ingamescene->GetUIActor();
+		ui_actor.SetEventMsg(text_);
+	};
+private:
+	string text_;
 };
 
 class GameOverEvent : public Event
