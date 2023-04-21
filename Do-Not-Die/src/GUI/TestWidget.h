@@ -2,6 +2,7 @@
 
 #include "Engine_include.h"
 
+#ifdef DEBUG_
 namespace reality
 {
 	struct Property
@@ -41,5 +42,4 @@ namespace reality
 		std::map<string, Property> properties;
 	};
 }
-
-
+#endif

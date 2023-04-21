@@ -12,8 +12,6 @@ void InGameScene::OnInit()
 	// LOADING : MANAGER_LOADING
 	loading_progress = LOADING_MANAGER;
 
-	GUI->AddWidget<PropertyWidget>("property");
-
 	WRITER->Init();
 	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
 
@@ -115,6 +113,8 @@ void InGameScene::OnInit()
 	sys_wave_.SetWorldEnv(&environment_);
 	sys_wave_.CreateExtractPoints(reg_scene_);
 
+#ifdef DEBUG_
+	GUI->AddWidget<PropertyWidget>("property");
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("FPS", &TIMER->fps);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Time Countdown", &sys_wave_.countdown_timer_);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Waves", &sys_wave_.wave_count_);
@@ -126,6 +126,7 @@ void InGameScene::OnInit()
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Car Repaired", &sys_wave_.car_repaired);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Created Actors", &cur_zombie_created);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<bool>("In Repair Volume", &player_actor->can_repair_car_);
+#endif
 }
 
 void InGameScene::OnUpdate()
@@ -171,7 +172,9 @@ void InGameScene::OnRender()
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
 
+#ifdef DEBUG_
 	GUI->RenderWidgets();
+#endif
 }
 
 void InGameScene::OnRelease()

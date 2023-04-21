@@ -48,8 +48,10 @@ public:
 	reality::WaveSystem& GetWaveSystem() { return sys_wave_; }
 	UI_Actor_Ingame& GetUIActor() { return ingame_ui; }
 private:
+#ifdef DEBUG_
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
+#endif
 	UI_Actor_Ingame ingame_ui;
 	void CreateExplosionEffectFromRay();
 	void CursorStateUpdate();
