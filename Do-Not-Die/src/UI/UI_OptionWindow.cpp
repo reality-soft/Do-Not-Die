@@ -41,20 +41,27 @@ void UI_OptionWindow::InitOptionWindow()
 
 	resolution_value = option_resolution_list_box_->GetCurrentItem();
 
-	// Volume Slider
-	option_volume_slider_ = make_shared<UI_Slider>();
-	option_volume_slider_->InitSlider("T_Volume_Slider_back.png", "T_Volume_Slider.png", "T_Volume_Slider.png");
-	option_window_->AddChildUI("1_VolumeSlider", option_volume_slider_);
-	option_volume_slider_->SetLocalRectByMin({ 50.0f, 430.0f }, 265.0f, 51.0f);
-	option_volume_slider_->SetSliderLocalRect(44.0f, 18.0f);
+	// SFX Volume Slider
+	option_sfx_volume_slider_ = make_shared<UI_Slider>();
+	option_sfx_volume_slider_->InitSlider("T_Volume_Slider_back.png", "T_Volume_Slider.png", "T_Volume_Slider.png");
+	option_window_->AddChildUI("1_SFX_VolumeSlider", option_sfx_volume_slider_);
+	option_sfx_volume_slider_->SetLocalRectByMin({ 50.0f, 430.0f }, 265.0f, 51.0f);
+	option_sfx_volume_slider_->SetSliderLocalRect(44.0f, 18.0f);
+
+	// Music Volume Slider
+	option_music_volume_slider_ = make_shared<UI_Slider>();
+	option_music_volume_slider_->InitSlider("T_Volume_Slider_back.png", "T_Volume_Slider.png", "T_Volume_Slider.png");
+	option_window_->AddChildUI("1_Music_VolumeSlider", option_music_volume_slider_);
+	option_music_volume_slider_->SetLocalRectByMin({ 50.0f, 500.0f }, 265.0f, 51.0f);
+	option_music_volume_slider_->SetSliderLocalRect(44.0f, 18.0f);
 }
 
 void UI_OptionWindow::UpdateThisUI()
 {
 	UIBase::UpdateThisUI();
 
-	FMOD_MGR->SetMusicVolume(option_volume_slider_->GetValue() / 100.0f);
-	FMOD_MGR->SetSFXVolume(option_volume_slider_->GetValue() / 100.0f);
+	FMOD_MGR->SetMusicVolume(option_music_volume_slider_->GetValue() / 100.0f);
+	FMOD_MGR->SetSFXVolume(option_sfx_volume_slider_->GetValue() / 100.0f);
 }
 
 E_UIState UI_OptionWindow::GetCloseButtonState()
