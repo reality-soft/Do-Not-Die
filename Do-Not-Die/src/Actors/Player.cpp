@@ -16,7 +16,9 @@ void Player::OnInit(entt::registry& registry)
 {
 	Character::OnInit(registry);
 
-	movement_component_->speed = 150;
+	movement_component_->speed = 0;
+	movement_component_->acceleration = 50;
+	movement_component_->max_speed = 150;
 	max_hp_ = cur_hp_ = 100;
 	
 	reality::C_SkeletalMesh skm;
@@ -124,7 +126,7 @@ void Player::MoveRight()
 		return;
 
 	SetCharacterAnimation("A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += right_;
+	movement_component_->accelaration_vector[0] += 1;
 }
 
 void Player::MoveRightForward()
@@ -133,8 +135,8 @@ void Player::MoveRightForward()
 		return;
 
 	SetCharacterAnimation("A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += front_;
-	movement_component_->direction += right_;
+	movement_component_->accelaration_vector[2] += 1;
+	movement_component_->accelaration_vector[0] += 1;
 }
 
 void Player::MoveRightBack()
@@ -143,8 +145,8 @@ void Player::MoveRightBack()
 		return;
 
 	SetCharacterAnimation("A_TP_CH_Jog_RB_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= front_;
-	movement_component_->direction += right_;
+	movement_component_->accelaration_vector[2] -= 1;
+	movement_component_->accelaration_vector[0] += 1;
 }
 
 void Player::MoveLeft()
@@ -153,7 +155,7 @@ void Player::MoveLeft()
 		return;
 
 	SetCharacterAnimation("A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= right_;
+	movement_component_->accelaration_vector[0] -= 1;
 }
 
 void Player::MoveLeftForward()
@@ -162,8 +164,8 @@ void Player::MoveLeftForward()
 		return;
 
 	SetCharacterAnimation("A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += front_;
-	movement_component_->direction -= right_;
+	movement_component_->accelaration_vector[2] += 1;
+	movement_component_->accelaration_vector[0] -= 1;
 }
 
 void Player::MoveLeftBack()
@@ -172,8 +174,8 @@ void Player::MoveLeftBack()
 		return;
 
 	SetCharacterAnimation("A_TP_CH_Jog_LB_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= front_;
-	movement_component_->direction -= right_;
+	movement_component_->accelaration_vector[2] -= 1;
+	movement_component_->accelaration_vector[0] -= 1;
 }
 
 void Player::MoveForward()
@@ -182,7 +184,7 @@ void Player::MoveForward()
 		return;
 
 	SetCharacterAnimation("A_TP_CH_Jog_F_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += front_;
+	movement_component_->accelaration_vector[2] += 1;
 }
 
 void Player::MoveBack()
@@ -191,7 +193,7 @@ void Player::MoveBack()
 		return;
 
 	SetCharacterAnimation("A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= front_;
+	movement_component_->accelaration_vector[2] -= 1;
 }
 
 void Player::Jump()
