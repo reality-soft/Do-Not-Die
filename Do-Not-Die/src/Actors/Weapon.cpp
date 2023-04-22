@@ -20,8 +20,8 @@ void Weapon::OnInit(entt::registry& registry)
 		* XMMatrixRotationX(XMConvertToRadians(180))
 		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
 
-	transform_matrix_ = XMMatrixTranslation(0, 100, 0);
-	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
+	cur_position_ = XMVECTOR{ 0.0f, 100.0f, 0.0f, 0.0f };
+	transform_tree_.root_node->OnUpdate(registry, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
 void Weapon::OnUpdate()
@@ -31,7 +31,7 @@ void Weapon::OnUpdate()
 	if (owner_character == nullptr) {
 		return;
 	}
-	transform_matrix_ = owner_character->GetTransformMatrix();
+	cur_position_ = owner_character->GetCurPosition();
 
 	C_Animation* animation_component = reg_scene_->try_get<C_Animation>(owner_character->GetEntityId());
 	C_Camera* camera_component = reg_scene_->try_get<C_Camera>(owner_character->GetEntityId());
@@ -42,7 +42,7 @@ void Weapon::OnUpdate()
 
 	XMMATRIX rotation_matrix = XMMatrixRotationY(camera_component->pitch_yaw.y);
 
-	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, socket_offset_ * animation_matrix_ * rotation_matrix * owner_transform_ * transform_matrix_);
+	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, socket_offset_ * animation_matrix_ * rotation_matrix * owner_transform_);
 }
 
 void Weapon::SetOwnerId(entt::entity owner_id)

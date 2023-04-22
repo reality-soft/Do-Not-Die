@@ -147,7 +147,7 @@ void reality::WaveSystem::PlayerExtractRepair()
 	if (DINPUT->GetKeyState(DIK_E) == KEY_HOLD)
 	{
 		player->extract_during_time_ += TM_DELTATIME;
-		player->InterectionRotate(_XMVECTOR3(trigger_comp->sphere_volume.center));
+		player->InteractionRotate(_XMVECTOR3(trigger_comp->sphere_volume.center));
 	}
 
 	if (DINPUT->GetKeyState(DIK_E) == KEY_UP)
@@ -208,7 +208,7 @@ void reality::WaveSystem::PlayerRepairCar()
 	if (DINPUT->GetKeyState(DIK_E) == KEY_HOLD)
 	{
 		player->repair_during_time_ += TM_DELTATIME;
-		player->InterectionRotate(car_event_.line_nodes.begin()->second);		
+		player->InteractionRotate(car_event_.line_nodes.begin()->second);		
 	}
 
 	if (player->repair_during_time_ >= player->repair_time_takes_)

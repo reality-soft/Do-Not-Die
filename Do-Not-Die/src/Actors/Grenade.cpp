@@ -26,8 +26,6 @@ void Grenade::OnInit(entt::registry& registry)
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_SphereCollision));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_SphereCollision), TYPE_ID(C_StaticMesh));
 
-	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
-
 	timer_ = 0.0f;
 	explosion_time_ = 3.0f;
 }
@@ -35,15 +33,13 @@ void Grenade::OnInit(entt::registry& registry)
 void Grenade::OnUpdate()
 {
 	timer_ += TIMER->GetDeltaTime();
-	XMVECTOR S, R, T;
-	XMMatrixDecompose(&S, &R, &T, transform_matrix_);
 	if (explosion_time_ < timer_ && !exploded_)
 	{
 		exploded_ = true;
-		EFFECT_MGR->SpawnEffect<FX_Explosion>(T);
+		EFFECT_MGR->SpawnEffect<FX_Explosion>(cur_position_);
 
 		auto player = SCENE_MGR->GetPlayer<Player>(0);
-		player->GetPos();
+		player->GetCurPosition();
 		EVENT->PushEvent<CameraShakeEvent>(player->GetEntityId(), 0.3f, 10.0f, 0.2f);
 
 		EVENT->PushEvent<DeleteActorEvent>(GetEntityId());
@@ -56,10 +52,9 @@ void Grenade::OnUpdate()
 		{
 			dir_.y += gravity.y * TIMER->GetDeltaTime();
 
-			XMVECTOR current_pos = XMVectorAdd(T, XMLoadFloat3(&dir_));
+			XMVECTOR cur_position_ = XMVectorAdd(cur_position_, XMLoadFloat3(&dir_));
 
-			transform_matrix_ = XMMatrixTranslationFromVector(current_pos);
-			transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, transform_matrix_);
+			transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 		}
 
 		auto& sphere_comp = reg_scene_->get<C_SphereCollision>(GetEntityId());
@@ -80,8 +75,8 @@ void Grenade::OnUpdate()
 
 void Grenade::SetPos(FXMVECTOR pos)
 {
-	transform_matrix_ = XMMatrixTranslationFromVector(pos);
-	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, transform_matrix_);
+	cur_position_ = pos;
+	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
 

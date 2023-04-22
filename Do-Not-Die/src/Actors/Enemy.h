@@ -56,9 +56,8 @@ public:
 
 		enemy->Move();
 
-		XMVECTOR cur_pos = enemy->GetPos();
+		XMVECTOR cur_pos = enemy->GetCurPosition();
 		enemy->SetDirection(XMVector3Normalize(target_position_ - cur_pos));
-		enemy->RotateAlongMovementDirection();
 
 		if (XMVector3Length(target_position_ - cur_pos).m128_f32[0] < 100.0f) {
 			return reality::BehaviorStatus::SUCCESS;

@@ -35,7 +35,7 @@ public:
 
 public:
 	bool IsAiming();
-	void InterectionRotate(XMVECTOR direction);
+	void InteractionRotate(XMVECTOR direction);
 
 public:
 	void ResetPos();

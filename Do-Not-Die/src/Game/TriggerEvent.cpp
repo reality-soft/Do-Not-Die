@@ -116,7 +116,7 @@ void reality::TriggerEvent::PlayerSelectable(Item* item_actor, bool selectable)
 			if (item.second == item_actor)
 				return;
 		}
-		float distance = Distance(player->GetTransformMatrix().r[3], item_actor->GetTransformMatrix().r[3]);
+		float distance = Distance(player->GetCurPosition(), item_actor->GetCurPosition());
 		player->selectable_items_.insert(make_pair(distance, item_actor));
 		++player->selectable_counts_;
 	}
