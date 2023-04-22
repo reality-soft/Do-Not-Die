@@ -100,6 +100,8 @@ void Player::OnUpdate()
 		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, cur_position_, rotation_);
 	}
 
+	Character::OnUpdate();
+
 	// FlashLight Update
 	UpdateFlashLight();
 
