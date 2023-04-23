@@ -19,6 +19,13 @@ void Player::OnInit(entt::registry& registry)
 	movement_component_->speed = 150;
 	max_hp_ = cur_hp_ = 100;
 	
+	C_TriggerSensor trigger_sensor;
+	trigger_sensor.can_sense_tags.insert("item");
+	trigger_sensor.can_sense_tags.insert("extract");
+	trigger_sensor.can_sense_tags.insert("repair");
+	trigger_sensor.can_sense_tags.insert("defense");
+	registry.emplace<reality::C_TriggerSensor>(entity_id_, trigger_sensor);
+
 	reality::C_SkeletalMesh skm;
 	skm.skeletal_mesh_id = "SM_Chr_Biker_Male_01.skmesh";
 	skm.vertex_shader_id = "SkinningVS.cso";
@@ -86,9 +93,9 @@ void Player::OnInit(entt::registry& registry)
 	inventory_timer_.resize(INVENTORY_MAX);
 
 	cur_hp_ = 0;
+	tag = "player";
 
-	// true means : this actor causes trigger event when overlaped at trigger 
-	trigger_sensor = true;
+
 }
 
 void Player::OnUpdate()
