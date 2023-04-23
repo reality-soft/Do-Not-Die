@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Item.h"
+#include "FX_Flame.h"
 
 using namespace reality;
 
@@ -12,8 +13,12 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 	repair_spawns_ = QUADTREE->GetGuideLines("DND_RepairPart_1")->at(0);
 	car_event_ = QUADTREE->GetGuideLines("DND_CarEvent_1")->at(0);
 	zomebie_tracks_ = QUADTREE->GetGuideLines("DND_NpcTrack_1");
+	fx_car_fire_ = QUADTREE->GetGuideLines("DND_FX_CarFire_1")->at(0);
+	fx_corpse_fire_ = QUADTREE->GetGuideLines("DND_FX_CorpseFire_1")->at(0);
 
+	CreateExtractPoints(reg);
 	CreateCarEventTriggers(_XMFLOAT3(car_event_.line_nodes.begin()->second), 250, 500);
+	//CreateStaticEffects();
 }
 
 void reality::WaveSystem::OnUpdate(entt::registry& reg)
@@ -97,6 +102,23 @@ void reality::WaveSystem::CreateCarEventTriggers(XMFLOAT3 point, float repair_ra
 	defense_trigger.sphere_volume.center = point;
 	defense_trigger.sphere_volume.radius = defense_radius;
 	SCENE_MGR->GetScene(INGAME).get()->GetRegistryRef().emplace<C_TriggerVolume>(defense_volume_ent, defense_trigger);
+}
+
+void reality::WaveSystem::CreateStaticEffects()
+{
+	srand(time(NULL));
+	for (const auto& node : fx_car_fire_.line_nodes)
+	{
+		float random_scale = (float)(rand() % 5 + 5);
+		entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Flame>(INGAME, node.second, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
+		car_fires_.insert(ent);
+	}
+	for (const auto& node : fx_corpse_fire_.line_nodes)
+	{
+		int random_scale = rand() % 5 + 5;
+		entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Flame>(INGAME, node.second, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
+		corpse_fires_.insert(ent);
+	}
 }
 
 void reality::WaveSystem::CreateExtractPoints(entt::registry& reg)
@@ -252,6 +274,7 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 	else
 	{
 		auto enemy_actor = SCENE_MGR->GetActor<Enemy>(enemy_entity);
+		enemy_actor->tag = "enemy";
 
 		int guidline_index = rand() % zomebie_tracks_->size();
 		int mesh_index = rand() % enemy_meshes.size();
