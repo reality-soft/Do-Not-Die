@@ -15,6 +15,7 @@ namespace reality
 		bool IsAlreadyTrigged(entt::entity target_actor, entt::entity trigger_actor);
 	private:
 		multiset<pair<entt::entity, entt::entity>> current_triggers;
+		entt::entity defense_trigger_;
 	};
 }
 
