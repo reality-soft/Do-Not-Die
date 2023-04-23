@@ -12,8 +12,6 @@ void InGameScene::OnInit()
 	// LOADING : MANAGER_LOADING
 	loading_progress = LOADING_MANAGER;
 
-	GUI->AddWidget<PropertyWidget>("property");
-	prop_widget_ = GUI->FindWidget<PropertyWidget>("property");
 	WRITER->Init();
 	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
 
@@ -41,39 +39,35 @@ void InGameScene::OnInit()
 
 	auto player_actor = Scene::GetPlayer<Player>(0);
 	// Key Settings
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_D }, std::bind(&Player::MoveRight, player_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_W, DIK_D }, std::bind(&Player::MoveRightForward, player_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_S, DIK_D }, std::bind(&Player::MoveRightBack, player_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_A }, std::bind(&Player::MoveLeft, player_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_W, DIK_A }, std::bind(&Player::MoveLeftForward, player_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_S, DIK_A }, std::bind(&Player::MoveLeftBack, player_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_W }, std::bind(&Player::MoveForward, player_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_S }, std::bind(&Player::MoveBack, player_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_RETURN }, std::bind(&Player::ResetPos, player_actor), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_E }, std::bind(&Player::PickClosestItem, player_actor), KEY_PUSH);
-
-	// Select Slot
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_1 }, std::bind(&Player::SelectSlot, player_actor, 0), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_2 }, std::bind(&Player::SelectSlot, player_actor, 1), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_3 }, std::bind(&Player::SelectSlot, player_actor, 2), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_4 }, std::bind(&Player::SelectSlot, player_actor, 3), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_D, std::bind(&Player::MoveRight, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_A , std::bind(&Player::MoveLeft, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_W, std::bind(&Player::MoveForward, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_S, std::bind(&Player::MoveBack, player_actor), KEY_HOLD);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_RETURN, std::bind(&Player::ResetPos, player_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_E, std::bind(&Player::PickClosestItem, player_actor), KEY_PUSH);
+								    
+	// Select Slot				    
+	INPUT_EVENT->SubscribeKeyEvent( DIK_1, std::bind(&Player::SelectSlot, player_actor, 0), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_2, std::bind(&Player::SelectSlot, player_actor, 1), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_3, std::bind(&Player::SelectSlot, player_actor, 2), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_4, std::bind(&Player::SelectSlot, player_actor, 3), KEY_PUSH);
 	
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_Q }, std::bind(&Player::UseItem, player_actor), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_C }, std::bind(&Player::DropItem, player_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_Q, std::bind(&Player::UseItem, player_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_C, std::bind(&Player::DropItem, player_actor), KEY_PUSH);
 
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_SPACE }, std::bind(&Player::Jump, player_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_SPACE, std::bind(&Player::Jump, player_actor), KEY_PUSH);
 	
-	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::R_BUTTON }, std::bind(&Player::Aim, player_actor, true), KEY_HOLD);
-	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::R_BUTTON }, std::bind(&Player::Aim, player_actor, false), KEY_UP);
+	INPUT_EVENT->SubscribeMouseEvent( MouseButton::R_BUTTON, std::bind(&Player::Aim, player_actor, true), KEY_PUSH);
+	INPUT_EVENT->SubscribeMouseEvent( MouseButton::R_BUTTON, std::bind(&Player::Aim, player_actor, false), KEY_UP);
 
 	std::function<void()> idle = std::bind(&Player::Idle, player_actor);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_D }, idle, KEY_UP);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_S }, idle, KEY_UP);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_W }, idle, KEY_UP);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_A }, idle, KEY_UP);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_D, idle, KEY_UP);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_S, idle, KEY_UP);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_W, idle, KEY_UP);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_A, idle, KEY_UP);
 
-	INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, std::bind(&Player::Fire, player_actor), KEY_HOLD);
-	INPUT_EVENT->SubscribeKeyEvent({ DIK_G }, std::bind(&Player::ThrowGrenade, player_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeMouseEvent( MouseButton::L_BUTTON , std::bind(&Player::Fire, player_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeKeyEvent( DIK_G , std::bind(&Player::ThrowGrenade, player_actor), KEY_PUSH);
 	//INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
 
 	level.Create("DNDLevel_WithCollision_01.stmesh", "LevelVS.cso");
@@ -123,6 +117,9 @@ void InGameScene::OnInit()
 	
 	QUADTREE->ImportFloydRout("DND_FloydRout_1.mapdat");
 
+
+#ifdef DEBUG_
+	GUI->AddWidget<PropertyWidget>("property");
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("FPS", &TIMER->fps);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Time Countdown", &sys_wave_.countdown_timer_);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Waves", &sys_wave_.wave_count_);
@@ -134,6 +131,7 @@ void InGameScene::OnInit()
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Car Repaired", &sys_wave_.car_repaired);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Created Actors", &cur_zombie_created);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<bool>("In Repair Volume", &player_actor->can_repair_car_);
+#endif
 }
 
 void InGameScene::OnUpdate()
@@ -179,7 +177,9 @@ void InGameScene::OnRender()
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
 
+#ifdef DEBUG_
 	GUI->RenderWidgets();
+#endif
 }
 
 void InGameScene::OnRelease()
