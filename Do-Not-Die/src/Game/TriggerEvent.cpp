@@ -88,7 +88,7 @@ void reality::TriggerEvent::PlayerProcess()
 
 void reality::TriggerEvent::ZombiePeocess()
 {
-	if (is_actor_zombie_ == true)
+	if (is_actor_zombie_ == false)
 		return;
 
 	switch (trigger_type_)
@@ -160,5 +160,7 @@ void reality::TriggerEvent::ZombieDefense(bool can_defense)
 	auto zombie = SCENE_MGR->GetActor<Enemy>(target_actor_);
 	if (zombie == nullptr)
 		return;
+
+	zombie->in_defense_bound_ = can_defense;
 
 }

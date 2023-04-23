@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "AnimationStateMachine.h"
+#include "Player.h"
 
 using namespace reality;
 
@@ -10,6 +11,11 @@ void Enemy::OnInit(entt::registry& registry)
 	// setting character data
 	movement_component_->speed = 60;
 	max_hp_ = cur_hp_ = 100;
+
+	// set trigger sensor
+	C_TriggerSensor trigger_sensor;
+	trigger_sensor.can_sense_tags.insert("defense");
+	registry.emplace<reality::C_TriggerSensor>(entity_id_, trigger_sensor);
 
 	// setting character objects
 	reality::C_SkeletalMesh skm;
@@ -43,6 +49,7 @@ void Enemy::OnInit(entt::registry& registry)
 void Enemy::OnUpdate()
 {
 	behavior_tree_.Update();
+	ChasePlayer();
 }
 
 void Enemy::SetCharacterAnimation(string anim_id) const
@@ -108,6 +115,51 @@ void Enemy::SetMeshId(const string& mesh_id)
 {
 	C_SkeletalMesh* skm = reg_scene_->try_get< reality::C_SkeletalMesh>(entity_id_);
 	skm->skeletal_mesh_id = mesh_id;
+}
+
+void Enemy::ChasePlayer()
+{
+	if (in_defense_bound_ == false)
+		return;
+
+	auto player = SCENE_MGR->GetPlayer<Player>(0);
+	if (player == nullptr)
+		return;
+
+	auto c_enemy_capsule = reg_scene_->try_get<C_CapsuleCollision>(entity_id_);
+	if (c_enemy_capsule == nullptr)
+		return;
+
+	auto c_player_capsule = reg_scene_->try_get<C_CapsuleCollision>(player->entity_id_);
+	if (c_player_capsule == nullptr)
+		return;
+
+	RayShape sight_ray;
+	sight_ray.start = _XMFLOAT3(GetTipBaseAB(c_enemy_capsule->capsule)[3]);
+	sight_ray.end = _XMFLOAT3(GetTipBaseAB(c_player_capsule->capsule)[3]);
+
+	UINT casted_triangle = 0;
+	const auto& triangles = QUADTREE->GetCarTriangles();
+	for (const auto& tri : triangles)
+	{
+		auto callback = RayToTriangle(sight_ray, tri);
+		if (callback.success)
+			casted_triangle++;
+	}
+	if (casted_triangle == 0)
+		player_in_sight = true;
+	else
+		player_in_sight = false;
+
+	if (player_in_sight)
+	{
+		SetDirection(GetRayDirection(sight_ray));
+	}
+	else
+	{
+		// Attack Car
+	}
+	
 }
 
 float Enemy::GetCurHp() const
