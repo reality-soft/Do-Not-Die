@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine_include.h"
+#include "StaticShadows.h"
 
 namespace reality
 {
@@ -36,7 +37,6 @@ namespace reality
 
 			properties.insert(make_pair(name, prop));
 		}
-
 	private:
 		std::map<string, Property> properties;
 	};
