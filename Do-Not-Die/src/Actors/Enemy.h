@@ -24,6 +24,7 @@ public:
 	void SetDirection(const XMVECTOR& direction);
 	void SetRoute(const vector<XMVECTOR>& target_poses);
 	void SetMeshId(const string& mesh_id);
+	void ChasePlayer();
 
 private:
 	string mesh_id_;
@@ -34,6 +35,8 @@ private:
 
 public:
 	bool is_hit_ = false;
+	bool in_defense_bound_ = false;
+	bool player_in_sight = true;
 
 private:
 	bool is_moving_ = false;
