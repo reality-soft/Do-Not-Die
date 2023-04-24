@@ -184,7 +184,7 @@ void UI_Actor_Ingame::CreateIngameUI()
 	addicted_ui_ = make_shared<UI_Image>();
 	addicted_ui_->InitImage("T_Addicted.png");
 	addicted_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
-	ui_comp_->ui_list.insert({ "Addicted UI", addicted_ui_ });
+	//ui_comp_->ui_list.insert({ "Addicted UI", addicted_ui_ });
 
 	// Event Message UI
 	event_msg_text_ = make_shared<UI_Text>();
