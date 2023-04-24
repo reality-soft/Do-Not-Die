@@ -46,9 +46,6 @@ private:
 	PropertyWidget* prop_widget_ = nullptr;
 #endif
 
-	ProjectionShadow directiional_shadow_;
-	vector<CubemapShadow> point_light_shadows_;
-
 public:
 	reality::CameraSystem GetCameraSystem() { return sys_camera; }
 	reality::WaveSystem& GetWaveSystem() { return sys_wave_; }
@@ -60,9 +57,7 @@ private:
 	PropertyWidget gw_property_;
 #endif
 	UI_Actor_Ingame ingame_ui;
-	void CreateExplosionEffectFromRay();
 	void CursorStateUpdate();
-	void CreateShadowMaps();
 	
 private:
 	int cur_zombie_created = 0;

@@ -96,16 +96,11 @@ void InGameScene::OnInit()
 	loading_progress = LOADING_ACTOR;
 	
 	environment_.CreateEnvironment();
-	environment_.SetWorldTime(180, 360);
+	environment_.SetWorldTime(120, 240);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(0.2f, 0.2f);
-	//directiional_shadow_.Init({ 5000,15000 }, { 2048, 2048 }, "DepthMapVS.cso");
-	//directiional_shadow_.CreateDepthMap(&level, XMVectorSet(5000, 5000, -5000, 0), XMVectorZero());
-	//prop_widget_->depth_map_tex_ = directiional_shadow_.GetDepthMapSRV();
 
-	//cube_map_shadow_.Init({ 10.f, 1000.0f }, { 2048, 2048 }, "DepthMapVS.cso");
-	//cube_map_shadow_.CreateDepthMap(&level, XMVectorSet(0, 100, 0, 0));
 	// LOADING FINISH
 	loading_progress = LOADING_FINISHED;
 	
@@ -113,9 +108,9 @@ void InGameScene::OnInit()
 	sys_wave_.OnCreate(reg_scene_);
 	sys_wave_.SetWorldEnv(&environment_);
 	sys_trigger_.OnCreate(reg_scene_);
-	//CreateShadowMaps();
-	
+
 	QUADTREE->ImportFloydRout("DND_FloydRout_1.mapdat");
+
 
 #ifdef _DEBUG
 	GUI->AddWidget<PropertyWidget>("property");
@@ -127,7 +122,7 @@ void InGameScene::OnInit()
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Jump", &player_actor->GetMovementComponent()->jump_pulse);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Gravity", &player_actor->GetMovementComponent()->gravity_pulse);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Selectable Items", &player_actor->selectable_counts_);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Car Repaired", &sys_wave_.car_repaired);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Car Repaired", &sys_wave_.car_health);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Created Actors", &cur_zombie_created);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<bool>("In Repair Volume", &player_actor->can_repair_car_);
 #endif
@@ -152,9 +147,6 @@ void InGameScene::OnUpdate()
 	ingame_ui.SetGameTimer(sys_wave_.countdown_timer_);
 	ingame_ui.OnUpdate();
 	
-	//if (DINPUT->GetKeyState(DIK_G) == KeyState::KEY_PUSH)
-		//CreateExplosionEffectFromRay();
-	
 	CursorStateUpdate();
 }
 
@@ -162,12 +154,6 @@ void InGameScene::OnRender()
 {
 	environment_.Render();	
 
-	//directiional_shadow_.SetDepthMapSRV();
-	//int start_slot = 9;
-	//for (int i = 0; i < 8; ++i)
-	//{
-	//	point_light_shadows_[i].SetDepthMapSRV(start_slot + i * 6);
-	//}
 	level.Update();
 	level.Render();
 
@@ -187,18 +173,6 @@ void InGameScene::OnRelease()
 	reality::RESOURCE->Release();
 }
 
-void InGameScene::CreateExplosionEffectFromRay()
-{
-	RayShape ray = sys_camera.CreateFrontRay();
-
-	RayCallback raycallback = QUADTREE->Raycast(ray);
-
-	if (raycallback.success)
-	{
-		EFFECT_MGR->SpawnEffect<FX_Explosion>(raycallback.point);		
-	}
-}
-
 void InGameScene::CursorStateUpdate()
 {
 	if (DINPUT->GetKeyState(DIK_T) == KeyState::KEY_PUSH)
@@ -216,20 +190,6 @@ void InGameScene::CursorStateUpdate()
 			SetCursorVisible();
 			ClipCursor(nullptr);
 		}
-	}
-}
-
-void InGameScene::CreateShadowMaps()
-{
-	auto point_light_view = reg_scene_.view<C_PointLight>();
-	UINT point_light_count = point_light_view.size();
-	point_light_shadows_.resize(point_light_count);
-	UINT index = 0;
-	for (auto ent : point_light_view)
-	{
-		auto& point_light = reg_scene_.get<C_PointLight>(ent);
-		point_light_shadows_[index].Init({ 10.f, 1000.0f }, { 2048, 2048 }, "DepthMapVS.cso");
-		point_light_shadows_[index].CreateDepthMap(&level, point_light.world.r[3]);
 	}
 }
 
