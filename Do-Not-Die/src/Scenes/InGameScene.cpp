@@ -141,7 +141,7 @@ void InGameScene::OnUpdate()
 	// Trigger And Wave System
 	sys_wave_.OnUpdate(reg_scene_);
 	sys_trigger_.OnUpdate(reg_scene_);
-	environment_.Update(&sys_camera, &sys_light);
+	environment_.Update(sys_camera.GetCamera()->camera_pos, &sys_light);
 	ingame_ui.SetGameTimer(sys_wave_.countdown_timer_);
 	ingame_ui.OnUpdate();
 	

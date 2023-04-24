@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine_Include.h"
 #include "UI_Actor_StartScene.h"
-
+#include "SequenceCameraActor.h"
 using namespace reality;
 
 enum E_StartLoading
@@ -24,6 +24,13 @@ public:
 	virtual void OnRelease();
 
 private:
+	Environment environment_;
+	StaticMeshLevel level;
+	entt::entity sequence_camera_;
+	SequenceCameraActor* sequence_camera_actor = nullptr;
+
+	reality::LightingSystem sys_light;
+	reality::EffectSystem   sys_effect;
 	reality::RenderSystem	sys_render;
 	reality::SoundSystem	sys_sound;
 	reality::UISystem		sys_ui;
