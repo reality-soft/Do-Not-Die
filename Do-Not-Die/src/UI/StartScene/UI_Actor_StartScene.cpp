@@ -25,12 +25,6 @@ void UI_Actor_StartScene::CreateUI()
 
 	float win_size_1920_width = E_Resolution_Size[E_Resolution::R1920x1080].x;
 	float win_size_1920_height = E_Resolution_Size[E_Resolution::R1920x1080].y;
-
-	// Background UI
-	background_ = make_shared<UI_Image>();
-	background_->InitImage("T_StartScene_background.png");
-	background_->SetLocalRectByMin({ 0, 0 }, win_size_1920_width, win_size_1920_height);
-	ui_comp_->ui_list.insert({ "Background", background_ });
 	
 	// New Game Button
 	newgame_button_ = make_shared<UI_Button>();
