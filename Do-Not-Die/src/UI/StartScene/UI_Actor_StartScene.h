@@ -25,8 +25,6 @@ namespace reality
 	private:
 		void OpenOptionWindow();
 		void CloseOptionWindow();
-	private:
-		void LoadingIngameScene();
 	};
 
 }

@@ -66,10 +66,7 @@ void UI_Actor_StartScene::UpdateUI()
 	// When NewGame Button Selected
 	if (newgame_button_->GetCurrentState() == E_UIState::UI_SELECT)
 	{
-		thread loading_thread = thread(&UI_Actor_StartScene::LoadingIngameScene, this);
-		loading_thread.detach();
-		SCENE_MGR->AddScene<LoadingScene>(E_SceneType::LOADING);
-		SCENE_MGR->ChangeScene(E_SceneType::LOADING);
+		SCENE_MGR->ChangeScene(E_SceneType::INGAME);
 	}
 
 	// When exit Button Selected
@@ -92,7 +89,7 @@ void UI_Actor_StartScene::UpdateUI()
 	if (option_window_->resolution_value != option_window_->option_resolution_list_box_->GetCurrentItem())
 	{
 		option_window_->resolution_value = option_window_->option_resolution_list_box_->GetCurrentItem();
-		ENGINE->Resize((E_Resolution)option_window_->option_resolution_list_box_->GetCurrentIndex());
+		ENGINE->Resize((E_Resolution)(option_window_->option_resolution_list_box_->GetCurrentIndex() + 1));
 		CloseOptionWindow();
 	}
 }
@@ -119,10 +116,4 @@ void UI_Actor_StartScene::CloseOptionWindow()
 	option_window_->SetCloseButtonState(E_UIState::UI_NORMAL);
 
 	ui_comp_->ui_list.erase("Option Window");
-}
-
-
-void UI_Actor_StartScene::LoadingIngameScene()
-{
-	SCENE_MGR->AddScene<InGameScene>(INGAME);
 }

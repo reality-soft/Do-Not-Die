@@ -447,7 +447,7 @@ void UI_Actor_Ingame::UpdateMenuUI()
 	if (menu_option_window_->resolution_value != menu_option_window_->option_resolution_list_box_->GetCurrentItem())
 	{
 		menu_option_window_->resolution_value = menu_option_window_->option_resolution_list_box_->GetCurrentItem();
-		ENGINE->Resize((E_Resolution)menu_option_window_->option_resolution_list_box_->GetCurrentIndex());
+		ENGINE->Resize((E_Resolution)(menu_option_window_->option_resolution_list_box_->GetCurrentIndex() + 1));
 		CloseOptionWindow();
 	}
 }
