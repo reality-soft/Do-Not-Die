@@ -76,10 +76,9 @@ void Player::OnInit(entt::registry& registry)
 	// create anim 
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
+	animation_component.GetAnimSlotByName("Base")->SetAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim", 0.5);
 	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_02");
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
-
-	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
 
 	// FlashLight
 	AddFlashLight();
@@ -94,8 +93,43 @@ void Player::OnInit(entt::registry& registry)
 	trigger_sensor = true;
 }
 
+void Player::SetCharacterMovementAnimation()
+{
+	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
+	AnimationBase* anim_slot = animation_component_ptr->GetAnimSlotByName("Base");
+
+	string anim_id = "A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim";
+
+	if (movement_component_->speed >= 0.1f) {
+		if (angle_ >= 330.0f || angle_ < 30.0f) {
+			anim_id = "A_TP_CH_Jog_F_Anim_Retargeted_Unreal Take.anim";
+		}
+		else if (30.0f <= angle_ && angle_ < 110.0f) {
+			anim_id = "A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim";
+		}
+		else if (110.0f <= angle_ && angle_ < 160.0f) {
+			anim_id = "A_TP_CH_Jog_RB_Anim_Retargeted_Unreal Take.anim";
+		}
+		else if (160.0f <= angle_ && angle_ < 200.0f) {
+			anim_id = "A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim";
+		}
+		else if (200.0f <= angle_ && angle_ < 250.0f) {
+			anim_id = "A_TP_CH_Jog_LB_Anim_Retargeted_Unreal Take.anim";
+		}
+		else if (250.0f <= angle_ && angle_ < 330.0f) {
+			anim_id = "A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim";
+		}
+	}
+
+	if (anim_slot->GetCurAnimationId() != anim_id) {
+		anim_slot->SetAnimation(anim_id, 1.0);
+	}
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
+}
+
 void Player::OnUpdate()
 {
+
 	if (controller_enable_)
 	{
 		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
@@ -105,6 +139,7 @@ void Player::OnUpdate()
 
 	Character::OnUpdate();
 	CalculateMovementAngle();
+	SetCharacterMovementAnimation();
 
 	// FlashLight Update
 	UpdateFlashLight();
@@ -112,22 +147,11 @@ void Player::OnUpdate()
 	UpdateTimer();
 }
 
-void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
-{
-	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
-	int slot_index = animation_component_ptr->name_to_anim_slot_index[anim_slot_id];
-	if (animation_component_ptr->anim_slots[slot_index].second->GetCurAnimationId() != anim_id) {
-		animation_component_ptr->anim_slots[slot_index].second->SetAnimation(anim_id, 0.2);
-	}
-	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
-}
-
 void Player::MoveRight()
 {
 	if (controller_enable_ == false)
 		return;
 
-	SetCharacterAnimation("A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->accelaration_vector[0] += 1;
 }
 
@@ -136,7 +160,6 @@ void Player::MoveLeft()
 	if (controller_enable_ == false)
 		return;
 
-	SetCharacterAnimation("A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->accelaration_vector[0] -= 1;
 }
 
@@ -145,7 +168,6 @@ void Player::MoveForward()
 	if (controller_enable_ == false)
 		return;
 
-	SetCharacterAnimation("A_TP_CH_Jog_F_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->accelaration_vector[2] += 1;
 }
 
@@ -154,7 +176,6 @@ void Player::MoveBack()
 	if (controller_enable_ == false)
 		return;
 
-	SetCharacterAnimation("A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim");
 	movement_component_->accelaration_vector[2] -= 1;
 }
 
@@ -166,11 +187,6 @@ void Player::Jump()
 	if (movement_component_->jump_pulse <= 0 && movement_component_->gravity_pulse <= 0) {
 		movement_component_->jump_pulse = 150.0f;
 	}
-}
-
-void Player::Idle()
-{
-	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
 }
 
 void Player::Fire()
@@ -359,6 +375,7 @@ void Player::CalculateMovementAngle()
 		angle_ = XM_2PI - angle_;
 	
 	angle_ = XMConvertToDegrees(angle_);
+	angle_ += 0.2f;
 }
 
 void Player::UpdateTimer()

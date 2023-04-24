@@ -16,18 +16,17 @@ class Player : public GameCharacter
 public:
 	virtual void OnInit(entt::registry& registry) override;
 	virtual void OnUpdate() override;
-	void SetCharacterAnimation(string anim_id, string anim_slot = "Base");
 public:
 	void MoveRight();
 	void MoveLeft();
 	void MoveForward();
 	void MoveBack();
 	void Jump();
-	void Idle();
 	void Fire();
 	void Aim(bool active);
 	void ThrowGrenade();
 	void PickClosestItem();
+	void SetCharacterMovementAnimation();
 
 public:
 	bool IsAiming();
