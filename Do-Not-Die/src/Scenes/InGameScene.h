@@ -29,7 +29,6 @@ public:
 private:
 	Environment environment_;
 	StaticMeshLevel level;
-	//SingleShadow single_shadow;
 
 	reality::LightingSystem sys_light;
 	reality::AnimationSystem sys_animation;
@@ -42,18 +41,26 @@ private:
 
 	TriggerSystem sys_trigger_;
 	WaveSystem sys_wave_;
+	PropertyWidget* prop_widget_ = nullptr;
+
+	ProjectionShadow directiional_shadow_;
+	vector<CubemapShadow> point_light_shadows_;
 
 public:
 	reality::CameraSystem GetCameraSystem() { return sys_camera; }
 	reality::WaveSystem& GetWaveSystem() { return sys_wave_; }
 	UI_Actor_Ingame& GetUIActor() { return ingame_ui; }
+
 private:
+#ifdef DEBUG_
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
+#endif
 	UI_Actor_Ingame ingame_ui;
 	void CreateExplosionEffectFromRay();
 	void CursorStateUpdate();
-
+	void CreateShadowMaps();
+	
 private:
 	int cur_zombie_created = 0;
 private:

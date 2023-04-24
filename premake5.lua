@@ -76,12 +76,8 @@ project "Do-Not-Die"
 	links
 	{
 		"Engine",
-		"libfbxsdk-md",
-		"libxml2-md",
-		"zlib-md",
 		"fmod_vc",
 		"fmodL_vc",
-		"ImGui_Win32_Dx11_D"
 	}
 
 	filter "files:**VS.hlsl"
@@ -124,6 +120,15 @@ project "Do-Not-Die"
 			"../SDK/FBXSDK/lib/debug",
 			"../SDK/FMOD/lib/debug",
 			"../output/bin/Debug-windows-x86_64/Engine/",
+		}
+
+		links
+		{
+			"Engine",
+			"libfbxsdk-md",
+			"libxml2-md",
+			"zlib-md",
+			"ImGui_Win32_Dx11_D"
 		}
 
 		prebuildcommands
