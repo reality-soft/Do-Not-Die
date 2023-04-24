@@ -26,4 +26,3 @@ protected:
 	float max_hp_;
 	float cur_hp_;
 };
-

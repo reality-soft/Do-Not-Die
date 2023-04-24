@@ -16,26 +16,21 @@ class Player : public GameCharacter
 public:
 	virtual void OnInit(entt::registry& registry) override;
 	virtual void OnUpdate() override;
-	void SetCharacterAnimation(string anim_id, string anim_slot = "Base");
 public:
 	void MoveRight();
-	void MoveRightForward();
-	void MoveRightBack();
 	void MoveLeft();
-	void MoveLeftForward();
-	void MoveLeftBack();
 	void MoveForward();
 	void MoveBack();
 	void Jump();
-	void Idle();
 	void Fire();
 	void Aim(bool active);
 	void ThrowGrenade();
 	void PickClosestItem();
+	void SetCharacterMovementAnimation();
 
 public:
 	bool IsAiming();
-	void InterectionRotate(XMVECTOR direction);
+	void InteractionRotate(XMVECTOR direction);
 
 public:
 	void ResetPos();
@@ -52,10 +47,15 @@ private:
 	void UpdateFlashLight();
 
 private:
+	void CalculateMovementAngle();
+
+private:
 	bool is_aiming_ = false;
 
 public:
 	bool is_firing_ = false;
+	float angle_ = 0.0f;
+	XMVECTOR direction_;
 
 private:
 	float grenade_cooltime_ = 3.0f;

@@ -159,7 +159,7 @@ void reality::TriggerSystem::AddTriggerAtActor(entt::entity ent, float radius)
 		return;
 
 	C_TriggerVolume new_trigger;
-	new_trigger.sphere_volume.center = _XMFLOAT3(actor->GetTransformMatrix().r[3]);
+	new_trigger.sphere_volume.center = _XMFLOAT3(actor->GetCurPosition());
 	new_trigger.sphere_volume.radius = radius;
 
 	SCENE_MGR->GetScene(E_SceneType::INGAME)->GetRegistryRef().emplace_or_replace<C_TriggerVolume>(ent, new_trigger);
@@ -167,7 +167,7 @@ void reality::TriggerSystem::AddTriggerAtActor(entt::entity ent, float radius)
 
 bool reality::TriggerSystem::IsActorInTrigger(entt::entity ent, const C_TriggerVolume& trigger)
 {
-	XMVECTOR actor_position = SCENE_MGR->GetActor<Actor>(ent)->GetTransformMatrix().r[3];
+	XMVECTOR actor_position = SCENE_MGR->GetActor<Actor>(ent)->GetCurPosition();
 	if (Distance(actor_position, _XMVECTOR3(trigger.sphere_volume.center)) <= trigger.sphere_volume.radius)
 		return true;
 

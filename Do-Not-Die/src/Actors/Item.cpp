@@ -55,8 +55,10 @@ void Item::OnInit(entt::registry& registry)
 	registry.emplace_or_replace<reality::C_TriggerVolume>(entity_id_, item_trigger);
 
 	transform_tree_.root_node = make_shared<reality::TransformTreeNode>(TYPE_ID(reality::C_StaticMesh));
-	transform_matrix_ = TransformT(trigger_sphere_.center);
-	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
+	cur_position_.m128_f32[0] = trigger_sphere_.center.x;
+	cur_position_.m128_f32[1] = trigger_sphere_.center.y;
+	cur_position_.m128_f32[2] = trigger_sphere_.center.z;
+	transform_tree_.root_node->OnUpdate(registry, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
 void Item::OnUpdate()
