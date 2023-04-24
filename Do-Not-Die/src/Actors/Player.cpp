@@ -57,8 +57,8 @@ void Player::OnInit(entt::registry& registry)
 	registry.emplace<C_Socket>(entity_id_, socket_component);
 
 	C_StaticMesh static_mesh_component;
-	static_mesh_component.local = XMMatrixScalingFromVector({ 1.4f, 1.4f, 1.4f, 0.0f });
-	static_mesh_component.world = XMMatrixIdentity();
+	static_mesh_component.local = XMMatrixScalingFromVector({ 1.4f, 1.4f, 1.4f, 1.0f });
+	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
 	static_mesh_component.static_mesh_id = "SK_Handgun_01.stmesh";
 	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
 	static_mesh_component.socket_name = "RightHand";
@@ -71,13 +71,14 @@ void Player::OnInit(entt::registry& registry)
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SoundGenerator));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_SkeletalMesh), TYPE_ID(C_Socket));
 
+	C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
+	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 1.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
+
 	transform_matrix_ = XMMatrixTranslation(0, 100, 0);
 	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
-
-	C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
-	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
-
-	// create anim 
+	
+	
+	// create anim
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
 	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_02");
@@ -91,7 +92,7 @@ void Player::OnInit(entt::registry& registry)
 	// Inventory
 	inventory_.resize(INVENTORY_MAX);
 	inventory_timer_.resize(INVENTORY_MAX);
-
+	
 	cur_hp_ = 0;
 	tag = "player";
 
@@ -103,17 +104,15 @@ void Player::OnUpdate()
 	if (controller_enable_)
 	{
 		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-		XMVECTOR scale, rotation, translation;
-		XMMatrixDecompose(&scale, &rotation, &translation, transform_matrix_);
 		XMMATRIX rotation_matrix = XMMatrixRotationY(camera->pitch_yaw.y);
-		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, translation, rotation_matrix);
+		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, GetPos(), rotation_matrix);
 		front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
 		right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
 	}
-
+	
 	// FlashLight Update
 	UpdateFlashLight();
-
+	
 	UpdateTimer();
 }
 
