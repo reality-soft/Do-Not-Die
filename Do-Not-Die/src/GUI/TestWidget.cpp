@@ -1,6 +1,6 @@
 #include "TestWidget.h"
 
-#ifdef DEBUG_
+#ifdef _DEBUG
 void reality::TestWidget::Update()
 {
 	ImGui::SetCurrentContext(GUI->GetContext());
