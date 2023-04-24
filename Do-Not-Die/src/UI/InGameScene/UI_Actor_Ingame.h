@@ -51,6 +51,8 @@ namespace reality
 			shared_ptr<UI_Image>	interaction_progressbar_;
 			shared_ptr<UI_Text>		interaction_text_;
 
+		shared_ptr<UI_Image>	addicted_ui_;
+
 		shared_ptr<UI_Text>		event_msg_text_;
 	private:
 		float wave_timer_ = 0.0f;

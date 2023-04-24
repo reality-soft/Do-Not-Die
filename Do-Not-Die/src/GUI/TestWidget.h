@@ -3,7 +3,6 @@
 #include "Engine_include.h"
 #include "GUIMgr.h"
 
-
 #ifdef _DEBUG
 namespace reality
 {
