@@ -19,11 +19,7 @@ public:
 	void SetCharacterAnimation(string anim_id, string anim_slot = "Base");
 public:
 	void MoveRight();
-	void MoveRightForward();
-	void MoveRightBack();
 	void MoveLeft();
-	void MoveLeftForward();
-	void MoveLeftBack();
 	void MoveForward();
 	void MoveBack();
 	void Jump();
@@ -52,10 +48,15 @@ private:
 	void UpdateFlashLight();
 
 private:
+	void CalculateMovementAngle();
+
+private:
 	bool is_aiming_ = false;
 
 public:
 	bool is_firing_ = false;
+	float angle_ = 0.0f;
+	XMVECTOR direction_;
 
 private:
 	float grenade_cooltime_ = 3.0f;

@@ -2,7 +2,7 @@
 
 #include "Engine_include.h"
 
-#ifdef DEBUG_
+#ifdef _DEBUG
 namespace reality
 {
 	struct Property

@@ -9,6 +9,7 @@
 #include "FX_Muzzle.h"
 #include "FX_Explosion.h"
 #include "GameEvents.h"
+#include "BlendSpace2D.h"
 
 using namespace reality;
 
@@ -17,7 +18,7 @@ void Player::OnInit(entt::registry& registry)
 	Character::OnInit(registry);
 
 	movement_component_->speed = 0;
-	movement_component_->acceleration = 50;
+	movement_component_->acceleration = 300;
 	movement_component_->max_speed = 150;
 	max_hp_ = cur_hp_ = 100;
 	
@@ -103,6 +104,7 @@ void Player::OnUpdate()
 	}
 
 	Character::OnUpdate();
+	CalculateMovementAngle();
 
 	// FlashLight Update
 	UpdateFlashLight();
@@ -129,52 +131,12 @@ void Player::MoveRight()
 	movement_component_->accelaration_vector[0] += 1;
 }
 
-void Player::MoveRightForward()
-{
-	if (controller_enable_ == false)
-		return;
-
-	SetCharacterAnimation("A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->accelaration_vector[2] += 1;
-	movement_component_->accelaration_vector[0] += 1;
-}
-
-void Player::MoveRightBack()
-{
-	if (controller_enable_ == false)
-		return;
-
-	SetCharacterAnimation("A_TP_CH_Jog_RB_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->accelaration_vector[2] -= 1;
-	movement_component_->accelaration_vector[0] += 1;
-}
-
 void Player::MoveLeft()
 {
 	if (controller_enable_ == false)
 		return;
 
 	SetCharacterAnimation("A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->accelaration_vector[0] -= 1;
-}
-
-void Player::MoveLeftForward()
-{
-	if (controller_enable_ == false)
-		return;
-
-	SetCharacterAnimation("A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->accelaration_vector[2] += 1;
-	movement_component_->accelaration_vector[0] -= 1;
-}
-
-void Player::MoveLeftBack()
-{
-	if (controller_enable_ == false)
-		return;
-
-	SetCharacterAnimation("A_TP_CH_Jog_LB_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->accelaration_vector[2] -= 1;
 	movement_component_->accelaration_vector[0] -= 1;
 }
 
@@ -202,7 +164,7 @@ void Player::Jump()
 		return;
 
 	if (movement_component_->jump_pulse <= 0 && movement_component_->gravity_pulse <= 0) {
-		movement_component_->jump_pulse = 300.0f;
+		movement_component_->jump_pulse = 150.0f;
 	}
 }
 
@@ -386,9 +348,22 @@ void Player::UpdateFlashLight()
 	
 }
 
+void Player::CalculateMovementAngle()
+{
+	direction_ = XMVector3Transform(XMVector3Normalize(movement_component_->velocity), rotation_);
+	float dot_product = XMVectorGetX(XMVector3Dot(front_, direction_));
+
+	angle_ = XMVectorGetX(XMVector3AngleBetweenNormals(front_, direction_));
+
+	if (XMVectorGetX(XMVector3Dot(right_, direction_)) < 0)
+		angle_ *= -1.0f;
+	
+	angle_ = XMConvertToDegrees(angle_);
+}
+
 void Player::UpdateTimer()
 {
-	// Grenade Timer
+	// Grenade Timerdd
 	if (grenade_timer_ < grenade_cooltime_)
 		grenade_timer_ += TIMER->GetDeltaTime();
 

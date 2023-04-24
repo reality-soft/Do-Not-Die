@@ -113,7 +113,7 @@ void InGameScene::OnInit()
 	sys_wave_.SetWorldEnv(&environment_);
 	sys_wave_.CreateExtractPoints(reg_scene_);
 
-#ifdef DEBUG_
+#ifdef _DEBUG
 	GUI->AddWidget<PropertyWidget>("property");
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("FPS", &TIMER->fps);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Time Countdown", &sys_wave_.countdown_timer_);
@@ -126,6 +126,13 @@ void InGameScene::OnInit()
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Car Repaired", &sys_wave_.car_repaired);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Created Actors", &cur_zombie_created);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<bool>("In Repair Volume", &player_actor->can_repair_car_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Angle", &player_actor->angle_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("front_x", &player_actor->front_.m128_f32[0]);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("front_y", &player_actor->front_.m128_f32[1]);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("front_z", &player_actor->front_.m128_f32[2]);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("direction_x", &player_actor->direction_.m128_f32[0]);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("direction_y", &player_actor->direction_.m128_f32[1]);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("direction_z", &player_actor->direction_.m128_f32[2]);
 #endif
 }
 
@@ -172,7 +179,7 @@ void InGameScene::OnRender()
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
 
-#ifdef DEBUG_
+#ifdef _DEBUG
 	GUI->RenderWidgets();
 #endif
 }

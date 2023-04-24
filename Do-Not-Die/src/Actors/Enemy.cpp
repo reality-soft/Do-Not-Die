@@ -90,21 +90,17 @@ void Enemy::TakeDamage(int damage)
 
 void Enemy::SetDirection(const XMVECTOR& direction)
 {
-	// Define two XMVECTORs
 	XMVECTOR front = { 0.0f, 0.0f, 1.0f, 0.0f };
 
-	// Calculate the dot product of A and B
 	float dot_product = XMVectorGetX(XMVector3Dot(front, direction));
 
-	// Calculate the magnitudes of A and B
 	float magnitude_front = XMVectorGetX(XMVector3Length(front));
-	float magnitude_direction = XMVectorGetX(XMVector3Length(front));
+	float magnitude_direction = XMVectorGetX(XMVector3Length(direction));
 
 	float cos_theta = dot_product / (magnitude_front * magnitude_direction);
 
 	float theta = acos(cos_theta);
 
-	// Convert the angle to degrees
 	theta = XMConvertToDegrees(theta);
 
 	rotation_ = XMMatrixRotationY(XMConvertToDegrees(theta));
