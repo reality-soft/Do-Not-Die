@@ -256,12 +256,12 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	kill_text_->SetText(to_string(kill));
 
 	// Vehicle Item Update
-	string repair_str = "Repair Count : ";
+	string car_health_str = "Car Health : ";
 	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 	auto wave_sys = ingame_scene->GetWaveSystem();
-	string repair_count = to_string(wave_sys.car_repaired);
-	string repair_max_count = " / 5";
-	repair_text_->SetText(repair_str + repair_count + repair_max_count);
+	car_health_str += to_string(wave_sys.car_health);
+	car_health_str += " / 100";
+	repair_text_->SetText(car_health_str);
 
 	// Cross Hair Update
 	if (ui_comp_->ui_list.find("CrossHair UI") != ui_comp_->ui_list.end())
