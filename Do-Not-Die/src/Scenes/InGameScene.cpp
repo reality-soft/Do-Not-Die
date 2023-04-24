@@ -117,7 +117,6 @@ void InGameScene::OnInit()
 	
 	QUADTREE->ImportFloydRout("DND_FloydRout_1.mapdat");
 
-
 #ifdef _DEBUG
 	GUI->AddWidget<PropertyWidget>("property");
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("FPS", &TIMER->fps);
@@ -141,9 +140,9 @@ void InGameScene::OnUpdate()
 
 	sys_camera.OnUpdate(reg_scene_);
 	sys_animation.OnUpdate(reg_scene_);
+	sys_effect.OnUpdate(reg_scene_);
 	sys_light.OnUpdate(reg_scene_);
 	sys_movement.OnUpdate(reg_scene_);
-	sys_effect.OnUpdate(reg_scene_);
 	sys_sound.OnUpdate(reg_scene_);
 
 	// Trigger And Wave System
