@@ -77,8 +77,8 @@ void Player::OnInit(entt::registry& registry)
 	C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
 	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 1.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
 
-	transform_matrix_ = XMMatrixTranslation(0, 100, 0);
-	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
+	cur_position_ = { 0.0f, 100.0f, 0.0f, 0.0f };
+	transform_tree_.root_node->OnUpdate(registry, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
@@ -126,7 +126,6 @@ void Player::SetCharacterMovementAnimation()
 			anim_id = "A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim";
 		}
 	}
-}
 
 	if (anim_slot->GetCurAnimationId() != anim_id) {
 		anim_slot->SetAnimation(anim_id, 1.0);
@@ -139,10 +138,10 @@ void Player::OnUpdate()
 	if (controller_enable_)
 	{
 		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-		XMMATRIX rotation_matrix = XMMatrixRotationY(camera->pitch_yaw.y);
-		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, GetPos(), rotation_matrix);
-		front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
-		right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
+		rotation_ = XMMatrixRotationY(camera->pitch_yaw.y);
+		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, cur_position_, rotation_);
+		front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_);
+		right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_);
 	}
 
 	Character::OnUpdate();
@@ -374,7 +373,9 @@ void Player::UpdateFlashLight()
 
 void Player::CalculateMovementAngle()
 {
-	direction_ = XMVector3Transform(XMVector3Normalize(movement_component_->velocity), rotation_);
+	XMVECTOR velocity = movement_component_->velocity;
+	velocity.m128_f32[1] = 0;
+	direction_ = XMVector3Transform(XMVector3Normalize(velocity), rotation_);
 	float dot_product = XMVectorGetX(XMVector3Dot(front_, direction_));
 
 	angle_ = XMVectorGetX(XMVector3AngleBetweenNormals(front_, direction_));
