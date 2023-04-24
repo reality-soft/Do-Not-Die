@@ -51,8 +51,7 @@ void Grenade::OnUpdate()
 		if (speed > 0.2f)
 		{
 			dir_.y += gravity.y * TIMER->GetDeltaTime();
-
-			XMVECTOR cur_position_ = XMVectorAdd(cur_position_, XMLoadFloat3(&dir_));
+			cur_position_ = XMVectorAdd(cur_position_, XMLoadFloat3(&dir_));
 
 			transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 		}
