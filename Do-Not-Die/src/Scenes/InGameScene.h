@@ -52,7 +52,7 @@ public:
 	UI_Actor_Ingame& GetUIActor() { return ingame_ui; }
 
 private:
-#ifdef DEBUG_
+#ifdef _DEBUG
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
 #endif

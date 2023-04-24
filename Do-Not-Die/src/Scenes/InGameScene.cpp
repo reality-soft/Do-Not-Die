@@ -118,7 +118,7 @@ void InGameScene::OnInit()
 	QUADTREE->ImportFloydRout("DND_FloydRout_1.mapdat");
 
 
-#ifdef DEBUG_
+#ifdef _DEBUG
 	GUI->AddWidget<PropertyWidget>("property");
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("FPS", &TIMER->fps);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Time Countdown", &sys_wave_.countdown_timer_);
@@ -177,7 +177,7 @@ void InGameScene::OnRender()
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
 
-#ifdef DEBUG_
+#ifdef _DEBUG
 	GUI->RenderWidgets();
 #endif
 }

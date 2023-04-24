@@ -3,7 +3,7 @@
 #include "Engine_include.h"
 #include "StaticShadows.h"
 
-#ifdef DEBUG_
+#ifdef _DEBUG
 namespace reality
 {
 	struct Property
