@@ -356,7 +356,7 @@ void Player::CalculateMovementAngle()
 	angle_ = XMVectorGetX(XMVector3AngleBetweenNormals(front_, direction_));
 
 	if (XMVectorGetX(XMVector3Dot(right_, direction_)) < 0)
-		angle_ *= -1.0f;
+		angle_ = XM_2PI - angle_;
 	
 	angle_ = XMConvertToDegrees(angle_);
 }
