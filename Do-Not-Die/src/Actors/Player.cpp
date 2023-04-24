@@ -22,6 +22,13 @@ void Player::OnInit(entt::registry& registry)
 	movement_component_->max_speed = 150;
 	max_hp_ = cur_hp_ = 100;
 	
+	C_TriggerSensor trigger_sensor;
+	trigger_sensor.can_sense_tags.insert("item");
+	trigger_sensor.can_sense_tags.insert("extract");
+	trigger_sensor.can_sense_tags.insert("repair");
+	trigger_sensor.can_sense_tags.insert("defense");
+	registry.emplace<reality::C_TriggerSensor>(entity_id_, trigger_sensor);
+
 	reality::C_SkeletalMesh skm;
 	skm.skeletal_mesh_id = "SM_Chr_Biker_Male_01.skmesh";
 	skm.vertex_shader_id = "SkinningVS.cso";
@@ -53,8 +60,8 @@ void Player::OnInit(entt::registry& registry)
 	registry.emplace<C_Socket>(entity_id_, socket_component);
 
 	C_StaticMesh static_mesh_component;
-	static_mesh_component.local = XMMatrixScalingFromVector({ 1.4f, 1.4f, 1.4f, 0.0f });
-	static_mesh_component.world = XMMatrixIdentity();
+	static_mesh_component.local = XMMatrixScalingFromVector({ 1.4f, 1.4f, 1.4f, 1.0f });
+	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
 	static_mesh_component.static_mesh_id = "SK_Handgun_01.stmesh";
 	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
 	static_mesh_component.socket_name = "RightHand";
@@ -67,12 +74,12 @@ void Player::OnInit(entt::registry& registry)
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SoundGenerator));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_SkeletalMesh), TYPE_ID(C_Socket));
 
-	cur_position_ = { 0.0f, 100.0f, 0.0f, 0.0f };
-	transform_tree_.root_node->OnUpdate(registry, entity_id_, XMMatrixTranslationFromVector(cur_position_));
-
 	C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
-	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
+	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 1.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
 
+	transform_matrix_ = XMMatrixTranslation(0, 100, 0);
+	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
+	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
 	animation_component.GetAnimSlotByName("Base")->SetAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim", 0.5);
@@ -85,11 +92,11 @@ void Player::OnInit(entt::registry& registry)
 	// Inventory
 	inventory_.resize(INVENTORY_MAX);
 	inventory_timer_.resize(INVENTORY_MAX);
-
+	
 	cur_hp_ = 0;
+	tag = "player";
 
-	// true means : this actor causes trigger event when overlaped at trigger 
-	trigger_sensor = true;
+
 }
 
 void Player::SetCharacterMovementAnimation()
@@ -119,6 +126,7 @@ void Player::SetCharacterMovementAnimation()
 			anim_id = "A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim";
 		}
 	}
+}
 
 	if (anim_slot->GetCurAnimationId() != anim_id) {
 		anim_slot->SetAnimation(anim_id, 1.0);
@@ -128,12 +136,13 @@ void Player::SetCharacterMovementAnimation()
 
 void Player::OnUpdate()
 {
-
 	if (controller_enable_)
 	{
 		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-		rotation_ = XMMatrixRotationY(camera->pitch_yaw.y);
-		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, cur_position_, rotation_);
+		XMMATRIX rotation_matrix = XMMatrixRotationY(camera->pitch_yaw.y);
+		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, GetPos(), rotation_matrix);
+		front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
+		right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
 	}
 
 	Character::OnUpdate();

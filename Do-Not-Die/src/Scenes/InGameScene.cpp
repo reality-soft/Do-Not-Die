@@ -74,6 +74,8 @@ void InGameScene::OnInit()
 	QUADTREE->ImportGuideLines("DND_RepairPart_1.mapdat", GuideType::eSpawnPoint);
 	QUADTREE->ImportGuideLines("DND_CarAttack_1.mapdat", GuideType::eNpcTrack);
 	QUADTREE->ImportGuideLines("DND_CarEvent_1.mapdat", GuideType::eSpawnPoint);
+	QUADTREE->ImportGuideLines("DND_FX_CorpseFire_1.mapdat", GuideType::eSpawnPoint);
+	QUADTREE->ImportGuideLines("DND_FX_CarFire_1.mapdat", GuideType::eSpawnPoint);
 
 	QUADTREE->Init(&level, reg_scene_);
 	QUADTREE->ImportQuadTreeData("QuadTreeData_01.mapdat");
@@ -92,28 +94,30 @@ void InGameScene::OnInit()
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(0.2f, 0.2f);
-	//single_shadow.Init({ 5000,15000 }, { 8192,8192 }, { 1024,1024 }, "DepthMapVS.cso", "ShadowVS.cso", "ShadowPS.cso");
-	//single_shadow.static_mesh_level_ = &level;
-	//single_shadow.RenderDepthMap(XMVectorSet(5000, 5000, -5000, 0), XMVectorZero());
-	
-	//EFFECT_MGR->SpawnEffect<FX_Flame>(E_SceneType::INGAME, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), XMQuaternionIdentity(), XMVectorSet(10.0f, 10.0f, 10.0f, 0.0f));
+	//directiional_shadow_.Init({ 5000,15000 }, { 2048, 2048 }, "DepthMapVS.cso");
+	//directiional_shadow_.CreateDepthMap(&level, XMVectorSet(5000, 5000, -5000, 0), XMVectorZero());
+	//prop_widget_->depth_map_tex_ = directiional_shadow_.GetDepthMapSRV();
 
+	//cube_map_shadow_.Init({ 10.f, 1000.0f }, { 2048, 2048 }, "DepthMapVS.cso");
+	//cube_map_shadow_.CreateDepthMap(&level, XMVectorSet(0, 100, 0, 0));
 	// LOADING FINISH
 	loading_progress = LOADING_FINISHED;
-
+	
 	// Trigger And Wave System
-	sys_trigger_.OnCreate(reg_scene_);
 	sys_wave_.OnCreate(reg_scene_);
 	sys_wave_.SetWorldEnv(&environment_);
-	sys_wave_.CreateExtractPoints(reg_scene_);
+	sys_trigger_.OnCreate(reg_scene_);
+	//CreateShadowMaps();
+	
+	QUADTREE->ImportFloydRout("DND_FloydRout_1.mapdat");
 
 #ifdef _DEBUG
 	GUI->AddWidget<PropertyWidget>("property");
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("FPS", &TIMER->fps);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("FPS", &TIMER->fps);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Time Countdown", &sys_wave_.countdown_timer_);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Waves", &sys_wave_.wave_count_);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("RaycastTri", &QUADTREE->raycast_calculated);
-
+	
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Jump", &player_actor->GetMovementComponent()->jump_pulse);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Gravity", &player_actor->GetMovementComponent()->gravity_pulse);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Selectable Items", &player_actor->selectable_counts_);
@@ -130,21 +134,18 @@ void InGameScene::OnInit()
 void InGameScene::OnUpdate()
 {
 	QUADTREE->Frame(&sys_camera);
-	QUADTREE->UpdatePhysics("PhysicsCS.cso");
-	
-	cur_zombie_created = SCENE_MGR->GetNumOfActor() - 1;
+	QUADTREE->UpdatePhysics();
 
 	sys_camera.OnUpdate(reg_scene_);
 	sys_animation.OnUpdate(reg_scene_);
+	sys_effect.OnUpdate(reg_scene_);
 	sys_light.OnUpdate(reg_scene_);
 	sys_movement.OnUpdate(reg_scene_);
-	sys_effect.OnUpdate(reg_scene_);
 	sys_sound.OnUpdate(reg_scene_);
 
 	// Trigger And Wave System
-	sys_trigger_.OnUpdate(reg_scene_);
 	sys_wave_.OnUpdate(reg_scene_);
-
+	sys_trigger_.OnUpdate(reg_scene_);
 	environment_.Update(&sys_camera, &sys_light);
 	ingame_ui.SetGameTimer(sys_wave_.countdown_timer_);
 	ingame_ui.OnUpdate();
@@ -157,11 +158,14 @@ void InGameScene::OnUpdate()
 
 void InGameScene::OnRender()
 {
-	environment_.Render();
-	
-	//single_shadow.RenderShadowMap();
-	//single_shadow.SetShadowMapSRV();
+	environment_.Render();	
 
+	//directiional_shadow_.SetDepthMapSRV();
+	//int start_slot = 9;
+	//for (int i = 0; i < 8; ++i)
+	//{
+	//	point_light_shadows_[i].SetDepthMapSRV(start_slot + i * 6);
+	//}
 	level.Update();
 	level.Render();
 
@@ -210,6 +214,20 @@ void InGameScene::CursorStateUpdate()
 			SetCursorVisible();
 			ClipCursor(nullptr);
 		}
+	}
+}
+
+void InGameScene::CreateShadowMaps()
+{
+	auto point_light_view = reg_scene_.view<C_PointLight>();
+	UINT point_light_count = point_light_view.size();
+	point_light_shadows_.resize(point_light_count);
+	UINT index = 0;
+	for (auto ent : point_light_view)
+	{
+		auto& point_light = reg_scene_.get<C_PointLight>(ent);
+		point_light_shadows_[index].Init({ 10.f, 1000.0f }, { 2048, 2048 }, "DepthMapVS.cso");
+		point_light_shadows_[index].CreateDepthMap(&level, point_light.world.r[3]);
 	}
 }
 

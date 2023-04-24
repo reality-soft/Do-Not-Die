@@ -180,6 +180,12 @@ void UI_Actor_Ingame::CreateIngameUI()
 	interaction_text_->InitText("", E_Font::BASIC, { 40.0f, 8.0f }, 0.5f);
 	interaction_ui_->AddChildUI("2_InteractionText", interaction_text_);
 
+	// Addicted UI
+	addicted_ui_ = make_shared<UI_Image>();
+	addicted_ui_->InitImage("T_Addicted.png");
+	addicted_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
+	ui_comp_->ui_list.insert({ "Addicted UI", addicted_ui_ });
+
 	// Event Message UI
 	event_msg_text_ = make_shared<UI_Text>();
 	event_msg_text_->InitText("Event Test", E_Font::BASIC, { win_size_1920_width / 2.0f - 100.0f, win_size_1920_height - 300.0f });

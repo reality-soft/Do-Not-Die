@@ -12,6 +12,7 @@ void Item::OnInit(entt::registry& registry)
 {
 	Actor::OnInit(registry);
 	visible = true;
+	tag = "item";
 
 	reality::C_StaticMesh stm;
 	stm.local = XMMatrixIdentity();

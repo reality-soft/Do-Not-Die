@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine_include.h"
+#include "GUIMgr.h"
 
 #ifdef _DEBUG
 namespace reality
@@ -37,7 +38,6 @@ namespace reality
 
 			properties.insert(make_pair(name, prop));
 		}
-
 	private:
 		std::map<string, Property> properties;
 	};
