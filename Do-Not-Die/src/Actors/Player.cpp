@@ -9,6 +9,7 @@
 #include "FX_Muzzle.h"
 #include "FX_Explosion.h"
 #include "GameEvents.h"
+#include "BlendSpace2D.h"
 
 using namespace reality;
 
@@ -16,7 +17,9 @@ void Player::OnInit(entt::registry& registry)
 {
 	Character::OnInit(registry);
 
-	movement_component_->speed = 150;
+	movement_component_->speed = 0;
+	movement_component_->acceleration = 300;
+	movement_component_->max_speed = 150;
 	max_hp_ = cur_hp_ = 100;
 	
 	C_TriggerSensor trigger_sensor;
@@ -74,17 +77,14 @@ void Player::OnInit(entt::registry& registry)
 	C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
 	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 1.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
 
-	transform_matrix_ = XMMatrixTranslation(0, 100, 0);
-	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
+	cur_position_ = { 0.0f, 100.0f, 0.0f, 0.0f };
+	transform_tree_.root_node->OnUpdate(registry, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 	
-	
-	// create anim
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_02");
+	animation_component.GetAnimSlotByName("Base")->SetAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim", 0.5);
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
-
-	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
 
 	// FlashLight
 	AddFlashLight();
@@ -99,31 +99,59 @@ void Player::OnInit(entt::registry& registry)
 
 }
 
+void Player::SetCharacterMovementAnimation()
+{
+	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
+	AnimationBase* anim_slot = animation_component_ptr->GetAnimSlotByName("Base");
+
+	string anim_id = "A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim";
+
+	if (movement_component_->speed >= 0.1f) {
+		if (angle_ >= 330.0f || angle_ < 30.0f) {
+			anim_id = "A_TP_CH_Jog_F_Anim_Retargeted_Unreal Take.anim";
+		}
+		else if (30.0f <= angle_ && angle_ < 110.0f) {
+			anim_id = "A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim";
+		}
+		else if (110.0f <= angle_ && angle_ < 160.0f) {
+			anim_id = "A_TP_CH_Jog_RB_Anim_Retargeted_Unreal Take.anim";
+		}
+		else if (160.0f <= angle_ && angle_ < 200.0f) {
+			anim_id = "A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim";
+		}
+		else if (200.0f <= angle_ && angle_ < 250.0f) {
+			anim_id = "A_TP_CH_Jog_LB_Anim_Retargeted_Unreal Take.anim";
+		}
+		else if (250.0f <= angle_ && angle_ < 330.0f) {
+			anim_id = "A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim";
+		}
+	}
+
+	if (anim_slot->GetCurAnimationId() != anim_id) {
+		anim_slot->SetAnimation(anim_id, 1.0);
+	}
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
+}
+
 void Player::OnUpdate()
 {
 	if (controller_enable_)
 	{
 		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-		XMMATRIX rotation_matrix = XMMatrixRotationY(camera->pitch_yaw.y);
-		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, GetPos(), rotation_matrix);
-		front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
-		right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
+		rotation_ = XMMatrixRotationY(camera->pitch_yaw.y);
+		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, cur_position_, rotation_);
+		front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_);
+		right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_);
 	}
-	
+
+	Character::OnUpdate();
+	CalculateMovementAngle();
+	SetCharacterMovementAnimation();
+
 	// FlashLight Update
 	UpdateFlashLight();
-	
-	UpdateTimer();
-}
 
-void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
-{
-	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
-	int slot_index = animation_component_ptr->name_to_anim_slot_index[anim_slot_id];
-	if (animation_component_ptr->anim_slots[slot_index].second->GetCurAnimationId() != anim_id) {
-		animation_component_ptr->anim_slots[slot_index].second->SetAnimation(anim_id, 0.2);
-	}
-	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
+	UpdateTimer();
 }
 
 void Player::MoveRight()
@@ -131,28 +159,7 @@ void Player::MoveRight()
 	if (controller_enable_ == false)
 		return;
 
-	SetCharacterAnimation("A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += right_;
-}
-
-void Player::MoveRightForward()
-{
-	if (controller_enable_ == false)
-		return;
-
-	SetCharacterAnimation("A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += front_;
-	movement_component_->direction += right_;
-}
-
-void Player::MoveRightBack()
-{
-	if (controller_enable_ == false)
-		return;
-
-	SetCharacterAnimation("A_TP_CH_Jog_RB_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= front_;
-	movement_component_->direction += right_;
+	movement_component_->accelaration_vector[0] += 1;
 }
 
 void Player::MoveLeft()
@@ -160,28 +167,7 @@ void Player::MoveLeft()
 	if (controller_enable_ == false)
 		return;
 
-	SetCharacterAnimation("A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= right_;
-}
-
-void Player::MoveLeftForward()
-{
-	if (controller_enable_ == false)
-		return;
-
-	SetCharacterAnimation("A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += front_;
-	movement_component_->direction -= right_;
-}
-
-void Player::MoveLeftBack()
-{
-	if (controller_enable_ == false)
-		return;
-
-	SetCharacterAnimation("A_TP_CH_Jog_LB_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= front_;
-	movement_component_->direction -= right_;
+	movement_component_->accelaration_vector[0] -= 1;
 }
 
 void Player::MoveForward()
@@ -189,8 +175,7 @@ void Player::MoveForward()
 	if (controller_enable_ == false)
 		return;
 
-	SetCharacterAnimation("A_TP_CH_Jog_F_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += front_;
+	movement_component_->accelaration_vector[2] += 1;
 }
 
 void Player::MoveBack()
@@ -198,8 +183,7 @@ void Player::MoveBack()
 	if (controller_enable_ == false)
 		return;
 
-	SetCharacterAnimation("A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= front_;
+	movement_component_->accelaration_vector[2] -= 1;
 }
 
 void Player::Jump()
@@ -208,13 +192,8 @@ void Player::Jump()
 		return;
 
 	if (movement_component_->jump_pulse <= 0 && movement_component_->gravity_pulse <= 0) {
-		movement_component_->jump_pulse = 300.0f;
+		movement_component_->jump_pulse = 150.0f;
 	}
-}
-
-void Player::Idle()
-{
-	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
 }
 
 void Player::Fire()
@@ -224,13 +203,11 @@ void Player::Fire()
 		is_firing_ = true;
 
 		// Make Muzzle when Shot
-		auto player_transform = GetTransformMatrix();
-		XMVECTOR s, r, t;
-		XMMatrixDecompose(&s, &r, &t, player_transform);
-		t = XMVectorAdd(t, front_ * 30.0f);
-		t = XMVectorAdd(t, right_ * 6.0f);
-		t = XMVectorAdd(t, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) * 40.0f);
-		EFFECT_MGR->SpawnEffect<FX_Muzzle>(t);
+		XMVECTOR player_position = GetCurPosition();
+		player_position += front_ * 30.0f;
+		player_position += right_ * 6.0f;
+		player_position += XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) * 40.0f;
+		EFFECT_MGR->SpawnEffect<FX_Muzzle>(player_position);
 
 		// Make Shot Sound when Shot
 		auto& generator = reg_scene_->get<C_SoundGenerator>(GetEntityId());
@@ -271,9 +248,7 @@ void Player::ThrowGrenade()
 
 	auto grenade_entity = SCENE_MGR->AddActor<Grenade>();
 	auto grenade_actor = SCENE_MGR->GetActor<Grenade>(grenade_entity); 
-	XMVECTOR s, r, t;
-	XMMatrixDecompose(&s, &r, &t, transform_matrix_);
-	XMVECTOR pos = XMVectorAdd(t, XMVectorSet(0.0f, 50.0f, 0.0f, 0.0f));
+	XMVECTOR pos = XMVectorAdd(cur_position_, XMVectorSet(0.0f, 50.0f, 0.0f, 0.0f));
 	grenade_actor->SetPos(pos);
 	XMVECTOR dir = XMVectorAdd(front_, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
 	grenade_actor->SetDir(dir, 4.0f);
@@ -284,31 +259,31 @@ bool Player::IsAiming()
 	return is_aiming_;
 }
 
-void Player::InterectionRotate(XMVECTOR interection_pos)
+void Player::InteractionRotate(XMVECTOR interaction_pos)
 {
 	controller_enable_ = false;
 	
-	XMVECTOR player_pos = GetTransformMatrix().r[3];
-	XMVECTOR direction = XMVector3Normalize(interection_pos - player_pos);
+	XMVECTOR player_pos = GetCurPosition();
+	XMVECTOR direction = XMVector3Normalize(interaction_pos - player_pos);
 	float angle = XMVector3AngleBetweenVectors(XMVectorSet(0, 0, 1, 0), direction).m128_f32[0];
 	if (XMVectorGetX(XMVector3Dot(XMVectorSet(1, 0, 0, 0), direction)) < 0)
 		angle *= -1.0f;
 
 	XMMATRIX rotation_matrix = XMMatrixRotationY(angle);
-	transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, GetPos(), rotation_matrix);
+	transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, player_pos, rotation_matrix);
 }
 
 void Player::ResetPos()
 {
 	spawn_point.m128_f32[1] += 100.f;
-	transform_matrix_ = XMMatrixTranslationFromVector(spawn_point);
-	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, transform_matrix_);
+	cur_position_ = spawn_point;
+	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
 void Player::SetPos(const XMVECTOR& position)
 {
-	transform_matrix_ = XMMatrixTranslationFromVector(position);
-	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, transform_matrix_);
+	cur_position_ = position;
+	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
 float Player::GetMaxHp() const
@@ -357,8 +332,6 @@ void Player::AddFlashLight()
 	//XMStoreFloat3(&spot_light_comp.direction, camera.look);
 
 	transform_tree_.AddNodeToNode(TYPE_ID(C_Camera), TYPE_ID(C_SpotLight));
-
-	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, transform_matrix_);
 }
 
 void Player::UpdateFlashLight()
@@ -398,9 +371,25 @@ void Player::UpdateFlashLight()
 	
 }
 
+void Player::CalculateMovementAngle()
+{
+	XMVECTOR velocity = movement_component_->velocity;
+	velocity.m128_f32[1] = 0;
+	direction_ = XMVector3Transform(XMVector3Normalize(velocity), rotation_);
+	float dot_product = XMVectorGetX(XMVector3Dot(front_, direction_));
+
+	angle_ = XMVectorGetX(XMVector3AngleBetweenNormals(front_, direction_));
+
+	if (XMVectorGetX(XMVector3Dot(right_, direction_)) < 0)
+		angle_ = XM_2PI - angle_;
+	
+	angle_ = XMConvertToDegrees(angle_);
+	angle_ += 0.2f;
+}
+
 void Player::UpdateTimer()
 {
-	// Grenade Timer
+	// Grenade Timerdd
 	if (grenade_timer_ < grenade_cooltime_)
 		grenade_timer_ += TIMER->GetDeltaTime();
 
@@ -465,7 +454,7 @@ void Player::DropItem()
 	if (item_base == nullptr)
 		return;
 
-	SCENE_MGR->AddActor<Item>(item_base->item_type_, _XMFLOAT3(GetPos()), 30);
+	SCENE_MGR->AddActor<Item>(item_base->item_type_, _XMFLOAT3(GetCurPosition()), 30);
 	item_base->Drop();
 	inventory_timer_[selected_slot] = 0;
 	if (item_base->GetCount() == 0)

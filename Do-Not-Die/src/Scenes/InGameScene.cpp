@@ -60,12 +60,6 @@ void InGameScene::OnInit()
 	INPUT_EVENT->SubscribeMouseEvent( MouseButton::R_BUTTON, std::bind(&Player::Aim, player_actor, true), KEY_PUSH);
 	INPUT_EVENT->SubscribeMouseEvent( MouseButton::R_BUTTON, std::bind(&Player::Aim, player_actor, false), KEY_UP);
 
-	std::function<void()> idle = std::bind(&Player::Idle, player_actor);
-	INPUT_EVENT->SubscribeKeyEvent( DIK_D, idle, KEY_UP);
-	INPUT_EVENT->SubscribeKeyEvent( DIK_S, idle, KEY_UP);
-	INPUT_EVENT->SubscribeKeyEvent( DIK_W, idle, KEY_UP);
-	INPUT_EVENT->SubscribeKeyEvent( DIK_A, idle, KEY_UP);
-
 	INPUT_EVENT->SubscribeMouseEvent( MouseButton::L_BUTTON , std::bind(&Player::Fire, player_actor), KEY_PUSH);
 	INPUT_EVENT->SubscribeKeyEvent( DIK_G , std::bind(&Player::ThrowGrenade, player_actor), KEY_PUSH);
 	//INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
@@ -125,6 +119,10 @@ void InGameScene::OnInit()
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Car Repaired", &sys_wave_.car_health);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Created Actors", &cur_zombie_created);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<bool>("In Repair Volume", &player_actor->can_repair_car_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Angle", &player_actor->angle_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("direction_x", &player_actor->direction_.m128_f32[0]);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("direction_y", &player_actor->direction_.m128_f32[1]);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("direction_z", &player_actor->direction_.m128_f32[2]);
 #endif
 }
 

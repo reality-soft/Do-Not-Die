@@ -58,6 +58,7 @@ project "Do-Not-Die"
 		"Do-Not-Die/src/UI/InGameScene",
 		"Do-Not-Die/src/UI/LoadingScene",
 		"Do-Not-Die/src/UI/StartScene",
+		"Do-Not-Die/src/UI/PopScene",
 		"../SDK/DirectXTK/include",
 		"../SDK/FBXSDK/include",
 		"../SDK/FMOD/include",

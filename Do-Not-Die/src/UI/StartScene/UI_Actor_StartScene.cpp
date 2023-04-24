@@ -25,12 +25,6 @@ void UI_Actor_StartScene::CreateUI()
 
 	float win_size_1920_width = E_Resolution_Size[E_Resolution::R1920x1080].x;
 	float win_size_1920_height = E_Resolution_Size[E_Resolution::R1920x1080].y;
-
-	// Background UI
-	background_ = make_shared<UI_Image>();
-	background_->InitImage("T_StartScene_background.png");
-	background_->SetLocalRectByMin({ 0, 0 }, win_size_1920_width, win_size_1920_height);
-	ui_comp_->ui_list.insert({ "Background", background_ });
 	
 	// New Game Button
 	newgame_button_ = make_shared<UI_Button>();
@@ -66,10 +60,7 @@ void UI_Actor_StartScene::UpdateUI()
 	// When NewGame Button Selected
 	if (newgame_button_->GetCurrentState() == E_UIState::UI_SELECT)
 	{
-		thread loading_thread = thread(&UI_Actor_StartScene::LoadingIngameScene, this);
-		loading_thread.detach();
-		SCENE_MGR->AddScene<LoadingScene>(E_SceneType::LOADING);
-		SCENE_MGR->ChangeScene(E_SceneType::LOADING);
+		SCENE_MGR->ChangeScene(E_SceneType::INGAME);
 	}
 
 	// When exit Button Selected
@@ -92,7 +83,7 @@ void UI_Actor_StartScene::UpdateUI()
 	if (option_window_->resolution_value != option_window_->option_resolution_list_box_->GetCurrentItem())
 	{
 		option_window_->resolution_value = option_window_->option_resolution_list_box_->GetCurrentItem();
-		ENGINE->Resize((E_Resolution)option_window_->option_resolution_list_box_->GetCurrentIndex());
+		ENGINE->Resize((E_Resolution)(option_window_->option_resolution_list_box_->GetCurrentIndex() + 1));
 		CloseOptionWindow();
 	}
 }
@@ -119,10 +110,4 @@ void UI_Actor_StartScene::CloseOptionWindow()
 	option_window_->SetCloseButtonState(E_UIState::UI_NORMAL);
 
 	ui_comp_->ui_list.erase("Option Window");
-}
-
-
-void UI_Actor_StartScene::LoadingIngameScene()
-{
-	SCENE_MGR->AddScene<InGameScene>(INGAME);
 }

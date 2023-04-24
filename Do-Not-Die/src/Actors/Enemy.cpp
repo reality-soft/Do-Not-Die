@@ -36,8 +36,8 @@ void Enemy::OnInit(entt::registry& registry)
 	reality::C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
 	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180.f));
 
-	transform_matrix_ = XMMatrixTranslationFromVector({ 0.f, 100.f, 0.f, 0.f });
-	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
+	cur_position_ = { 0.f, 100.f, 0.f, 0.f };
+	transform_tree_.root_node->OnUpdate(registry, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
@@ -49,7 +49,9 @@ void Enemy::OnInit(entt::registry& registry)
 void Enemy::OnUpdate()
 {
 	behavior_tree_.Update();
+	Character::OnUpdate();
 	ChasePlayer();
+
 }
 
 void Enemy::SetCharacterAnimation(string anim_id) const
@@ -96,7 +98,21 @@ void Enemy::TakeDamage(int damage)
 
 void Enemy::SetDirection(const XMVECTOR& direction)
 {
-	movement_component_->direction = direction;
+	XMVECTOR front = { 0.0f, 0.0f, 1.0f, 0.0f };
+
+	float dot_product = XMVectorGetX(XMVector3Dot(front, direction));
+
+	float magnitude_front = XMVectorGetX(XMVector3Length(front));
+	float magnitude_direction = XMVectorGetX(XMVector3Length(direction));
+
+	float cos_theta = dot_product / (magnitude_front * magnitude_direction);
+
+	float theta = acos(cos_theta);
+
+	theta = XMConvertToDegrees(theta);
+
+	rotation_ = XMMatrixRotationY(XMConvertToDegrees(theta));
+
 }
 
 void Enemy::SetRoute(const vector<XMVECTOR>& target_poses)
