@@ -41,7 +41,10 @@ private:
 
 	TriggerSystem sys_trigger_;
 	WaveSystem sys_wave_;
+
+#ifdef _DEBUG
 	PropertyWidget* prop_widget_ = nullptr;
+#endif
 
 	ProjectionShadow directiional_shadow_;
 	vector<CubemapShadow> point_light_shadows_;
