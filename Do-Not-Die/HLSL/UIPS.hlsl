@@ -17,7 +17,7 @@ float4 PS(PS_IN input) : SV_Target
 {
     float4 tex_color = g_tex.Sample(g_SampleWrap, input.t);
 
-    if (tex_color.a < 0.1f)
+    if (tex_color.a < 0.001f)
         discard;
 
     return tex_color;
