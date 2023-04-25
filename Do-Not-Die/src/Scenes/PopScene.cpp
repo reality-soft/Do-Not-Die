@@ -1,5 +1,6 @@
 #include "PopScene.h"
 #include "StartScene.h"
+#include "IntroScene.h"
 
 using namespace reality;
 
@@ -102,7 +103,7 @@ void PopScene::OnUpdate()
 				if (pop_scene_ui.start_button_->GetCurrentState() == E_UIState::UI_SELECT)
 				{
 					ENGINE->Resize(E_Resolution::R1920x1080);
-					SCENE_MGR->ChangeScene(E_SceneType::START);
+					SCENE_MGR->ChangeScene(E_SceneType::INTRO);
 				}
 				break;
 			}
@@ -125,5 +126,6 @@ void PopScene::OnRelease()
 void PopScene::LoadingScenes()
 {
 	SCENE_MGR->AddScene<StartScene>(START);
+	SCENE_MGR->AddScene<IntroScene>(INTRO);
 	SCENE_MGR->AddScene<InGameScene>(INGAME);
 }

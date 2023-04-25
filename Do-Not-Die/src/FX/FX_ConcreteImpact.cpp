@@ -9,7 +9,7 @@ void FX_ConcreteImpact::OnInit(entt::registry& registry)
 {
 	FX_BaseEffectActor::OnInit(registry);
 
-	AddEffectComponent("concrete_effect", 1.0f);
+	AddEffectComponent("concrete_effect_edited", 1.0f);
 
 	AddSoundGeneratorComponent();
 

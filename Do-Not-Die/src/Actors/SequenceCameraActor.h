@@ -47,6 +47,7 @@ public:
 
 private:
 	CbCameraInfo cb_camera_info_;
+	CbCameraEffect	cb_effect;
 
 	XMMATRIX world_matrix_;
 	XMMATRIX view_matrix_;

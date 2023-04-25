@@ -9,7 +9,7 @@ void FX_BloodImpact::OnInit(entt::registry& registry)
 {
 	FX_BaseEffectActor::OnInit(registry);
 
-	AddEffectComponent("blood_effect", 1.0f);
+	AddEffectComponent("blood_effect_edited", 1.0f);
 
 	AddSoundGeneratorComponent();
 

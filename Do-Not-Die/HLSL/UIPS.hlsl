@@ -1,6 +1,7 @@
 struct PS_IN
 {
     float4 p : SV_POSITION;
+    float4 c : COLOR0;
     float2 t : TEXCOORD0;
 };
 
@@ -17,8 +18,9 @@ float4 PS(PS_IN input) : SV_Target
 {
     float4 tex_color = g_tex.Sample(g_SampleWrap, input.t);
 
-    if (tex_color.a < 0.001f)
-        discard;
+    //if (tex_color.a < 0.001f)
+    //    discard;
 
+    tex_color.a *= input.c.a;
     return tex_color;
 }
