@@ -184,7 +184,8 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_Handgun_Aim_Pose_Retargeted_Unreal Take.anim", 0.2f);
+			//animation_base->SetAnimation("A_TP_CH_Handgun_Aim_Pose_Retargeted_Unreal Take.anim", 0.2f);
+			animation_base->SetAnimation("A_TP_CH_AR_01_Aim_Pose_Anim_Retargeted_Unreal_Take.anim", 0.2f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -200,7 +201,8 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_Handgun_Fire_Retargeted_Unreal Take.anim", 0.0f);
+			//animation_base->SetAnimation("A_TP_CH_Handgun_Fire_Retargeted_Unreal Take.anim", 0.0f);
+			animation_base->SetAnimation("A_TP_CH_AR_Fire_Anim_Retargeted_Unreal_Take.anim", 0.0f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
