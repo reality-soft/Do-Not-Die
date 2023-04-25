@@ -1,5 +1,6 @@
 #include "StartScene.h"
 #include "FbxMgr.h"
+#include "FX_Flame.h"
 
 void StartScene::OnInit()
 {
@@ -21,7 +22,7 @@ void StartScene::OnInit()
 
 	sequence_camera_ = Scene::AddActor<SequenceCameraActor>();
 	sequence_camera_actor = Scene::GetActor<SequenceCameraActor>(sequence_camera_);
-	sequence_camera_actor->ImportSequenceTrack("DND_SequenceTrack_1.mapdat");
+	sequence_camera_actor->ImportSequenceTrack("DND_SequenceTrack_2.mapdat");
 	start_scene_ui.OnInit(reg_scene_);
 
 	level.Create("DNDLevel_WithCollision_01.stmesh", "LevelVS.cso");
@@ -31,6 +32,14 @@ void StartScene::OnInit()
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(0.2f, 0.2f);
+	fire_effects_.Import("DND_StartSceneFire_1.mapdat", GuideType::eSpawnPoint);
+
+	for (const auto& node : fire_effects_.line_nodes)
+	{
+		int random_scale = RandomFloatInRange(10.0f, 15.0f);
+		entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Flame>(START, node.second, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
+		Scene::GetActor<Actor>(ent)->visible = true;
+	}
 
 	loading_progress = START_FINISHED;
 }
@@ -57,5 +66,5 @@ void StartScene::OnRender()
 
 void StartScene::OnRelease()
 {
-	reality::RESOURCE->Release();
+
 }
