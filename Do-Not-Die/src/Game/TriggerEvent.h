@@ -34,6 +34,7 @@ namespace reality
 		void PlayerSelectable(Item* item_actor, bool selectable);
 		void PlayerCanExtract(bool can_extract);
 		void PlayerCanRepair(bool can_repair);
+		void PlayerDefense(bool can_defense);
 		void ZombieDefense(bool can_defense);
 	};
 }
