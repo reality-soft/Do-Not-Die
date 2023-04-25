@@ -45,6 +45,8 @@ void UI_Actor_IntroScene::UpdateUI()
 	static float alpha = 0.0f;
 	if (alpha < 1.0f)
 		alpha = intro_timer_ / intro_time_ / 2.0f;
+	else
+		alpha = 1.0f;
 	//else if (intro_timer_ > intro_time_ / 2.0f && intro_timer_ < intro_time_)
 	//	alpha = (intro_time_ - intro_timer_) / intro_time_ / 2.0f;
 
