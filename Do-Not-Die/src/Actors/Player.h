@@ -94,6 +94,7 @@ public:
 	void SetSpawnPoint(XMVECTOR point);
 	XMVECTOR spawn_point;
 	bool controller_enable_ = true;
+	bool player_in_defense_ = false;
 
 private:
 	void UpdateTimer();

@@ -47,7 +47,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
-	SpawnZombies(3.0f, 30);
+	SpawnZombies(3.0f, 1);
 
 	if (car_repaired >= 5)
 	{
@@ -269,7 +269,7 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 
 	cur_time += TM_DELTATIME;
 
-	if (zombie_spawn_count_ > count)
+	if (zombie_spawn_count_ >= count)
 		return;
 	
 
@@ -287,7 +287,7 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 		auto enemy_actor = SCENE_MGR->GetActor<Enemy>(enemy_entity);
 		enemy_actor->tag = "enemy";
 
-		int guidline_index = rand() % zomebie_tracks_->size();
+		int guidline_index = 4; //rand() % zomebie_tracks_->size();
 		int mesh_index = rand() % enemy_meshes.size();
 
 		vector<XMVECTOR> target_poses;
