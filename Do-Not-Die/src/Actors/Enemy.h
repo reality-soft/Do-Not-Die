@@ -21,7 +21,7 @@ public:
 	void TakeDamage(int damage) override;
 
 public:
-	void SetDirection(const XMVECTOR& direction);
+	void SetMovement(const XMVECTOR& direction);
 	void SetRoute(const vector<XMVECTOR>& target_poses);
 	void SetMeshId(const string& mesh_id);
 	void ChasePlayer();
@@ -60,9 +60,15 @@ public:
 		enemy->Move();
 
 		XMVECTOR cur_pos = enemy->GetCurPosition();
-		enemy->SetDirection(XMVector3Normalize(target_position_ - cur_pos));
+		XMVECTOR target_pos = target_position_;
+		target_pos.m128_f32[1] = 0.0f;
+		cur_pos.m128_f32[1] = 0.0f;
+		cur_pos.m128_f32[3] = 0.0f;
+		float distance = XMVector3Length(target_pos - cur_pos).m128_f32[0];
+		XMVECTOR direction_vector = XMVector3Normalize(target_pos - cur_pos);
+		enemy->SetMovement(direction_vector);
 
-		if (XMVector3Length(target_position_ - cur_pos).m128_f32[0] < 100.0f) {
+		if (XMVector3Length(target_pos - cur_pos).m128_f32[0] < 10.0f) {
 			return reality::BehaviorStatus::SUCCESS;
 		}
 

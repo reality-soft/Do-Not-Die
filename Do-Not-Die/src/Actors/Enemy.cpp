@@ -9,7 +9,8 @@ void Enemy::OnInit(entt::registry& registry)
 	Character::OnInit(registry);
 
 	// setting character data
-	movement_component_->speed = 60;
+	movement_component_->max_speed = 60;
+	movement_component_->acceleration = 60;
 	max_hp_ = cur_hp_ = 100;
 
 	// set trigger sensor
@@ -50,8 +51,7 @@ void Enemy::OnUpdate()
 {
 	behavior_tree_.Update();
 	Character::OnUpdate();
-	ChasePlayer();
-
+	//ChasePlayer();
 }
 
 void Enemy::SetCharacterAnimation(string anim_id) const
@@ -96,23 +96,23 @@ void Enemy::TakeDamage(int damage)
 	}
 }
 
-void Enemy::SetDirection(const XMVECTOR& direction)
+void Enemy::SetMovement(const XMVECTOR& direction)
 {
 	XMVECTOR front = { 0.0f, 0.0f, 1.0f, 0.0f };
+	XMVECTOR right = { 1.0f, 0.0f, 0.0f, 0.0f };
 
 	float dot_product = XMVectorGetX(XMVector3Dot(front, direction));
 
-	float magnitude_front = XMVectorGetX(XMVector3Length(front));
-	float magnitude_direction = XMVectorGetX(XMVector3Length(direction));
+	float angle = XMVectorGetX(XMVector3AngleBetweenNormals(front, direction));
 
-	float cos_theta = dot_product / (magnitude_front * magnitude_direction);
+	if (XMVectorGetX(XMVector3Dot(right, direction)) < 0)
+		angle = XM_2PI - angle;
 
-	float theta = acos(cos_theta);
+	angle = XMConvertToDegrees(angle);
 
-	theta = XMConvertToDegrees(theta);
+	rotation_ = XMMatrixRotationY(angle);
 
-	rotation_ = XMMatrixRotationY(XMConvertToDegrees(theta));
-
+	movement_component_->accelaration_vector[2] = 1;
 }
 
 void Enemy::SetRoute(const vector<XMVECTOR>& target_poses)
@@ -169,7 +169,7 @@ void Enemy::ChasePlayer()
 
 	if (player_in_sight)
 	{
-		SetDirection(GetRayDirection(sight_ray));
+		SetMovement(GetRayDirection(sight_ray));
 	}
 	else
 	{
