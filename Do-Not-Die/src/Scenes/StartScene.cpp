@@ -57,5 +57,5 @@ void StartScene::OnRender()
 
 void StartScene::OnRelease()
 {
-	reality::RESOURCE->Release();
+
 }
