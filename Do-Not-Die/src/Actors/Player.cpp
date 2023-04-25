@@ -59,7 +59,7 @@ void Player::OnInit(entt::registry& registry)
 	socket_component.AddSocket("RightHand", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 	registry.emplace<C_Socket>(entity_id_, socket_component);
 
-#define AK47
+#define AXE
 
 #ifdef PISTOL
 	C_StaticMesh static_mesh_component;

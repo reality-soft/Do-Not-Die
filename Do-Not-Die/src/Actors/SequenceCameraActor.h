@@ -3,12 +3,18 @@
 
 using namespace reality;
 
+enum class SequenceType
+{
+	ViewSequence,
+	TargetSequence,
+};
+
 struct SequenceTrack
 {
+	SequenceType sequence_type;
 	XMVECTOR move_vector;
-	float rotate_pitch;
-	float rotate_yaw;
-	float length;
+	XMFLOAT2 rotate_pitch_yaw;
+	XMVECTOR sequence_target;
 };
 
 struct SequenceCutInfo
@@ -24,7 +30,8 @@ public:
 	virtual void OnInit(entt::registry& registry);
 	virtual void OnUpdate();
 
-	bool PlaySequence(float time);
+	bool PlaySequence();
+
 	void ImportSequenceTrack(string mapdat_file);
 
 	UINT current_track_ = 0;
