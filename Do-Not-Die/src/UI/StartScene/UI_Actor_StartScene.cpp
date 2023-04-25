@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "UI_Actor_StartScene.h"
 #include "SceneMgr.h"
-#include "LoadingScene.h"
 #include "InGameScene.h"
 
 using namespace reality;
