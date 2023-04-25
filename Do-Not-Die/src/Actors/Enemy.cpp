@@ -62,11 +62,6 @@ void Enemy::SetCharacterAnimation(string anim_id) const
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
 }
 
-void Enemy::Move()
-{
-	is_moving_ = true;
-}
-
 void Enemy::Jump()
 {
 }
@@ -98,6 +93,11 @@ void Enemy::TakeDamage(int damage)
 
 void Enemy::SetMovement(const XMVECTOR& direction)
 {
+	if (XMVector3Length(direction).m128_f32[0] <= 0.00001f) {
+		return;
+	}
+
+	is_moving_ = true;
 	XMVECTOR front = { 0.0f, 0.0f, 1.0f, 0.0f };
 	XMVECTOR right = { 1.0f, 0.0f, 0.0f, 0.0f };
 
@@ -115,16 +115,8 @@ void Enemy::SetMovement(const XMVECTOR& direction)
 	movement_component_->accelaration_vector[2] = 1;
 }
 
-void Enemy::SetRoute(const vector<XMVECTOR>& target_poses)
+void Enemy::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 {
-	SetPos(target_poses[0] + XMVECTOR{ 0, 50.0f, 0, 0 });
-	// setting behavior tree
-	behavior_tree_.SetRootNode<SequenceNode>();
-
-	for (auto target_pos : target_poses) {
-		BehaviorNode* root_node = behavior_tree_.GetRootNode();
-		root_node->AddChild<EnemyMoveToTargets>(entity_id_, target_pos);
-	}
 }
 
 void Enemy::SetMeshId(const string& mesh_id)
@@ -163,11 +155,11 @@ void Enemy::ChasePlayer()
 			casted_triangle++;
 	}
 	if (casted_triangle == 0)
-		player_in_sight = true;
+		player_in_sight_ = true;
 	else
-		player_in_sight = false;
+		player_in_sight_ = false;
 
-	if (player_in_sight)
+	if (player_in_sight_)
 	{
 		SetMovement(GetRayDirection(sight_ray));
 	}

@@ -9,7 +9,7 @@ public:
 	void SetCharacterAnimation(string anim_id) const;
 
 public:
-	void Move();
+	void SetMovement(const XMVECTOR& direction);
 	void Jump();
 	void Idle();
 	void Attack();
@@ -21,8 +21,7 @@ public:
 	void TakeDamage(int damage) override;
 
 public:
-	void SetMovement(const XMVECTOR& direction);
-	void SetRoute(const vector<XMVECTOR>& target_poses);
+	virtual void SetBehaviorTree(const vector<XMVECTOR>& target_poses);
 	void SetMeshId(const string& mesh_id);
 	void ChasePlayer();
 
@@ -36,7 +35,9 @@ private:
 public:
 	bool is_hit_ = false;
 	bool in_defense_bound_ = false;
-	bool player_in_sight = true;
+	bool player_in_sight_ = true;
+	bool is_attacking_ = true;
+	bool is_attack_ended = false;
 
 private:
 	bool is_moving_ = false;
@@ -48,16 +49,14 @@ public:
 class EnemyMoveToTargets : public reality::ActionNode
 {
 public:
-	EnemyMoveToTargets(entt::entity enemy_id, XMVECTOR target_position)
-		: enemy_id_(enemy_id), target_position_(target_position)
+	EnemyMoveToTargets(entt::entity owner_id, XMVECTOR target_position)
+		: owner_id_(owner_id), target_position_(target_position)
 	{
 	};
 
 	virtual reality::BehaviorStatus Action() override
 	{
-		Enemy* enemy = reality::SCENE_MGR->GetActor<Enemy>(enemy_id_);
-
-		enemy->Move();
+		Enemy* enemy = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
 
 		XMVECTOR cur_pos = enemy->GetCurPosition();
 		XMVECTOR target_pos = target_position_;
@@ -75,9 +74,57 @@ public:
 		return reality::BehaviorStatus::RUNNING;
 	}
 
-private:
+protected:
 	XMVECTOR target_position_;
-	entt::entity enemy_id_;
+	entt::entity owner_id_;
+};
+
+class EnemyFollowPlayer : public EnemyMoveToTargets
+{
+public:
+	EnemyFollowPlayer(entt::entity enemy_id, XMVECTOR target_position)
+		: EnemyMoveToTargets(enemy_id, target_position)
+	{
+	};
+
+	virtual reality::BehaviorStatus Action() override
+	{
+		Enemy* owner = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
+		if (owner->player_in_sight_) {
+			return reality::BehaviorStatus::FAILURE;
+		}
+		return EnemyMoveToTargets::Action();
+	}
+};
+
+class Attack : public reality::ActionNode
+{
+public:
+	Attack(entt::entity owner_id, XMVECTOR target_position)
+		: owner_id_(owner_id), target_position_(target_position)
+	{
+	};
+
+	virtual reality::BehaviorStatus Action() override
+	{
+		Enemy* enemy = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
+
+		if (enemy->is_attacking_ == true) {
+			return reality::BehaviorStatus::RUNNING;
+		}
+		if (enemy->is_attacking_ == false && enemy->is_attack_ended == true) {
+			enemy->is_attack_ended = false;
+			return reality::BehaviorStatus::SUCCESS;
+		}
+		if (enemy->is_attacking_ == false && enemy->is_attack_ended == false) {
+			enemy->Attack();
+			return reality::BehaviorStatus::RUNNING;
+		}
+	}
+
+protected:
+	XMVECTOR target_position_;
+	entt::entity owner_id_;
 };
 
 namespace reality {

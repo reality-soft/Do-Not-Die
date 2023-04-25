@@ -294,7 +294,7 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 		for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
 			target_poses.push_back(target_pos.second);
 		}
-		enemy_actor->SetRoute(target_poses);
+		enemy_actor->SetBehaviorTree(target_poses);
 		enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
 
 		cur_time = 0.0f;
