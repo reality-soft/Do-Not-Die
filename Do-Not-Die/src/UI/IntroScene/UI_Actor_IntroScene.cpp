@@ -41,15 +41,18 @@ void UI_Actor_IntroScene::CreateUI()
 
 void UI_Actor_IntroScene::UpdateUI()
 {
-	intro_timer_ += TIMER->GetDeltaTime();
 	static float alpha = 0.0f;
-	if (alpha < 1.0f)
-		alpha = intro_timer_ / intro_time_ / 2.0f;
-	else
-		alpha = 1.0f;
-	//else if (intro_timer_ > intro_time_ / 2.0f && intro_timer_ < intro_time_)
-	//	alpha = (intro_time_ - intro_timer_) / intro_time_ / 2.0f;
 
-	intro_logo_->SetAlpha(alpha);
+	if (intro_timer_ < intro_time_)
+	{
+		intro_timer_ += TIMER->GetDeltaTime();
+		if (alpha < 1.0f)
+		{
+			alpha += TIMER->GetDeltaTime() * 0.2f;
+		}
+		else
+			alpha = 1.0f;
+	}
+	intro_logo_->SetAlpha(intro_timer_);
 }
 
