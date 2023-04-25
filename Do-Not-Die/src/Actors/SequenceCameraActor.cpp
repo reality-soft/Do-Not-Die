@@ -22,6 +22,18 @@ void SequenceCameraActor::OnInit(entt::registry& registry)
 	HRESULT hr = DX11APP->GetDevice()->CreateBuffer(&desc, &subdata, cb_camera_info_.buffer.GetAddressOf());
 	if (FAILED(hr))
 		return;
+
+	ZeroMemory(&desc, sizeof(desc));
+	ZeroMemory(&subdata, sizeof(subdata));
+
+	desc.ByteWidth = sizeof(CbCameraEffect::Data);
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	subdata.pSysMem = cb_effect.buffer.GetAddressOf();
+
+	hr = DX11APP->GetDevice()->CreateBuffer(&desc, &subdata, cb_effect.buffer.GetAddressOf());
+	if (FAILED(hr))
+		return;
 }
 
 void SequenceCameraActor::OnUpdate()
@@ -39,6 +51,42 @@ void SequenceCameraActor::OnUpdate()
 
 	DX11APP->GetDeviceContext()->UpdateSubresource(cb_camera_info_.buffer.Get(), 0, nullptr, &cb_camera_info_.data, 0, 0);
 	DX11APP->GetDeviceContext()->VSSetConstantBuffers(0, 1, cb_camera_info_.buffer.GetAddressOf());
+
+	// Billboard
+	cb_effect.data.view_matrix = XMMatrixTranspose(view_matrix_);
+	cb_effect.data.projection_matrix = XMMatrixTranspose(proj_matrix_);
+	XMMATRIX billboard = XMMatrixInverse(0, view_matrix_);
+	billboard.r[3].m128_f32[0] = 0.0f;
+	billboard.r[3].m128_f32[1] = 0.0f;
+	billboard.r[3].m128_f32[2] = 0.0f;
+	cb_effect.data.main_billboard = XMMatrixTranspose(billboard);
+
+	XMMATRIX x_only = XMMatrixIdentity();
+	x_only.r[1].m128_f32[1] = view_matrix_.r[1].m128_f32[1];
+	x_only.r[1].m128_f32[2] = view_matrix_.r[1].m128_f32[2];
+	x_only.r[2].m128_f32[1] = view_matrix_.r[2].m128_f32[1];
+	x_only.r[2].m128_f32[2] = view_matrix_.r[2].m128_f32[2];
+
+	billboard = DirectX::XMMatrixInverse(0, x_only);
+	billboard.r[3].m128_f32[0] = 0.0f;
+	billboard.r[3].m128_f32[1] = 0.0f;
+	billboard.r[3].m128_f32[2] = 0.0f;
+	cb_effect.data.x_billboard = XMMatrixTranspose(billboard);
+
+	XMMATRIX y_only = XMMatrixIdentity();
+	y_only.r[0].m128_f32[0] = view_matrix_.r[0].m128_f32[0];
+	y_only.r[0].m128_f32[2] = view_matrix_.r[0].m128_f32[2];
+	y_only.r[2].m128_f32[0] = view_matrix_.r[2].m128_f32[0];
+	y_only.r[2].m128_f32[2] = view_matrix_.r[2].m128_f32[2];
+
+	billboard = DirectX::XMMatrixInverse(0, y_only);
+	billboard.r[3].m128_f32[0] = 0.0f;
+	billboard.r[3].m128_f32[1] = 0.0f;
+	billboard.r[3].m128_f32[2] = 0.0f;
+	cb_effect.data.y_billboard = XMMatrixTranspose(billboard);
+
+	DX11APP->GetDeviceContext()->UpdateSubresource(cb_effect.buffer.Get(), 0, nullptr, &cb_effect.data, 0, 0);
+	DX11APP->GetDeviceContext()->GSSetConstantBuffers(0, 1, cb_effect.buffer.GetAddressOf());
 }
 
 bool SequenceCameraActor::PlaySequence(float time)
