@@ -32,9 +32,10 @@ public:
 	float track_length = 0;
 	float lerp_value = 0;
 
-	SequenceCutInfo start_cut_;
 
 	XMVECTOR world_pos_;
+	float yaw;
+	float pitch;
 	XMVECTOR rotation_;
 
 private:

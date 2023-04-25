@@ -26,7 +26,7 @@ void SequenceCameraActor::OnInit(entt::registry& registry)
 
 void SequenceCameraActor::OnUpdate()
 {
-	PlaySequence(60);
+	PlaySequence(30);
 	
 	world_matrix_ = XMMatrixAffineTransformation(XMVectorReplicate(1.0f), XMVectorZero(), rotation_, world_pos_);
 	view_matrix_ = XMMatrixInverse(0, world_matrix_);
@@ -50,19 +50,27 @@ bool SequenceCameraActor::PlaySequence(float time)
 	if (sequence_time > time)
 		return false;
 
-	sequence_time += TM_DELTATIME;
-	lerp_value = sequence_time / time;
 
-	float move_length = track_length * lerp_value;
-	for (const auto& track : sequence_tracks_)
+	float speed = 10;
+	auto track = sequence_tracks_[current_track_];
+	static float move_legnth = 0.0f;
+	
+	XMVECTOR movement = track.move_vector * speed * TM_DELTATIME;
+	world_pos_ += movement;
+	float current_pitch = pitch + track.rotate_pitch * lerp_value;
+	float current_yaw = yaw + track.rotate_yaw * lerp_value;
+	rotation_ = XMQuaternionRotationRollPitchYaw(current_pitch, current_yaw, 0);
+
+	move_legnth += Vector3Length(movement);
+	if (move_legnth > track.length)
 	{
-		world_pos_ = start_cut_.world_pos + track.move_vector * min(track.length, move_length);
-		move_length = max(0, move_length - track.length);
-
-		float pitch = start_cut_.camera_pitch + track.rotate_pitch * lerp_value;
-		float yaw = start_cut_.camera_yaw + track.rotate_yaw * lerp_value;
-		rotation_ = XMQuaternionRotationRollPitchYaw(pitch, yaw, 0);
+		current_track_++;
+		pitch = current_pitch;
+		yaw = current_yaw;
+		move_legnth = 0;
 	}
+
+	lerp_value = move_legnth / track.length;
 
 	return true;
 }
@@ -90,5 +98,7 @@ void SequenceCameraActor::ImportSequenceTrack(string mapdat_file)
 		track_length += track.length;
 	}
 
-	start_cut_ = start_cut;
+	world_pos_ = start_cut.world_pos;
+	pitch = start_cut.camera_pitch;
+	yaw = start_cut.camera_yaw;
 }
