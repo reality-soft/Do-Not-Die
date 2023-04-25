@@ -28,6 +28,7 @@ private:
 	StaticMeshLevel level;
 	entt::entity sequence_camera_;
 	SequenceCameraActor* sequence_camera_actor = nullptr;
+	GuideLine fire_effects_;
 
 	reality::LightingSystem sys_light;
 	reality::EffectSystem   sys_effect;
