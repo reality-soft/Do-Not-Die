@@ -69,10 +69,10 @@ void GS(
 		//float4 view = mul(bill, g_view);
 		//float4 proj = mul(view, g_proj);
 		vertex.p = proj;
-
 		vertex.c = input[0].c * g_color;
 		vertex.t = g_texcoords[i];
 		vertex.uv = g_uvtexcoords[i];
+		vertex.world_pos = world;
 
 		output.Append(vertex);
 	}

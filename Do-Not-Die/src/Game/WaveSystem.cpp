@@ -13,7 +13,7 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 	repair_spawns_ = QUADTREE->GetGuideLines("DND_RepairPart_1")->at(0);
 	car_event_ = QUADTREE->GetGuideLines("DND_CarEvent_1")->at(0);
 	zomebie_tracks_ = QUADTREE->GetGuideLines("DND_NpcTrack_1");
-	fx_car_fire_ = QUADTREE->GetGuideLines("DND_FX_CarFire_1")->at(0);
+	//fx_car_fire_ = QUADTREE->GetGuideLines("DND_FX_CarFire_1")->at(0);
 	fx_corpse_fire_ = QUADTREE->GetGuideLines("DND_FX_CorpseFire_1")->at(0);
 
 	CreateExtractPoints(reg);
@@ -23,10 +23,6 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 
 void reality::WaveSystem::OnUpdate(entt::registry& reg)
 {
-	//static int i = 1;
-	//if (i)
-	//	RandomSpawnItem(30.0f); i = 0;
-
 	float counting_time = world_env_->GetCountingTime();
 	if (world_env_->IsDayChanged())
 	{
@@ -49,7 +45,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	PlayerRepairCar();
 	SpawnZombies(3.0f, 1);
 
-	if (car_repaired >= 5)
+	if (wave_count_ > 5)
 	{
 		EVENT->PushEvent<GameOverEvent>();
 	}
@@ -107,12 +103,12 @@ void reality::WaveSystem::CreateCarEventTriggers(XMFLOAT3 point, float repair_ra
 void reality::WaveSystem::CreateStaticEffects()
 {
 	srand(time(NULL));
-	for (const auto& node : fx_car_fire_.line_nodes)
-	{
-		float random_scale = (float)(rand() % 5 + 5);
-		entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Flame>(INGAME, node.second, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
-		car_fires_.insert(ent);
-	}
+	//for (const auto& node : fx_car_fire_.line_nodes)
+	//{
+	//	float random_scale = (float)(rand() % 5 + 5);
+	//	entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Flame>(INGAME, node.second, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
+	//	car_fires_.insert(ent);
+	//}
 	for (const auto& node : fx_corpse_fire_.line_nodes)
 	{
 		int random_scale = rand() % 5 + 5;
@@ -123,18 +119,7 @@ void reality::WaveSystem::CreateStaticEffects()
 
 void reality::WaveSystem::CreateExtractPoints(entt::registry& reg)
 {
-	srand(time(NULL));
-	UINT repair_part_count = 5;
-	set<UINT> random_indices;
-	for (int i = 0; i < repair_part_count; ++i)
-	{
-		UINT index = rand() % repair_spawns_.line_nodes.size();
 
-		if (random_indices.find(index) == random_indices.end())
-			random_indices.insert(index);
-		else
-			i -= 1;
-	} 
 
 	for (const auto& node : repair_spawns_.line_nodes)
 	{
@@ -146,10 +131,6 @@ void reality::WaveSystem::CreateExtractPoints(entt::registry& reg)
 
 		entt::entity trigger_entity = reg.create();
 		reg.emplace<C_TriggerVolume>(trigger_entity, trigger);
-
-		
-		if (random_indices.find(node.first) != random_indices.end())
-			repair_parts.insert(trigger_entity);
 	}
 }
 
@@ -180,24 +161,14 @@ void reality::WaveSystem::PlayerExtractRepair()
 
 	if (player->extract_during_time_ >= player->extract_time_takes_)
 	{
-		if (repair_parts.find(player->repair_extract_trigger) != repair_parts.end())
-		{
-			repair_parts.erase(player->repair_extract_trigger);
+		auto trigger_comp = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_TriggerVolume>(player->repair_extract_trigger);
+		if (trigger_comp == nullptr)
+			return;
 
-			auto trigger_comp = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_TriggerVolume>(player->repair_extract_trigger);
-			if (trigger_comp == nullptr)
-				return;
+		SpawnRepairItem(trigger_comp->sphere_volume.center);
 
-			SpawnRepairItem(trigger_comp->sphere_volume.center);
+		EVENT->PushEvent<MakeTextEvent>("Extract Success!");
 
-			EVENT->PushEvent<MakeTextEvent>("Extract Success!");
-		}
-		else
-		{
-			// extract complete but there was no repair item
-			EVENT->PushEvent<MakeTextEvent>("Extract Failed!");
-
-		}
 		DeleteExtractPoint(player->repair_extract_trigger);
 		player->extract_during_time_ = 0.0f;
 		player->can_extract_repair_ = false;
@@ -237,7 +208,7 @@ void reality::WaveSystem::PlayerRepairCar()
 	{
 		player->controller_enable_ = true;
 		player->UseRepairPart();
-		car_repaired += 1;
+		car_health = min(100, car_health + 20);
 		player->repair_during_time_ = 0.0f;
 		EVENT->PushEvent<MakeTextEvent>("Repair Success!");
 	}

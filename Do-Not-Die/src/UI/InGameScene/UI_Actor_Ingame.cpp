@@ -184,7 +184,7 @@ void UI_Actor_Ingame::CreateIngameUI()
 	addicted_ui_ = make_shared<UI_Image>();
 	addicted_ui_->InitImage("T_Addicted.png");
 	addicted_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
-	ui_comp_->ui_list.insert({ "Addicted UI", addicted_ui_ });
+	//ui_comp_->ui_list.insert({ "Addicted UI", addicted_ui_ });
 
 	// Event Message UI
 	event_msg_text_ = make_shared<UI_Text>();
@@ -256,12 +256,12 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	kill_text_->SetText(to_string(kill));
 
 	// Vehicle Item Update
-	string repair_str = "Repair Count : ";
+	string car_health_str = "Car Health : ";
 	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 	auto wave_sys = ingame_scene->GetWaveSystem();
-	string repair_count = to_string(wave_sys.car_repaired);
-	string repair_max_count = " / 5";
-	repair_text_->SetText(repair_str + repair_count + repair_max_count);
+	car_health_str += to_string(wave_sys.car_health);
+	car_health_str += " / 100";
+	repair_text_->SetText(car_health_str);
 
 	// Cross Hair Update
 	if (ui_comp_->ui_list.find("CrossHair UI") != ui_comp_->ui_list.end())
@@ -447,7 +447,7 @@ void UI_Actor_Ingame::UpdateMenuUI()
 	if (menu_option_window_->resolution_value != menu_option_window_->option_resolution_list_box_->GetCurrentItem())
 	{
 		menu_option_window_->resolution_value = menu_option_window_->option_resolution_list_box_->GetCurrentItem();
-		ENGINE->Resize((E_Resolution)menu_option_window_->option_resolution_list_box_->GetCurrentIndex());
+		ENGINE->Resize((E_Resolution)(menu_option_window_->option_resolution_list_box_->GetCurrentIndex() + 1));
 		CloseOptionWindow();
 	}
 }

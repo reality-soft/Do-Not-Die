@@ -11,8 +11,8 @@ namespace reality
 		virtual void OnUpdate();
 	private:
 		C_UI* ui_comp_;
-	private:
-		shared_ptr<UI_Image>	background_;
+	private: 
+		shared_ptr<UI_Image>	title_img_;
 		shared_ptr<UI_Button>	newgame_button_;
 		shared_ptr<UI_Button>	loadinggame_button;
 		shared_ptr<UI_Button>	option_button_;
@@ -25,8 +25,6 @@ namespace reality
 	private:
 		void OpenOptionWindow();
 		void CloseOptionWindow();
-	private:
-		void LoadingIngameScene();
 	};
 
 }

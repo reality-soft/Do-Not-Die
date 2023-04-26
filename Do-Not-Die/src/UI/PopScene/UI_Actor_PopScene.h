@@ -3,7 +3,7 @@
 
 namespace reality
 {
-	class UI_Actor_LoadingScene : public UIActor
+	class UI_Actor_PopScene : public UIActor
 	{
 	public:
 		virtual void OnInit(entt::registry& registry);
@@ -11,8 +11,9 @@ namespace reality
 	private:
 		shared_ptr<UI_Image>	background_;
 	public:
-		shared_ptr<UI_Image>	progress_bar_;
-		shared_ptr<UI_Image>	progress_bar_back_;
+		shared_ptr<UI_Text>		progress_text_;
+		shared_ptr<UI_Button>	start_button_;
+		shared_ptr<UI_Button>	exit_button_;
 	private:
 		void CreateUI();
 		void UpdateUI();

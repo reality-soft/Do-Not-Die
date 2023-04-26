@@ -59,13 +59,62 @@ void Player::OnInit(entt::registry& registry)
 	socket_component.AddSocket("RightHand", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 	registry.emplace<C_Socket>(entity_id_, socket_component);
 
+#define AXE
+
+#ifdef PISTOL
 	C_StaticMesh static_mesh_component;
-	static_mesh_component.local = XMMatrixScalingFromVector({ 1.4f, 1.4f, 1.4f, 1.0f });
+	static_mesh_component.local = TransformR(XMFLOAT3(0, 180, 0));
 	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
-	static_mesh_component.static_mesh_id = "SK_Handgun_01.stmesh";
+	static_mesh_component.static_mesh_id = "WEP_Pistol.stmesh";
 	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
 	static_mesh_component.socket_name = "RightHand";
 	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
+#endif
+
+#ifdef RIFLE
+	C_StaticMesh static_mesh_component;
+	
+	static_mesh_component.local = TransformR(XMFLOAT3(-10, 170, 0)) * TransformT(XMFLOAT3(5, 0, -10));
+	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
+	static_mesh_component.static_mesh_id = "WEP_Rifle.stmesh";
+	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
+	static_mesh_component.socket_name = "RightHand";
+	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
+#endif
+
+#ifdef AK47
+	C_StaticMesh static_mesh_component;
+
+	static_mesh_component.local = TransformR(XMFLOAT3(-10, 170, 0)) * TransformT(XMFLOAT3(5, 0, 5));
+	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
+	static_mesh_component.static_mesh_id = "WEP_AK47.stmesh";
+	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
+	static_mesh_component.socket_name = "RightHand";
+	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
+#endif
+
+#ifdef AXE
+	C_StaticMesh static_mesh_component;
+	static_mesh_component.local = TransformR(XMFLOAT3(0, 180, 0));
+	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
+	static_mesh_component.static_mesh_id = "WEP_Axe.stmesh";
+	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
+	static_mesh_component.socket_name = "RightHand";
+	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
+#endif
+
+#ifdef CROSSBAR
+	C_StaticMesh static_mesh_component;
+	static_mesh_component.local = TransformR(XMFLOAT3(0, 180, 0));
+	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
+	static_mesh_component.static_mesh_id = "WEP_Crossbar.stmesh";
+	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
+	static_mesh_component.socket_name = "RightHand";
+	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
+#endif
+
+
+
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_CapsuleCollision));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SkeletalMesh));

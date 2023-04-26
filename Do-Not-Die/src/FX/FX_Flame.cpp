@@ -10,7 +10,7 @@ void FX_Flame::OnInit(entt::registry& registry)
 {
 	FX_BaseEffectActor::OnInit(registry);
 
-	AddEffectComponent("flame_effect", -1.0f);
+	AddEffectComponent("flame_effect_edited", -1.0f);
 
 	AddPointLightComponent("PL_Flame", -1.0f);
 
