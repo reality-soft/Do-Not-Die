@@ -45,7 +45,7 @@ public:
 		});
 		transitions_.insert({ MOVE, Transition(HIT,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
-				if (enemy->is_hit_ && enemy->GetCurHp() >= 0.) {
+				if (enemy->is_hit_ && enemy->GetCurHp() > 0.0f) {
 					return true;
 				}
 				else {
@@ -63,9 +63,19 @@ public:
 				}
 			})
 		});
+		transitions_.insert({ HIT, Transition(HIT,[this](const AnimationStateMachine* animation_state_machine) {
+				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				if (enemy->is_hit_ == true && enemy->GetCurHp() > 0.0f) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+		});
 		transitions_.insert({ HIT, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
-				if (IsAnimationEnded() && enemy->GetCurHp() >= 0 && enemy->IsMoving() == false) {
+				if (IsAnimationEnded() && enemy->GetCurHp() > 0.0f && enemy->IsMoving() == false) {
 					return true;
 				}
 				else {
@@ -75,7 +85,18 @@ public:
 		});
 		transitions_.insert({ HIT, Transition(MOVE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
-				if (IsAnimationEnded() && enemy->GetCurHp() >= 0 && enemy->IsMoving() == true) {
+				if (IsAnimationEnded() && enemy->GetCurHp() > 0 && enemy->IsMoving() == true) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+		});
+
+		transitions_.insert({ HIT, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
+				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				if (enemy->GetCurHp() <= 0.0f) {
 					return true;
 				}
 				else {
@@ -85,7 +106,7 @@ public:
 		});
 		transitions_.insert({ MOVE, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
-				if (enemy->is_hit_ == true && enemy->GetCurHp() <= 0) {
+				if (enemy->GetCurHp() <= 0.0f) {
 					return true;
 				}
 				else {
@@ -95,7 +116,7 @@ public:
 		});
 		transitions_.insert({ IDLE, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
-				if (enemy->is_hit_ == true && enemy->GetCurHp() <= 0) {
+				if (enemy->GetCurHp() <= 0.0f) {
 					return true;
 				}
 				else {
@@ -193,10 +214,10 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			animation_state_machine->SetAnimation("Zombie_Atk_KnockBack_1_IPC_Anim_Unreal Take.anim", 0.8f);
+			SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId())->is_hit_ = false;
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId())->is_hit_ = false;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
