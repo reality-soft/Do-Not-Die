@@ -18,7 +18,6 @@ public:
 		target_pos.m128_f32[1] = 0.0f;
 		cur_pos.m128_f32[1] = 0.0f;
 		cur_pos.m128_f32[3] = 0.0f;
-		float distance = XMVector3Length(target_pos - cur_pos).m128_f32[0];
 		XMVECTOR direction_vector = XMVector3Normalize(target_pos - cur_pos);
 		enemy->SetMovement(direction_vector);
 
@@ -44,11 +43,21 @@ public:
 
 	virtual reality::BehaviorStatus Action() override
 	{
-		Enemy* owner = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
-		XMVECTOR prev_target_position = target_position_;
-		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
-		target_position_ = player->GetCurPosition();
+		static float search_time = 0.0f;
+		search_time += TM_DELTATIME;
 
+		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
+
+		if (status_ == BehaviorStatus::IDLE) {
+			target_position_ = player->GetCurPosition();
+			search_time = 0.0f;
+		}
+		if (search_time >= 1.5f) {
+			target_position_ = player->GetCurPosition();
+			search_time = 0.0f;
+		}
+
+		Enemy* owner = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
 		if (owner->player_in_sight_ == false || player->player_in_defense_ == false) {
 			return reality::BehaviorStatus::FAILURE;
 		}

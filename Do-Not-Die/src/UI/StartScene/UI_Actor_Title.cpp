@@ -30,7 +30,7 @@ void UI_Actor_Title::CreateUI()
 	title_img_ = make_shared<UI_Image>();
 	title_img_->InitImage("T_GameTitle.png");
 	title_img_->SetLocalRectByMin({ win_size_1920_width * 2.0f / 4.0f - 100.0f, win_size_1920_height * 1.0f / 5.0f }, 1000.0f, 300.0f);
-	ui_comp_->ui_list.insert({ "Title Image", title_img_ });
+	ui_comp_->ui_list.insert({ "1_Title Image", title_img_ });
 
 	// Background UI
 	background_img_ = make_shared<UI_Image>();
@@ -44,25 +44,25 @@ void UI_Actor_Title::CreateUI()
 	newgame_button_ = make_shared<UI_Button>();
 	newgame_button_->InitButton("T_Button_NewGame_Normal.png", "T_Button_NewGame_Hover.png", "T_Button_NewGame_Pushed.png");
 	newgame_button_->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f }, 200.0f, 70.0f);
-	ui_comp_->ui_list.insert({ "New Game Button", newgame_button_ });
+	ui_comp_->ui_list.insert({ "1_New Game Button", newgame_button_ });
 
 	// Load Game Button
 	loadinggame_button = make_shared<UI_Button>();
 	loadinggame_button->InitButton("T_Button_LoadGame_Normal.png", "T_Button_LoadGame_Hover.png", "T_Button_LoadGame_Pushed.png");
 	loadinggame_button->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f + 70.0f * 1.0f }, 200.0f, 70.0f);
-	ui_comp_->ui_list.insert({ "Load Game Button", loadinggame_button });
+	ui_comp_->ui_list.insert({ "1_Load Game Button", loadinggame_button });
 
 	// Option Button
 	option_button_ = make_shared<UI_Button>();
 	option_button_->InitButton("T_Button_Option_Normal.png", "T_Button_Option_Hover.png", "T_Button_Option_Pushed.png");
 	option_button_->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f + 70.0f * 2.0f }, 200.0f, 70.0f);
-	ui_comp_->ui_list.insert({ "Option Button", option_button_ });
+	ui_comp_->ui_list.insert({ "1_Option Button", option_button_ });
 
 	// Exit Button
 	exit_button_ = make_shared<UI_Button>();
 	exit_button_->InitButton("T_Button_Exit_Normal.png", "T_Button_Exit_Hover.png", "T_Button_Exit_Pushed.png");
 	exit_button_->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f + 70.0f * 3.0f }, 200.0f, 70.0f);
-	ui_comp_->ui_list.insert({ "Exit Button", exit_button_ });
+	ui_comp_->ui_list.insert({ "1_Exit Button", exit_button_ });
 
 	// Option Window
 	option_window_ = make_shared<UI_OptionWindow>();
@@ -151,7 +151,7 @@ void UI_Actor_Title::UpdateUI()
 		OpenOptionWindow();
 
 	// If Option Window Opened
-	if (ui_comp_->ui_list.find("Option Window") != ui_comp_->ui_list.end())
+	if (ui_comp_->ui_list.find("2_Option Window") != ui_comp_->ui_list.end())
 	{
 		if (option_window_->GetCloseButtonState() == E_UIState::UI_SELECT || DINPUT->GetKeyState(DIK_ESCAPE) == KEY_PUSH)
 			CloseOptionWindow();
@@ -174,7 +174,7 @@ void UI_Actor_Title::OpenOptionWindow()
 
 	option_button_->SetCurrentState(E_UIState::UI_NORMAL);
 
-	ui_comp_->ui_list.insert({ "Option Window", option_window_ });
+	ui_comp_->ui_list.insert({ "2_Option Window", option_window_ });
 }
 
 void UI_Actor_Title::CloseOptionWindow()
@@ -186,5 +186,5 @@ void UI_Actor_Title::CloseOptionWindow()
 
 	option_window_->SetCloseButtonState(E_UIState::UI_NORMAL);
 
-	ui_comp_->ui_list.erase("Option Window");
+	ui_comp_->ui_list.erase("2_Option Window");
 }
