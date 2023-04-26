@@ -11,7 +11,8 @@ public:
 		IDLE,
 		MOVE,
 		HIT,
-		DIE
+		DIE,
+		ATTACK
 	};
 
 	ZombieAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
@@ -21,6 +22,7 @@ public:
 		states_.insert({ MOVE, make_shared<Move>() });
 		states_.insert({ HIT, make_shared<Hit>() });
 		states_.insert({ DIE, make_shared<Die>() });
+		states_.insert({ ATTACK, make_shared<Attack>() });
 		transitions_.insert({ IDLE, Transition(MOVE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 				if (enemy->IsMoving()) {
@@ -30,7 +32,7 @@ public:
 					return false;
 				}
 			})
-			});
+		});
 		transitions_.insert({ MOVE, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 				if (enemy->IsMoving() == false) {
@@ -40,7 +42,7 @@ public:
 					return false;
 				}
 			})
-			});
+		});
 		transitions_.insert({ MOVE, Transition(HIT,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 				if (enemy->is_hit_ && enemy->GetCurHp() >= 0.) {
@@ -50,7 +52,7 @@ public:
 					return false;
 				}
 			})
-			});
+		});
 		transitions_.insert({ IDLE, Transition(HIT,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 				if (enemy->is_hit_) {
@@ -60,7 +62,7 @@ public:
 					return false;
 				}
 			})
-			});
+		});
 		transitions_.insert({ HIT, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 				if (IsAnimationEnded() && enemy->GetCurHp() >= 0 && enemy->IsMoving() == false) {
@@ -70,7 +72,7 @@ public:
 					return false;
 				}
 			})
-			});
+		});
 		transitions_.insert({ HIT, Transition(MOVE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 				if (IsAnimationEnded() && enemy->GetCurHp() >= 0 && enemy->IsMoving() == true) {
@@ -80,7 +82,7 @@ public:
 					return false;
 				}
 			})
-			});
+		});
 		transitions_.insert({ MOVE, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 				if (enemy->is_hit_ == true && enemy->GetCurHp() <= 0) {
@@ -90,7 +92,7 @@ public:
 					return false;
 				}
 			})
-			});
+		});
 		transitions_.insert({ IDLE, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 				if (enemy->is_hit_ == true && enemy->GetCurHp() <= 0) {
@@ -100,10 +102,42 @@ public:
 					return false;
 				}
 			})
-			});
+		});
 
 		transitions_.insert({ DIE, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				if (enemy->is_attacking_ == true) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+		});
+
+		transitions_.insert({ IDLE, Transition(ATTACK,[this](const AnimationStateMachine* animation_state_machine) {
+				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				if (enemy->is_attacking_ == true) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+		});
+
+		transitions_.insert({ MOVE, Transition(ATTACK,[this](const AnimationStateMachine* animation_state_machine) {
+				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				if (enemy->is_attacking_ == true) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+		});
+
+		transitions_.insert({ ATTACK, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 				if (IsAnimationEnded() == true) {
 					return true;
 				}
@@ -111,7 +145,7 @@ public:
 					return false;
 				}
 			})
-			});
+		});
 
 		cur_state_ = states_[IDLE];
 	}
@@ -183,6 +217,27 @@ public:
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 			EVENT->PushEvent<DeleteActorEvent>(animation_state_machine->GetOwnerId());
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+			Enemy* enemy = SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId());
+			enemy->CancelMovement();
+		}
+	};
+
+	class Attack : public AnimationState {
+	public:
+		Attack() : AnimationState(ATTACK) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			animation_state_machine->SetAnimation("Zombie_Atk_Arms_3_SHORT_Loop_IPC_Retargeted_Unreal Take.anim", 0.5f);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+			Enemy* enemy = SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId());
+			enemy->is_attack_ended = true;
+			enemy->is_attacking_ = false;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{

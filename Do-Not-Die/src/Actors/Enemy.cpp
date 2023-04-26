@@ -122,7 +122,6 @@ void Enemy::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 {
 	SetPos(target_poses[0] + XMVECTOR{ 0, 50.0f, 0, 0 });
 
-
 	// setting behavior tree
 
 	// in combat zone

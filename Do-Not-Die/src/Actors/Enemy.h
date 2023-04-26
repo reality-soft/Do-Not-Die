@@ -37,7 +37,7 @@ public:
 	bool is_hit_ = false;
 	bool in_defense_bound_ = false;
 	bool player_in_sight_ = true;
-	bool is_attacking_ = true;
+	bool is_attacking_ = false;
 	bool is_attack_ended = false;
 
 private:
