@@ -16,8 +16,14 @@ namespace reality
 	private:
 		C_UI* ui_comp_;
 	private:
-		shared_ptr<UI_Image>	weapon_ui_;
-			shared_ptr<UI_Text>		ammo_text_;
+		shared_ptr<UI_Image>	ar_ui_;
+			shared_ptr<UI_Text>		ar_ammo_text_;
+		shared_ptr<UI_Image>	handgun_ui_;
+			shared_ptr<UI_Text>		handgun_ammo_text_;
+		shared_ptr<UI_Image>	meele_ui_;
+		shared_ptr<UI_Image>	grenade_ui_;
+			shared_ptr<UI_Text>		grenade_ammo_text_;
+		shared_ptr<UI_Image>	weapon_select_ui_;
 
 		shared_ptr<UI_Minimap>	minimap_ui;
 
