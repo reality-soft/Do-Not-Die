@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#include "UI_Actor_StartScene.h"
+#include "UI_Actor_Title.h"
 #include "SceneMgr.h"
 #include "InGameScene.h"
 
 using namespace reality;
 
-void UI_Actor_StartScene::OnInit(entt::registry& registry)
+void UI_Actor_Title::OnInit(entt::registry& registry)
 {
 	UIActor::OnInit(registry);
 
@@ -13,12 +13,12 @@ void UI_Actor_StartScene::OnInit(entt::registry& registry)
 
 }
 
-void UI_Actor_StartScene::OnUpdate()
+void UI_Actor_Title::OnUpdate()
 {
 	UpdateUI();
 }
 
-void UI_Actor_StartScene::CreateUI()
+void UI_Actor_Title::CreateUI()
 {
 	ui_comp_ = &reg_scene_->get<C_UI>(GetEntityId());
 
@@ -73,7 +73,7 @@ void UI_Actor_StartScene::CreateUI()
 	exit_button_->Off();
 }
 
-void UI_Actor_StartScene::UpdateUI()
+void UI_Actor_Title::UpdateUI()
 {
 	static float timer = 0.0f;
 	static float alpha = 0.0f;
@@ -81,7 +81,7 @@ void UI_Actor_StartScene::UpdateUI()
 
 	timer += TIMER->GetDeltaTime();
 
-	if (8.0f < timer && alpha < 1.0f)
+	if (12.0f < timer && alpha < 1.0f)
 	{
 		timer += TIMER->GetDeltaTime();
 		alpha += speed * TIMER->GetDeltaTime();
@@ -135,7 +135,7 @@ void UI_Actor_StartScene::UpdateUI()
 	}
 }
 
-void UI_Actor_StartScene::OpenOptionWindow()
+void UI_Actor_Title::OpenOptionWindow()
 {
 	newgame_button_->Off();
 	loadinggame_button->Off();
@@ -147,7 +147,7 @@ void UI_Actor_StartScene::OpenOptionWindow()
 	ui_comp_->ui_list.insert({ "Option Window", option_window_ });
 }
 
-void UI_Actor_StartScene::CloseOptionWindow()
+void UI_Actor_Title::CloseOptionWindow()
 {
 	newgame_button_->On();
 	loadinggame_button->On();

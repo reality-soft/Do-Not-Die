@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine_Include.h"
-#include "UI_Actor_StartScene.h"
+#include "UI_Actor_Title.h"
+#include "UI_Actor_Intro.h"
 #include "SequenceCameraActor.h"
 using namespace reality;
 
@@ -35,9 +36,9 @@ private:
 	reality::RenderSystem	sys_render;
 	reality::SoundSystem	sys_sound;
 	reality::UISystem		sys_ui;
-
 private:
-	UI_Actor_StartScene start_scene_ui; 
+	UI_Actor_Intro intro_scene_ui;
+	UI_Actor_Title start_scene_ui; 
 private:
 	E_StartLoading loading_progress = START_START;
 public:
