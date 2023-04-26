@@ -54,7 +54,15 @@ void StartScene::OnUpdate()
 	if (scene_finished)
 		FinishProgress();
 	else
-		sys_sound.PlayBackground("MichaelFK-Empyrean.mp3", true, 3.0f, 3.0f);
+	{
+		sys_sound.PlayBackground("MichaelFK_Empyrean_cut.wav", true, 10.0f, 1.0f);
+		//sys_sound.PlayBackground("TonyAnderson_Nuit_cut.wav", true, 10.0f, 1.0f);
+		//sys_sound.PlayBackground("NathanWhitehead_DaysGone_cut.wav", true, 10.0f, 1.0f);
+		//sys_sound.PlayBackground("ZackHemsey_TheWay_cut.wav", true, 10.0f, 1.0f);
+		//sys_sound.PlayBackground("Saw_HelloZepp_cut.wav", true, 10.0f, 1.0f);
+		//sys_sound.PlayBackground("FarCry5_OhJohn_cut.wav", true, 10.0f, 1.0f);
+		
+	}
 
 	intro_scene_ui.OnUpdate();
 	start_scene_ui.OnUpdate();
