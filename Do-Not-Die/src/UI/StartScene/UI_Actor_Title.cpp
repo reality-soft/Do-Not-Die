@@ -2,6 +2,7 @@
 #include "UI_Actor_Title.h"
 #include "SceneMgr.h"
 #include "InGameScene.h"
+#include "StartScene.h"
 
 using namespace reality;
 
@@ -30,6 +31,12 @@ void UI_Actor_Title::CreateUI()
 	title_img_->InitImage("T_GameTitle.png");
 	title_img_->SetLocalRectByMin({ win_size_1920_width * 2.0f / 4.0f - 100.0f, win_size_1920_height * 1.0f / 5.0f }, 1000.0f, 300.0f);
 	ui_comp_->ui_list.insert({ "1_Title Image", title_img_ });
+
+	// Background UI
+	background_img_ = make_shared<UI_Image>();
+	background_img_->InitImage("T_Intro_Background.png");
+	background_img_->SetLocalRectByMin({ 0, 0 }, win_size_1920_width, win_size_1920_height);
+	ui_comp_->ui_list.insert({ "Background Image", background_img_ });
 
 	float button_x = title_img_->rect_transform_[R1920x1080].world_rect.center.x;
 
@@ -62,6 +69,7 @@ void UI_Actor_Title::CreateUI()
 	option_window_->InitOptionWindow();
 
 	title_img_->SetAlpha(0.0f);
+	background_img_->SetAlpha(0.0f);
 	newgame_button_->SetAlpha(0.0f);
 	loadinggame_button->SetAlpha(0.0f);
 	option_button_->SetAlpha(0.0f);
@@ -73,45 +81,63 @@ void UI_Actor_Title::CreateUI()
 	exit_button_->Off();
 }
 
-void UI_Actor_Title::UpdateUI()
+void reality::UI_Actor_Title::FadeInUI()
 {
 	static float timer = 0.0f;
 	static float alpha = 0.0f;
-	static float speed = 0.3f;
 
-	timer += TIMER->GetDeltaTime();
-
-	if (12.0f < timer && alpha < 1.0f)
+	if (alpha >= 1.0f)
 	{
-		timer += TIMER->GetDeltaTime();
-		alpha += speed * TIMER->GetDeltaTime();
-		title_img_->SetAlpha(alpha);
-		newgame_button_->SetAlpha(alpha);
-		loadinggame_button->SetAlpha(alpha);
-		option_button_->SetAlpha(alpha);
-		exit_button_->SetAlpha(alpha);
-	}
-
-	static bool exe_once = false;
-
-	if (alpha > 1.0f && !exe_once)
-	{
-		title_img_->SetAlpha(1.0f);
-		newgame_button_->SetAlpha(1.0f);
-		loadinggame_button->SetAlpha(1.0f);
-		option_button_->SetAlpha(1.0f);
-		exit_button_->SetAlpha(1.0f);
 		newgame_button_->On();
 		loadinggame_button->On();
 		option_button_->On();
 		exit_button_->On();
-		exe_once = true;
+		return;
 	}
+
+	timer += TM_DELTATIME;
+	alpha = FadeInAlpha(15.0f, 18.0f, timer);
+	
+	title_img_->SetAlpha(alpha);
+	newgame_button_->SetAlpha(alpha);
+	loadinggame_button->SetAlpha(alpha);
+	option_button_->SetAlpha(alpha);
+	exit_button_->SetAlpha(alpha);
+}
+
+void reality::UI_Actor_Title::DisappearUI()
+{
+	static float timer = 0.0f;
+	static float alpha = 1.0f;
+
+	timer += TM_DELTATIME;
+	alpha = FadeOutAlpha(0.0f, 3.0f, timer);
+
+	background_img_->SetAlpha(1.0f - alpha);
+	title_img_->SetAlpha(alpha);
+	newgame_button_->SetAlpha(alpha);
+	loadinggame_button->SetAlpha(alpha);
+	option_button_->SetAlpha(alpha);
+	exit_button_->SetAlpha(alpha);
+
+	newgame_button_->Off();
+	loadinggame_button->Off();
+	option_button_->Off();
+	exit_button_->Off();
+}
+
+
+void UI_Actor_Title::UpdateUI()
+{
+	FadeInUI();
+
 
 	// When NewGame Button Selected
 	if (newgame_button_->GetCurrentState() == E_UIState::UI_SELECT)
 	{
-		SCENE_MGR->ChangeScene(E_SceneType::INGAME);
+		StartScene* start_scene = (StartScene*)(SCENE_MGR->GetScene(START).get());
+		if (start_scene != nullptr)
+			start_scene->scene_finished = true;
 	}
 
 	// When exit Button Selected

@@ -51,6 +51,11 @@ void StartScene::OnInit()
 
 void StartScene::OnUpdate()
 {
+	if (scene_finished)
+		FinishProgress();
+	else
+		sys_sound.PlayBackground("MichaelFK-Empyrean.mp3", true, 3.0f, 3.0f);
+
 	intro_scene_ui.OnUpdate();
 	start_scene_ui.OnUpdate();
 
@@ -78,5 +83,13 @@ void StartScene::OnRender()
 
 void StartScene::OnRelease()
 {
+}
 
+void StartScene::FinishProgress()
+{
+	bool sound_finished = sys_sound.FadeOutDelete(3.0f);
+	start_scene_ui.DisappearUI();
+
+	if (sound_finished)
+		SCENE_MGR->ChangeScene(E_SceneType::INGAME);
 }

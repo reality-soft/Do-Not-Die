@@ -11,7 +11,6 @@ namespace reality
 	private:
 		void CreateUI();
 		bool UpdateUI();
-		float FadeAlpha(float fade_in, float fade_out, float cur_time, float total_time);
 
 	private:
 		float intro_time_ = 8.0f;

@@ -24,6 +24,8 @@ public:
 	virtual void OnRender();
 	virtual void OnRelease();
 
+	bool scene_finished = false;
+	void FinishProgress();
 private:
 	Environment environment_;
 	StaticMeshLevel level;
