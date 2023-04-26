@@ -86,9 +86,9 @@ void reality::TriggerEvent::PlayerProcess()
 
 	case TriggerType::CAR_DEFENSE:
 		if (is_begin_)
-			PlayerCanRepair(true);
+			PlayerDefense(true);
 		else
-			PlayerCanRepair(false);
+			PlayerDefense(false);
 		break;
 	}
 }
