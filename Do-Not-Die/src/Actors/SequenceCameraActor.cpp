@@ -38,10 +38,7 @@ void SequenceCameraActor::OnInit(entt::registry& registry)
 
 void SequenceCameraActor::OnUpdate()
 {
-	PlaySequence(30);
-	
-	world_matrix_ = XMMatrixAffineTransformation(XMVectorReplicate(1.0f), XMVectorZero(), rotation_, world_pos_);
-	view_matrix_ = XMMatrixInverse(0, world_matrix_);
+	PlaySequence();
 
 	cb_camera_info_.data.view_proj_matrix = XMMatrixTranspose(view_matrix_ * proj_matrix_);
 	cb_camera_info_.data.camera_position = world_pos_;
@@ -89,28 +86,35 @@ void SequenceCameraActor::OnUpdate()
 	DX11APP->GetDeviceContext()->GSSetConstantBuffers(0, 1, cb_effect.buffer.GetAddressOf());
 }
 
-bool SequenceCameraActor::PlaySequence(float time)
+bool SequenceCameraActor::PlaySequence()
 {
 	if (current_track_ >= sequence_tracks_.size())
 		return false;
 
-	static float sequence_time = 0.0f;
-	if (sequence_time > time)
-		return false;
+	// Lerp Speed By Time
+	static float speed = 0.f;
+	static float time = 0.0f;
+	time += TM_DELTATIME;
+	float lerp_time = time / 20;
+	speed = 30 * pow(pow(2.71828182846, time), 2 * lerp_time) * 0.01f;
+	speed = min(30, speed);
 
 
-	float speed = 10;
 	auto track = sequence_tracks_[current_track_];
-	static float move_legnth = 0.0f;
 	
-	XMVECTOR movement = track.move_vector * speed * TM_DELTATIME;
+	XMVECTOR movement_vector = XMVector3Normalize(track.move_vector);
+	float track_length = Vector3Length(track.move_vector);
+
+	XMVECTOR movement = movement_vector * speed * TM_DELTATIME;
 	world_pos_ += movement;
-	float current_pitch = pitch + track.rotate_pitch * lerp_value;
-	float current_yaw = yaw + track.rotate_yaw * lerp_value;
+	float current_pitch = pitch + track.rotate_pitch_yaw.x * lerp_value;
+	float current_yaw = yaw + track.rotate_pitch_yaw.y * lerp_value;
 	rotation_ = XMQuaternionRotationRollPitchYaw(current_pitch, current_yaw, 0);
 
+	static float move_legnth = 0.0f;
 	move_legnth += Vector3Length(movement);
-	if (move_legnth > track.length)
+
+	if (move_legnth > track_length)
 	{
 		current_track_++;
 		pitch = current_pitch;
@@ -118,7 +122,18 @@ bool SequenceCameraActor::PlaySequence(float time)
 		move_legnth = 0;
 	}
 
-	lerp_value = move_legnth / track.length;
+	lerp_value = move_legnth / Vector3Length(track.move_vector);
+
+	switch (track.sequence_type)
+	{
+	case SequenceType::ViewSequence:
+		world_matrix_ = XMMatrixAffineTransformation(XMVectorReplicate(1.0f), XMVectorZero(), rotation_, world_pos_);
+		view_matrix_ = XMMatrixInverse(0, world_matrix_);
+		break;
+	case SequenceType::TargetSequence:
+		view_matrix_ = XMMatrixLookAtLH(world_pos_, track.sequence_target, XMVectorSet(0, 1, 0, 0));
+		world_matrix_ = XMMatrixInverse(0, view_matrix_);
+	}
 
 	return true;
 }
@@ -143,7 +158,7 @@ void SequenceCameraActor::ImportSequenceTrack(string mapdat_file)
 
 	for (const auto& track : sequence_tracks_)
 	{
-		track_length += track.length;
+		track_length += Vector3Length(track.move_vector);
 	}
 
 	world_pos_ = start_cut.world_pos;
