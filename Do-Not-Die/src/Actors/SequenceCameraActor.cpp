@@ -38,7 +38,8 @@ void SequenceCameraActor::OnInit(entt::registry& registry)
 
 void SequenceCameraActor::OnUpdate()
 {
-	PlaySequence();
+	if (playable)
+		PlaySequence();
 
 	cb_camera_info_.data.view_proj_matrix = XMMatrixTranspose(view_matrix_ * proj_matrix_);
 	cb_camera_info_.data.camera_position = world_pos_;

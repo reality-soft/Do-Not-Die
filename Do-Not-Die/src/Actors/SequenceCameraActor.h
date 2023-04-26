@@ -31,6 +31,7 @@ public:
 	virtual void OnUpdate();
 
 	bool PlaySequence();
+	bool playable = false;
 
 	void ImportSequenceTrack(string mapdat_file);
 

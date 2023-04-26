@@ -9,7 +9,7 @@
 #include "FX_Muzzle.h"
 #include "FX_Explosion.h"
 #include "GameEvents.h"
-#include "BlendSpace2D.h"
+#include "Player_ASM.h"
 
 using namespace reality;
 
@@ -188,9 +188,6 @@ void Player::OnUpdate()
 	{
 		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
 		rotation_ = XMMatrixRotationY(camera->pitch_yaw.y);
-		transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, cur_position_, rotation_);
-		front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_);
-		right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_);
 	}
 
 	Character::OnUpdate();
@@ -240,9 +237,9 @@ void Player::Jump()
 	if (controller_enable_ == false)
 		return;
 
-	if (movement_component_->jump_pulse <= 0 && movement_component_->gravity_pulse <= 0) {
+	//if (movement_component_->jump_pulse <= 0 && movement_component_->gravity_pulse <= 0) {
 		movement_component_->jump_pulse = 150.0f;
-	}
+	//}
 }
 
 void Player::Fire()
