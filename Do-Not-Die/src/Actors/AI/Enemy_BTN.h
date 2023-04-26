@@ -22,7 +22,7 @@ public:
 		XMVECTOR direction_vector = XMVector3Normalize(target_pos - cur_pos);
 		enemy->SetMovement(direction_vector);
 
-		if (XMVector3Length(target_pos - cur_pos).m128_f32[0] < 50.0f) {
+		if (XMVector3Length(target_pos - cur_pos).m128_f32[0] < 30.0f) {
 			return reality::BehaviorStatus::SUCCESS;
 		}
 
@@ -45,8 +45,11 @@ public:
 	virtual reality::BehaviorStatus Action() override
 	{
 		Enemy* owner = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
-		target_position_ = reality::SCENE_MGR->GetPlayer<Player>(0)->GetCurPosition();
-		if (owner->player_in_sight_ == false) {
+		XMVECTOR prev_target_position = target_position_;
+		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
+		target_position_ = player->GetCurPosition();
+
+		if (owner->player_in_sight_ == false || player->player_in_defense_ == false) {
 			return reality::BehaviorStatus::FAILURE;
 		}
 		return EnemyMoveToTarget::Action();
@@ -66,7 +69,8 @@ public:
 		Enemy* owner = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
 		XMVECTOR owner_pos = owner->GetCurPosition();
 
-		if (owner->player_in_sight_) {
+		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
+		if (owner->player_in_sight_ && player->player_in_defense_ == true) {
 			return reality::BehaviorStatus::FAILURE;
 		}
 
