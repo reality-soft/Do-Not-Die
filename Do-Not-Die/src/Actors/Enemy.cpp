@@ -104,12 +104,17 @@ void Enemy::SetMovement(const XMVECTOR& direction)
 
 	float dot_product = XMVectorGetX(XMVector3Dot(front, direction));
 
-	float angle = XMVectorGetX(XMVector3AngleBetweenNormals(front, direction));
+	float angle = XMVectorGetX(XMVector3AngleBetweenVectors(front, direction));
 
 	if (XMVectorGetX(XMVector3Dot(right, direction)) < 0)
 		angle = XM_2PI - angle;
 
 	angle = XMConvertToDegrees(angle);
+
+	wstringstream wss;
+	wss << angle << '\n';
+
+	OutputDebugStringW(wss.str().c_str());
 
 	rotation_ = XMMatrixRotationY(angle);
 

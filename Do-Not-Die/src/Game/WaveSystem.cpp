@@ -43,7 +43,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
-	SpawnZombies(1.0f, 50);
+	SpawnZombies(0.3f, 300);
 
 	if (wave_count_ > 5)
 	{
