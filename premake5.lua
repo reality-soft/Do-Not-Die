@@ -56,7 +56,6 @@ project "Do-Not-Die"
 		"Do-Not-Die/src/UI",
 		"Do-Not-Die/src/Item",
 		"Do-Not-Die/src/UI/InGameScene",
-		"Do-Not-Die/src/UI/IntroScene",
 		"Do-Not-Die/src/UI/StartScene",
 		"Do-Not-Die/src/UI/PopScene",
 		"../SDK/DirectXTK/include",
