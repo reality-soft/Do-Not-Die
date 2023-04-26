@@ -38,85 +38,124 @@ void UI_Actor_Ingame::CreateIngameUI()
 	float win_size_1920_height = E_Resolution_Size[E_Resolution::R1920x1080].y;
 
 	// 무기 UI
-	weapon_ui_ = make_shared<UI_Image>();
-	weapon_ui_->InitImage("T_Handgun_01.png");
-	weapon_ui_->SetLocalRectByMin({ 100.0f, win_size_1920_height - 200.0f }, 512.0f, 179.0f);
-	ammo_text_ = make_shared<UI_Text>();
-	weapon_ui_->AddChildUI("1_AmmoText", ammo_text_);
-	ammo_text_->InitText("30", BASIC, { 320.0f, 65.0f }, 1.3f);
-	ui_comp_->ui_list.insert({ "Weapon UI", weapon_ui_ });
+	{
+		float weapon_ui_height = win_size_1920_height - 300.0f;
+		float width_step = 52.0f;
+		XMFLOAT2 text_pos = { 10.0f, 12.0f };
+		float text_size = 0.5f;
+		// AR
+		ar_ui_ = make_shared<UI_Image>();
+		ar_ui_->InitImage("T_Weapon_AR.png");
+		ar_ui_->SetLocalRectByMin({ 100.0f, weapon_ui_height + width_step * 0.0f }, 200.0f, 50.0f);
+		ar_ammo_text_ = make_shared<UI_Text>();
+		ar_ui_->AddChildUI("1_AmmoText", ar_ammo_text_);
+		ar_ammo_text_->InitText("30", BASIC, text_pos, text_size);
+		ui_comp_->ui_list.insert({ "Weapon_AR UI", ar_ui_ });
+
+		// Handgun
+		handgun_ui_ = make_shared<UI_Image>();
+		handgun_ui_->InitImage("T_Weapon_Handgun.png");
+		handgun_ui_->SetLocalRectByMin({ 100.0f, weapon_ui_height + width_step * 1.0f }, 200.0f, 50.0f);
+		handgun_ammo_text_ = make_shared<UI_Text>();
+		handgun_ui_->AddChildUI("1_AmmoText", handgun_ammo_text_);
+		handgun_ammo_text_->InitText("30", BASIC, text_pos, text_size);
+		ui_comp_->ui_list.insert({ "Weapon_Handgun UI", handgun_ui_ });
+
+		// Meele
+		meele_ui_ = make_shared<UI_Image>();
+		meele_ui_->InitImage("T_Weapon_Meele.png");
+		meele_ui_->SetLocalRectByMin({ 100.0f, weapon_ui_height + width_step * 2.0f }, 200.0f, 50.0f);
+		ui_comp_->ui_list.insert({ "Weapon_Meele UI", meele_ui_ });
+
+		// Grenade
+		grenade_ui_ = make_shared<UI_Image>();
+		grenade_ui_->InitImage("T_Weapon_Grenade.png");
+		grenade_ui_->SetLocalRectByMin({ 100.0f, weapon_ui_height + width_step * 3.0f }, 200.0f, 50.0f);
+		grenade_ammo_text_ = make_shared<UI_Text>();
+		grenade_ui_->AddChildUI("1_AmmoText", grenade_ammo_text_);
+		grenade_ammo_text_->InitText("5", BASIC, text_pos, text_size);
+		ui_comp_->ui_list.insert({ "Weapon_Grenade UI", grenade_ui_ });
+
+		// Weapon Select
+		weapon_select_ui_ = make_shared<UI_Image>();
+		weapon_select_ui_->InitImage("T_Weapon_Select.png");
+		weapon_select_ui_->SetLocalRectByMin({ 100.0f, weapon_ui_height + width_step * 0.0f }, 200.0f, 50.0f);
+		ui_comp_->ui_list.insert({ "Weapon_Select UI", weapon_select_ui_ });
+	}
 
 	// 상태 + 아이템 UI
-	status_ui = make_shared<UI_Image>();
-	status_ui->InitImage("T_ItemUI.png");
-	status_ui->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height - 150.0f }, 512.0f, 200.0f);
+	{
+		status_ui = make_shared<UI_Image>();
+		status_ui->InitImage("T_ItemUI.png");
+		status_ui->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height - 150.0f }, 512.0f, 200.0f);
 
-	inven_select_ = make_shared<UI_Image>();
-	inven_select_->InitImage("T_Item_Select.png");
-	inven_select_->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
-	status_ui->AddChildUI("2_InvenSelect", inven_select_);
+		inven_select_ = make_shared<UI_Image>();
+		inven_select_->InitImage("T_Item_Select.png");
+		inven_select_->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
+		status_ui->AddChildUI("2_InvenSelect", inven_select_);
 
-	inven_[0] = make_shared<UI_Image>();
-	inven_[0]->InitImage("");
-	inven_[0]->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
-	inven_count_text_[0] = make_shared<UI_Text>();
-	inven_count_text_[0]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
-	inven_[0]->AddChildUI("2_InvenCountText", inven_count_text_[0]);
-	inven_slot_text_[0] = make_shared<UI_Text>();
-	inven_slot_text_[0]->InitText("1", E_Font::ROTUNDA, { 5.0f, 12.0f });
-	inven_[0]->AddChildUI("2_InvenSlotText", inven_slot_text_[0]);
-	inven_cooltime_img_[0] = make_shared<UI_Image>();
-	inven_cooltime_img_[0]->InitImage("T_ItemCoolTime.png");
-	inven_[0]->AddChildUI("3_CoolDownImg", inven_cooltime_img_[0]);
-	inven_cooltime_img_[0]->SetLocalRectByMin({0.0f, 0.0f}, 90.0f, 90.0f);
+		inven_[0] = make_shared<UI_Image>();
+		inven_[0]->InitImage("");
+		inven_[0]->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
+		inven_count_text_[0] = make_shared<UI_Text>();
+		inven_count_text_[0]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_[0]->AddChildUI("2_InvenCountText", inven_count_text_[0]);
+		inven_slot_text_[0] = make_shared<UI_Text>();
+		inven_slot_text_[0]->InitText("1", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_[0]->AddChildUI("2_InvenSlotText", inven_slot_text_[0]);
+		inven_cooltime_img_[0] = make_shared<UI_Image>();
+		inven_cooltime_img_[0]->InitImage("T_ItemCoolTime.png");
+		inven_[0]->AddChildUI("3_CoolDownImg", inven_cooltime_img_[0]);
+		inven_cooltime_img_[0]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
 
-	inven_[1] = make_shared<UI_Image>();
-	inven_[1]->InitImage("");
-	inven_[1]->SetLocalRectByCenter({ 203.5f, 76.5f }, 90.0f, 90.0f);
-	inven_count_text_[1] = make_shared<UI_Text>();
-	inven_count_text_[1]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
-	inven_[1]->AddChildUI("2_InvenCountText", inven_count_text_[1]);
-	inven_slot_text_[1] = make_shared<UI_Text>();
-	inven_slot_text_[1]->InitText("2", E_Font::ROTUNDA, { 5.0f, 12.0f });
-	inven_[1]->AddChildUI("2_InvenSlotText", inven_slot_text_[1]);
-	inven_cooltime_img_[1] = make_shared<UI_Image>();
-	inven_cooltime_img_[1]->InitImage("T_ItemCoolTime.png");
-	inven_[1]->AddChildUI("3_CoolDownImg", inven_cooltime_img_[1]);
-	inven_cooltime_img_[1]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
+		inven_[1] = make_shared<UI_Image>();
+		inven_[1]->InitImage("");
+		inven_[1]->SetLocalRectByCenter({ 203.5f, 76.5f }, 90.0f, 90.0f);
+		inven_count_text_[1] = make_shared<UI_Text>();
+		inven_count_text_[1]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_[1]->AddChildUI("2_InvenCountText", inven_count_text_[1]);
+		inven_slot_text_[1] = make_shared<UI_Text>();
+		inven_slot_text_[1]->InitText("2", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_[1]->AddChildUI("2_InvenSlotText", inven_slot_text_[1]);
+		inven_cooltime_img_[1] = make_shared<UI_Image>();
+		inven_cooltime_img_[1]->InitImage("T_ItemCoolTime.png");
+		inven_[1]->AddChildUI("3_CoolDownImg", inven_cooltime_img_[1]);
+		inven_cooltime_img_[1]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
 
-	inven_[2] = make_shared<UI_Image>();
-	inven_[2]->InitImage("");
-	inven_[2]->SetLocalRectByCenter({ 306.5f, 76.5f }, 90.0f, 90.0f);
-	inven_count_text_[2] = make_shared<UI_Text>();
-	inven_count_text_[2]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
-	inven_[2]->AddChildUI("2_InvenCountText", inven_count_text_[2]);
-	inven_slot_text_[2] = make_shared<UI_Text>();
-	inven_slot_text_[2]->InitText("3", E_Font::ROTUNDA, { 5.0f, 12.0f });
-	inven_[2]->AddChildUI("2_InvenSlotText", inven_slot_text_[2]);
-	inven_cooltime_img_[2] = make_shared<UI_Image>();
-	inven_cooltime_img_[2]->InitImage("T_ItemCoolTime.png");
-	inven_[2]->AddChildUI("3_CoolDownImg", inven_cooltime_img_[2]);
-	inven_cooltime_img_[2]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
+		inven_[2] = make_shared<UI_Image>();
+		inven_[2]->InitImage("");
+		inven_[2]->SetLocalRectByCenter({ 306.5f, 76.5f }, 90.0f, 90.0f);
+		inven_count_text_[2] = make_shared<UI_Text>();
+		inven_count_text_[2]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_[2]->AddChildUI("2_InvenCountText", inven_count_text_[2]);
+		inven_slot_text_[2] = make_shared<UI_Text>();
+		inven_slot_text_[2]->InitText("3", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_[2]->AddChildUI("2_InvenSlotText", inven_slot_text_[2]);
+		inven_cooltime_img_[2] = make_shared<UI_Image>();
+		inven_cooltime_img_[2]->InitImage("T_ItemCoolTime.png");
+		inven_[2]->AddChildUI("3_CoolDownImg", inven_cooltime_img_[2]);
+		inven_cooltime_img_[2]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
 
-	inven_[3] = make_shared<UI_Image>();
-	inven_[3]->InitImage("");
-	inven_[3]->SetLocalRectByCenter({ 410.5f, 76.5f }, 90.0f, 90.0f);
-	inven_count_text_[3] = make_shared<UI_Text>();
-	inven_count_text_[3]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
-	inven_[3]->AddChildUI("2_InvenCountText", inven_count_text_[3]);
-	inven_slot_text_[3] = make_shared<UI_Text>();
-	inven_slot_text_[3]->InitText("4", E_Font::ROTUNDA, { 5.0f, 12.0f });
-	inven_[3]->AddChildUI("2_InvenSlotText", inven_slot_text_[3]);
-	inven_cooltime_img_[3] = make_shared<UI_Image>();
-	inven_cooltime_img_[3]->InitImage("T_ItemCoolTime.png");
-	inven_[3]->AddChildUI("3_CoolDownImg", inven_cooltime_img_[3]);
-	inven_cooltime_img_[3]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
+		inven_[3] = make_shared<UI_Image>();
+		inven_[3]->InitImage("");
+		inven_[3]->SetLocalRectByCenter({ 410.5f, 76.5f }, 90.0f, 90.0f);
+		inven_count_text_[3] = make_shared<UI_Text>();
+		inven_count_text_[3]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_[3]->AddChildUI("2_InvenCountText", inven_count_text_[3]);
+		inven_slot_text_[3] = make_shared<UI_Text>();
+		inven_slot_text_[3]->InitText("4", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_[3]->AddChildUI("2_InvenSlotText", inven_slot_text_[3]);
+		inven_cooltime_img_[3] = make_shared<UI_Image>();
+		inven_cooltime_img_[3]->InitImage("T_ItemCoolTime.png");
+		inven_[3]->AddChildUI("3_CoolDownImg", inven_cooltime_img_[3]);
+		inven_cooltime_img_[3]->SetLocalRectByMin({ 0.0f, 0.0f }, 90.0f, 90.0f);
 
-	hp_img_ = make_shared<UI_Image>();
-	status_ui->AddChildUI("1_HpBar", hp_img_);
-	hp_img_->InitImage("T_HpBar.png");
-	hp_img_->SetLocalRectByMin({ status_ui->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f - 200.0f, 150.0f}, 400.0f, 30.0f);
-	ui_comp_->ui_list.insert({ "Status UI", status_ui });
+		hp_img_ = make_shared<UI_Image>();
+		status_ui->AddChildUI("1_HpBar", hp_img_);
+		hp_img_->InitImage("T_HpBar.png");
+		hp_img_->SetLocalRectByMin({ status_ui->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f - 200.0f, 150.0f }, 400.0f, 30.0f);
+		ui_comp_->ui_list.insert({ "Status UI", status_ui });
+	}
 
 	// 미니맵 UI
 	minimap_ui = make_shared<UI_Minimap>();
@@ -479,7 +518,7 @@ void UI_Actor_Ingame::CloseMenu()
 {
 	ui_comp_->ui_list.erase("Menu UI");
 
-	ui_comp_->ui_list.insert({ "Weapon UI", weapon_ui_ });
+	ui_comp_->ui_list.insert({ "Weapon UI", ar_ui_ });
 	ui_comp_->ui_list.insert({ "Minimap UI", minimap_ui });
 	ui_comp_->ui_list.insert({ "Status UI", status_ui });
 	ui_comp_->ui_list.insert({ "Objective UI", objective_ui_ });
