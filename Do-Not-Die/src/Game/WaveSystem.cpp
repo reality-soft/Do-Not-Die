@@ -17,8 +17,8 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 	fx_corpse_fire_ = QUADTREE->GetGuideLines("DND_FX_CorpseFire_1")->at(0);
 
 	CreateExtractPoints(reg);
-	CreateCarEventTriggers(_XMFLOAT3(car_event_.line_nodes.begin()->second), 250, 500);
-	CreateStaticEffects();
+	CreateCarEventTriggers(_XMFLOAT3(car_event_.line_nodes.begin()->second), 500, 700);
+	//CreateStaticEffects();
 }
 
 void reality::WaveSystem::OnUpdate(entt::registry& reg)
@@ -43,7 +43,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
-	SpawnZombies(3.0f, 30);
+	SpawnZombies(3.0f, 1);
 
 	if (wave_count_ > 5)
 	{
@@ -240,7 +240,7 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 
 	cur_time += TM_DELTATIME;
 
-	if (zombie_spawn_count_ > count)
+	if (zombie_spawn_count_ >= count)
 		return;
 	
 
@@ -258,14 +258,14 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 		auto enemy_actor = SCENE_MGR->GetActor<Enemy>(enemy_entity);
 		enemy_actor->tag = "enemy";
 
-		int guidline_index = rand() % zomebie_tracks_->size();
+		int guidline_index = 4; //rand() % zomebie_tracks_->size();
 		int mesh_index = rand() % enemy_meshes.size();
 
 		vector<XMVECTOR> target_poses;
 		for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
 			target_poses.push_back(target_pos.second);
 		}
-		enemy_actor->SetRoute(target_poses);
+		enemy_actor->SetBehaviorTree(target_poses);
 		enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
 
 		cur_time = 0.0f;
