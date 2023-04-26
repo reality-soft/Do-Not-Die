@@ -18,6 +18,6 @@ float4 PS(PS_IN input) : SV_Target
 	float4 final_color = float4(tex_color.rgb * input.c.rgb, alpha * input.c.a);
 	final_color = float4(final_color.rgb * 2.0f, final_color.a);
 	final_color = ApplyDistanceFog(final_color, input.world_pos);
-	//final_color.a *= alpha;
+	final_color.a *= tex_color.a;
 	return final_color;
 }

@@ -48,6 +48,8 @@ project "Do-Not-Die"
 		"../Game-Engine/Engine/src",
 		"../Game-Engine/Engine/vendor/spdlog/include",
 		"Do-Not-Die/src/Actors",
+		"Do-Not-Die/src/Actors/AI",
+		"Do-Not-Die/src/Actors/Animation",
 		"Do-Not-Die/src/Game",
 		"Do-Not-Die/src/Events",
 		"Do-Not-Die/src/FX",

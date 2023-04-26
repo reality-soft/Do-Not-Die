@@ -83,6 +83,13 @@ void reality::TriggerEvent::PlayerProcess()
 		else
 			PlayerCanRepair(false);
 		break;
+
+	case TriggerType::CAR_DEFENSE:
+		if (is_begin_)
+			PlayerDefense(true);
+		else
+			PlayerDefense(false);
+		break;
 	}
 }
 
@@ -163,4 +170,13 @@ void reality::TriggerEvent::ZombieDefense(bool can_defense)
 
 	zombie->in_defense_bound_ = can_defense;
 
+}
+
+void reality::TriggerEvent::PlayerDefense(bool can_defense)
+{
+	auto player = SCENE_MGR->GetPlayer<Player>(0);
+	if (player == nullptr)
+		return;
+
+	player->player_in_defense_ = can_defense;
 }
