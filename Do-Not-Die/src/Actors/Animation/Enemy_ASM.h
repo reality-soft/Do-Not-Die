@@ -105,8 +105,7 @@ public:
 		});
 
 		transitions_.insert({ DIE, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
-				if (enemy->is_attacking_ == true) {
+				if (IsAnimationEnded() == true) {
 					return true;
 				}
 				else {
