@@ -1,6 +1,8 @@
 #include "Enemy.h"
 #include "AnimationStateMachine.h"
 #include "Player.h"
+#include "Enemy_ASM.h"
+#include "Enemy_BTN.h"
 
 using namespace reality;
 
@@ -72,6 +74,7 @@ void Enemy::Idle()
 
 void Enemy::Attack()
 {
+	is_attacking_ = true;
 }
 
 float Enemy::GetMaxHp() const
@@ -134,7 +137,7 @@ void Enemy::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 	follow_and_attack_car->AddChild<EnemyAttack>(entity_id_);
 	follow_player_or_car->AddChild<SequenceNode>(*follow_and_attack_car);
 
-	shared_ptr<RepeatNode> repeat_node = make_shared<RepeatNode>(follow_player_or_car, INT_MAX);
+	shared_ptr<InfiniteRepeatNode> repeat_node = make_shared<InfiniteRepeatNode>(follow_player_or_car);
 
 	// to combat zone
 	shared_ptr<SequenceNode> move_to_combat_zone = make_shared<SequenceNode>();

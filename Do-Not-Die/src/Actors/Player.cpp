@@ -9,7 +9,7 @@
 #include "FX_Muzzle.h"
 #include "FX_Explosion.h"
 #include "GameEvents.h"
-#include "BlendSpace2D.h"
+#include "Player_ASM.h"
 
 using namespace reality;
 
