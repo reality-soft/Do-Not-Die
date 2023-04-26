@@ -88,10 +88,8 @@ void Enemy::SetCurHp(int hp)
 
 void Enemy::TakeDamage(int damage)
 {
-	if (is_hit_ == false) {
-		is_hit_ = true;
-		cur_hp_ -= damage;
-	}
+	is_hit_ = true;
+	cur_hp_ -= damage;
 }
 
 void Enemy::SetMovement(const XMVECTOR& direction)
