@@ -51,7 +51,7 @@ void Enemy::OnUpdate()
 {
 	behavior_tree_.Update();
 	Character::OnUpdate();
-	//ChasePlayer();
+	ChasePlayer();
 }
 
 void Enemy::SetCharacterAnimation(string anim_id) const
@@ -117,6 +117,35 @@ void Enemy::SetMovement(const XMVECTOR& direction)
 
 void Enemy::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 {
+	SetPos(target_poses[0] + XMVECTOR{ 0, 50.0f, 0, 0 });
+
+
+	// setting behavior tree
+
+	// in combat zone
+	shared_ptr<SelectorNode> follow_player_or_car = make_shared<SelectorNode>();
+	shared_ptr<SequenceNode> follow_and_attack_player = make_shared<SequenceNode>();
+	follow_and_attack_player->AddChild<EnemyFollowPlayer>(entity_id_, SCENE_MGR->GetPlayer<Player>(0)->GetCurPosition());
+	follow_and_attack_player->AddChild<EnemyAttack>(entity_id_);
+	follow_player_or_car->AddChild<SequenceNode>(*follow_and_attack_player);
+	
+	shared_ptr<SequenceNode> follow_and_attack_car = make_shared<SequenceNode>();
+	follow_and_attack_car->AddChild<EnemyFollowCar>(entity_id_, XMVectorZero());
+	follow_and_attack_car->AddChild<EnemyAttack>(entity_id_);
+	follow_player_or_car->AddChild<SequenceNode>(*follow_and_attack_car);
+
+	shared_ptr<RepeatNode> repeat_node = make_shared<RepeatNode>(follow_player_or_car, INT_MAX);
+
+	// to combat zone
+	shared_ptr<SequenceNode> move_to_combat_zone = make_shared<SequenceNode>();
+	for (auto target_pos : target_poses) {
+		move_to_combat_zone->AddChild<EnemyMoveToTarget>(entity_id_, target_pos);
+	}
+
+	// root node
+	vector<pair<std::function<bool()>, shared_ptr<BehaviorNode>>> children_;
+	children_.push_back(make_pair([this]() { return in_defense_bound_; }, repeat_node));
+	behavior_tree_.SetRootNode<IfElseIfNode>(children_, move_to_combat_zone);
 }
 
 void Enemy::SetMeshId(const string& mesh_id)
@@ -158,16 +187,6 @@ void Enemy::ChasePlayer()
 		player_in_sight_ = true;
 	else
 		player_in_sight_ = false;
-
-	if (player_in_sight_)
-	{
-		SetMovement(GetRayDirection(sight_ray));
-	}
-	else
-	{
-		// Attack Car
-	}
-	
 }
 
 float Enemy::GetCurHp() const
