@@ -18,7 +18,12 @@ void StartScene::OnInit()
 	sys_light.OnCreate(reg_scene_);
 	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
 
+	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
+
 	loading_progress = START_ACTOR;
+
+	intro_scene_ui.OnInit(reg_scene_);
+	intro_scene_ui.SetIntroTime(6.0f);
 
 	sequence_camera_ = Scene::AddActor<SequenceCameraActor>();
 	sequence_camera_actor = Scene::GetActor<SequenceCameraActor>(sequence_camera_);
@@ -46,9 +51,16 @@ void StartScene::OnInit()
 
 void StartScene::OnUpdate()
 {
+	intro_scene_ui.OnUpdate();
+	start_scene_ui.OnUpdate();
+
+	if (intro_scene_ui.intro_end_)
+	{
+		sequence_camera_actor->playable = true;
+	}
+
 	sys_effect.OnUpdate(reg_scene_);
 	sys_light.OnUpdate(reg_scene_);
-	start_scene_ui.OnUpdate();
 	sys_sound.OnUpdate(reg_scene_);
 	environment_.Update(sequence_camera_actor->world_pos_, &sys_light);
 }
