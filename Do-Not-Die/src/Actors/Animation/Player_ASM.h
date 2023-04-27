@@ -325,7 +325,7 @@ public:
 
 			// Attack
 			{
-				transitions_.insert({ AIM_POSE_GR, Transition(ATTACK_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_MELEE, Transition(ATTACK_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->is_firing_ == true) {
@@ -336,7 +336,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ ATTACK_GR, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ ATTACK_MELEE, Transition(AIM_POSE_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
 						if (IsAnimationEnded()) {
 							return true;
 						}

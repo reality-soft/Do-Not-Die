@@ -24,7 +24,7 @@ void UI_OptionWindow::InitOptionWindow()
 	option_close_button_ = make_shared<UI_Button>();
 	option_close_button_->InitButton("T_Button_Close_Normal.png", "T_Button_Close_Hover.png", "T_Button_Close_Normal.png");
 	option_window_->AddChildUI("1_CloseButton", option_close_button_);
-	option_close_button_->SetLocalRectByCenter({ 370.0f, 80.0f }, 51.0f, 56.0f);
+	option_close_button_->SetLocalRectByCenter({ 450.0f, 42.0f }, 60.0f, 60.0f);
 
 	// Resolution Listbox
 	option_resolution_list_box_ = make_shared<UI_Listbox>();
@@ -33,27 +33,29 @@ void UI_OptionWindow::InitOptionWindow()
 	option_window_->AddChildUI("1_ResolutionListbox", option_resolution_list_box_);
 	option_resolution_list_box_->SetLocalRectByMin({ 40.0f, 180.0f }, 265.0f, 51.0f);
 
-	option_resolution_list_box_->SetOpenPanelLocalRectByMin({ 0.0f, option_resolution_list_box_->rect_transform_[E_Resolution::R1920x1080].world_rect.height - 20.0f}, 263.0f, 181.0f);
+	option_resolution_list_box_->SetOpenPanelLocalRectByMin({ 0.0f, option_resolution_list_box_->rect_transform_[E_Resolution::R1920x1080].world_rect.height - 20.0f}, 265.0f, 181.0f);
 
 	option_resolution_list_box_->AddItem(E_Resolution_String[E_Resolution::R1920x1080]);
 	option_resolution_list_box_->AddItem(E_Resolution_String[E_Resolution::R1280x720]);
-	option_resolution_list_box_->SetItemSelected(E_Resolution_String[ENGINE->GetWindowResolution()]);
+	option_resolution_list_box_->SetItemSelected(E_Resolution_String[E_Resolution::R1920x1080]);
 
 	resolution_value = option_resolution_list_box_->GetCurrentItem();
-
-	// SFX Volume Slider
-	option_sfx_volume_slider_ = make_shared<UI_Slider>();
-	option_sfx_volume_slider_->InitSlider("T_Volume_Slider_back.png", "T_Volume_Slider.png", "T_Volume_Slider.png");
-	option_window_->AddChildUI("1_SFX_VolumeSlider", option_sfx_volume_slider_);
-	option_sfx_volume_slider_->SetLocalRectByMin({ 50.0f, 430.0f }, 265.0f, 51.0f);
-	option_sfx_volume_slider_->SetSliderLocalRect(44.0f, 18.0f);
 
 	// Music Volume Slider
 	option_music_volume_slider_ = make_shared<UI_Slider>();
 	option_music_volume_slider_->InitSlider("T_Volume_Slider_back.png", "T_Volume_Slider.png", "T_Volume_Slider.png");
 	option_window_->AddChildUI("1_Music_VolumeSlider", option_music_volume_slider_);
-	option_music_volume_slider_->SetLocalRectByMin({ 50.0f, 500.0f }, 265.0f, 51.0f);
+	option_music_volume_slider_->SetLocalRectByMin({ 40.0f, 410.0f }, 400.0f, 51.0f);
 	option_music_volume_slider_->SetSliderLocalRect(44.0f, 18.0f);
+
+	// SFX Volume Slider
+	option_sfx_volume_slider_ = make_shared<UI_Slider>();
+	option_sfx_volume_slider_->InitSlider("T_Volume_Slider_back.png", "T_Volume_Slider.png", "T_Volume_Slider.png");
+	option_window_->AddChildUI("1_SFX_VolumeSlider", option_sfx_volume_slider_);
+	option_sfx_volume_slider_->SetLocalRectByMin({ 40.0f, 525.0f }, 400.0f, 51.0f);
+	option_sfx_volume_slider_->SetSliderLocalRect(44.0f, 18.0f);
+
+	
 }
 
 void UI_OptionWindow::UpdateThisUI()
