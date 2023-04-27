@@ -9,6 +9,9 @@ class ItemBase;
 
 using namespace reality;
 
+#define AUTO_RIFLE_MAX 32
+#define HAND_GUN_MAX 8
+
 enum class EQUIPPED_WEAPON {
 	AUTO_RIFLE,
 	HAND_GUN,
@@ -28,8 +31,9 @@ public:
 	void MoveForward();
 	void MoveBack();
 	void Jump();
-	void Fire();
+	void Attack();
 	void Aim(bool active);
+	void Reload();
 	void ThrowGrenade();
 	void PickClosestItem();
 	void SetCharacterMovementAnimation();
@@ -58,6 +62,8 @@ private:
 
 private:
 	bool is_aiming_ = false;
+	int cur_weapon_using_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 0, 0, 1, 0 };
+	int cur_weapon_total_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 0, 0, 0, 0 };
 
 public:
 	EQUIPPED_WEAPON cur_equipped_weapon_ = EQUIPPED_WEAPON::HAND_GUN;

@@ -239,9 +239,10 @@ void Player::Jump()
 	//}
 }
 
-void Player::Fire()
+void Player::Attack()
 {
-	if (is_aiming_ && !is_firing_) {
+	if (is_aiming_ && !is_firing_ && cur_weapon_using_remained_[static_cast<int>(cur_equipped_weapon_)] > 0) {
+		cur_weapon_using_remained_[static_cast<int>(cur_equipped_weapon_)]--;
 		is_firing_ = true;
 
 		// Make Muzzle when Shot
@@ -279,6 +280,13 @@ void Player::Aim(bool active)
 		camera->target_rotation = 0;
 
 	is_aiming_ = active;
+}
+
+void Player::Reload()
+{
+	if (cur_weapon_total_remained_[static_cast<int>(cur_equipped_weapon_)] > 0) {
+
+	}
 }
 
 void Player::ThrowGrenade()
