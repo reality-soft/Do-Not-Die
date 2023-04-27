@@ -40,6 +40,21 @@ void UI_Actor_Title::CreateUI()
 
 	float button_x = title_img_->rect_transform_[R1920x1080].world_rect.center.x;
 
+	float img_width = 300.0f;
+	float img_height = 300.0f;
+
+	// Direct X IMG
+	direct_x_img_ = make_shared<UI_Image>();
+	direct_x_img_->InitImage("T_Directx11.png");
+	direct_x_img_->SetLocalRectByMin({ 10.0f, win_size_1920_height * 3.0f / 4.0f }, img_width, img_height);
+	ui_comp_->ui_list.insert({ "DirectX Image", direct_x_img_ });
+
+	// FMOD IMG
+	fmod_img_ = make_shared<UI_Image>();
+	fmod_img_->InitImage("T_Fmod.png");
+	fmod_img_->SetLocalRectByMin({ img_width + 50.0f, win_size_1920_height * 3.0f / 4.0f }, img_width, img_height);
+	ui_comp_->ui_list.insert({ "FMOD Image", fmod_img_ });
+
 	// New Game Button
 	newgame_button_ = make_shared<UI_Button>();
 	newgame_button_->InitButton("T_Button_NewGame_Normal.png", "T_Button_NewGame_Hover.png", "T_Button_NewGame_Pushed.png");
@@ -69,7 +84,9 @@ void UI_Actor_Title::CreateUI()
 	option_window_->InitOptionWindow();
 
 	title_img_->SetAlpha(0.0f);
-	background_img_->SetAlpha(0.0f);
+	background_img_->SetAlpha(0.0f); 
+	direct_x_img_->SetAlpha(0.0f);
+	fmod_img_->SetAlpha(0.0f);
 	newgame_button_->SetAlpha(0.0f);
 	loadinggame_button->SetAlpha(0.0f);
 	option_button_->SetAlpha(0.0f);
@@ -99,6 +116,8 @@ void reality::UI_Actor_Title::FadeInUI()
 	alpha = FadeInAlpha(15.0f, 18.0f, timer);
 	
 	title_img_->SetAlpha(alpha);
+	direct_x_img_->SetAlpha(alpha);
+	fmod_img_->SetAlpha(alpha);
 	newgame_button_->SetAlpha(alpha);
 	loadinggame_button->SetAlpha(alpha);
 	option_button_->SetAlpha(alpha);
@@ -114,6 +133,8 @@ void reality::UI_Actor_Title::DisappearUI()
 	alpha = FadeOutAlpha(0.0f, 3.0f, timer);
 
 	background_img_->SetAlpha(1.0f - alpha);
+	direct_x_img_->SetAlpha(alpha);
+	fmod_img_->SetAlpha(alpha);
 	title_img_->SetAlpha(alpha);
 	newgame_button_->SetAlpha(alpha);
 	loadinggame_button->SetAlpha(alpha);
