@@ -40,6 +40,7 @@ public:
 
 public:
 	bool IsAiming();
+	bool IsReloading();
 	void InteractionRotate(XMVECTOR direction);
 
 public:
@@ -63,14 +64,14 @@ private:
 
 private:
 	bool is_aiming_ = false;
-	int cur_weapon_using_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 0, 0, 1, 0 };
-	int cur_weapon_total_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 0, 0, 0, 0 };
+	int cur_weapon_using_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 30, 8, 1, 0 };
+	int cur_weapon_total_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 30, 30, 0, 0 };
 
 public:
 	int kill_score_ = 0;
 public:
 	EQUIPPED_WEAPON cur_equipped_weapon_ = EQUIPPED_WEAPON::HAND_GUN;
-	bool is_firing_ = false;
+	bool is_attacking_ = false;
 	float angle_ = 0.0f;
 	XMVECTOR direction_;
 
@@ -105,6 +106,8 @@ public:
 
 	bool can_extract_repair_ = false;
 	bool can_repair_car_ = false;
+
+	bool is_reloading_ = false;
 	
 	entt::entity repair_extract_trigger;
 

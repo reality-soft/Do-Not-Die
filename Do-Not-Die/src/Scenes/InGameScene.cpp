@@ -56,7 +56,9 @@ void InGameScene::OnInit()
 	INPUT_EVENT->SubscribeKeyEvent( DIK_C, std::bind(&Player::DropItem, player_actor), KEY_PUSH);
 
 	INPUT_EVENT->SubscribeKeyEvent( DIK_SPACE, std::bind(&Player::Jump, player_actor), KEY_PUSH);
-	
+
+	INPUT_EVENT->SubscribeKeyEvent(DIK_R, std::bind(&Player::Reload, player_actor), KEY_PUSH);
+
 	INPUT_EVENT->SubscribeMouseEvent( MouseButton::R_BUTTON, std::bind(&Player::Aim, player_actor, true), KEY_PUSH);
 	INPUT_EVENT->SubscribeMouseEvent( MouseButton::R_BUTTON, std::bind(&Player::Aim, player_actor, false), KEY_UP);
 

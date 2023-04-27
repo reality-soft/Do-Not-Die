@@ -31,7 +31,7 @@ void Player::OnInit(entt::registry& registry)
 	registry.emplace<reality::C_TriggerSensor>(entity_id_, trigger_sensor);
 
 	reality::C_SkeletalMesh skm;
-	skm.skeletal_mesh_id = "SM_Chr_Biker_Male_01.skmesh";
+	skm.skeletal_mesh_id = "Player_SKM.skmesh";
 	skm.vertex_shader_id = "SkinningVS.cso";
 	registry.emplace_or_replace<reality::C_SkeletalMesh>(entity_id_, skm);
 
@@ -129,7 +129,7 @@ void Player::OnInit(entt::registry& registry)
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.GetAnimSlotByName("Base")->SetAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim", 0.5);
+	animation_component.GetAnimSlotByName("Base")->SetAnimation("A_TP_CH_Breathing_Retargeted_Unreal Take.anim", 0.5);
 	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
@@ -149,26 +149,26 @@ void Player::SetCharacterMovementAnimation()
 	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
 	AnimationBase* anim_slot = animation_component_ptr->GetAnimSlotByName("Base");
 
-	string anim_id = "A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim";
+	string anim_id = "A_TP_CH_Breathing_Retargeted_Unreal Take.anim";
 
 	if (movement_component_->speed >= 0.1f) {
 		if (angle_ >= 330.0f || angle_ < 30.0f) {
-			anim_id = "A_TP_CH_Jog_F_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "A_TP_CH_Jog_F_Retargeted_Unreal Take.anim";
 		}
 		else if (30.0f <= angle_ && angle_ < 110.0f) {
-			anim_id = "A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "A_TP_CH_Jog_RF_Retargeted_Unreal Take.anim";
 		}
 		else if (110.0f <= angle_ && angle_ < 160.0f) {
-			anim_id = "A_TP_CH_Jog_RB_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "A_TP_CH_Jog_RB_Retargeted_Unreal Take.anim";
 		}
 		else if (160.0f <= angle_ && angle_ < 200.0f) {
 			anim_id = "A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim";
 		}
 		else if (200.0f <= angle_ && angle_ < 250.0f) {
-			anim_id = "A_TP_CH_Jog_LB_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "A_TP_CH_Jog_LB_Retargeted_Unreal Take.anim";
 		}
 		else if (250.0f <= angle_ && angle_ < 330.0f) {
-			anim_id = "A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "A_TP_CH_Jog_LF_Retargeted_Unreal Take.anim";
 		}
 	}
 
@@ -241,9 +241,9 @@ void Player::Jump()
 
 void Player::Attack()
 {
-	if (is_aiming_ && !is_firing_ && cur_weapon_using_remained_[static_cast<int>(cur_equipped_weapon_)] > 0) {
+	if (is_aiming_ && !is_attacking_ && cur_weapon_using_remained_[static_cast<int>(cur_equipped_weapon_)] > 0) {
 		cur_weapon_using_remained_[static_cast<int>(cur_equipped_weapon_)]--;
-		is_firing_ = true;
+		is_attacking_ = true;
 
 		// Make Muzzle when Shot
 		XMVECTOR player_position = GetCurPosition();
@@ -284,8 +284,8 @@ void Player::Aim(bool active)
 
 void Player::Reload()
 {
-	if (cur_weapon_total_remained_[static_cast<int>(cur_equipped_weapon_)] > 0) {
-
+	if (is_reloading_ == false && cur_weapon_total_remained_[static_cast<int>(cur_equipped_weapon_)] > 0) {
+		is_reloading_ = true;
 	}
 }
 
@@ -309,6 +309,11 @@ void Player::ThrowGrenade()
 bool Player::IsAiming()
 {
 	return is_aiming_;
+}
+
+bool Player::IsReloading()
+{
+	return is_reloading_;
 }
 
 void Player::InteractionRotate(XMVECTOR interaction_pos)
@@ -441,6 +446,9 @@ void Player::CalculateMovementAngle()
 
 void Player::ChangeWeapon()
 {
+	if (is_aiming_ == true || is_reloading_) {
+		return;
+	}
 	int cur_equipped_weapon = static_cast<int>(cur_equipped_weapon_);
 	cur_equipped_weapon += DINPUT->GetMouseWheel() / 120 * -1;
 
@@ -455,6 +463,8 @@ void Player::ChangeWeapon()
 
 	wstringstream wss;
 	wss << static_cast<int>(cur_equipped_weapon_) << '\n';
+
+	OutputDebugStringW(wss.str().c_str());
 }
 
 void Player::UpdateTimer()
