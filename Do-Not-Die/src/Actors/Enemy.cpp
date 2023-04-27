@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "GameEvents.h"
 #include "AnimationStateMachine.h"
 #include "Player.h"
 #include "Enemy_ASM.h"
@@ -9,10 +10,11 @@ using namespace reality;
 void Enemy::OnInit(entt::registry& registry)
 {
 	Character::OnInit(registry);
+	tag = "enemy";
 
 	// setting character data
-	movement_component_->max_speed = 60;
-	movement_component_->acceleration = 60;
+	movement_component_->max_speed = 100;
+	movement_component_->acceleration = 100;
 	max_hp_ = cur_hp_ = 100;
 
 	// set trigger sensor
@@ -51,9 +53,9 @@ void Enemy::OnInit(entt::registry& registry)
 
 void Enemy::OnUpdate()
 {
+	ChasePlayer();
 	behavior_tree_.Update();
 	Character::OnUpdate();
-	ChasePlayer();
 }
 
 void Enemy::SetCharacterAnimation(string anim_id) const
@@ -74,7 +76,17 @@ void Enemy::Idle()
 
 void Enemy::Attack()
 {
-	is_attacking_ = true;
+	if (is_attacking_ == true)
+		return;
+
+	auto c_enemy_capsule = reg_scene_->try_get<C_CapsuleCollision>(entity_id_);
+	if (c_enemy_capsule == nullptr)
+		return;
+
+	RayShape attack_ray;
+	attack_ray.start = _XMFLOAT3(GetTipBaseAB(c_enemy_capsule->capsule)[3]);
+	attack_ray.end = _XMFLOAT3((_XMVECTOR3(attack_ray.start) + (front_ * attack_distance_)));
+	EVENT->PushEvent<AttackEvent_SingleRay>(attack_ray, entity_id_);
 }
 
 float Enemy::GetMaxHp() const
@@ -98,18 +110,17 @@ void Enemy::SetMovement(const XMVECTOR& direction)
 		return;
 	}
 
+
+	XMVECTOR dir = direction; dir.m128_f32[1] = 0.0f;
+
 	is_moving_ = true;
 	XMVECTOR front = { 0.0f, 0.0f, 1.0f, 0.0f };
 	XMVECTOR right = { 1.0f, 0.0f, 0.0f, 0.0f };
 
-	float dot_product = XMVectorGetX(XMVector3Dot(front, direction));
-
-	float angle = XMVectorGetX(XMVector3AngleBetweenVectors(front, direction));
-
-	if (XMVectorGetX(XMVector3Dot(right, direction)) < 0)
+	float dot_product = XMVectorGetX(XMVector3Dot(front, dir));
+	float angle = XMVectorGetX(XMVector3AngleBetweenVectors(front, dir));
+	if (XMVectorGetX(XMVector3Dot(right, dir)) < 0)
 		angle = XM_2PI - angle;
-
-	angle = XMConvertToDegrees(angle);
 
 	wstringstream wss;
 	wss << angle << '\n';
@@ -129,15 +140,8 @@ void Enemy::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 
 	// in combat zone
 	shared_ptr<SelectorNode> follow_player_or_car = make_shared<SelectorNode>();
-	shared_ptr<SequenceNode> follow_and_attack_player = make_shared<SequenceNode>();
-	follow_and_attack_player->AddChild<EnemyFollowPlayer>(entity_id_, SCENE_MGR->GetPlayer<Player>(0)->GetCurPosition());
-	follow_and_attack_player->AddChild<EnemyAttack>(entity_id_);
-	follow_player_or_car->AddChild<SequenceNode>(*follow_and_attack_player);
-	
-	shared_ptr<SequenceNode> follow_and_attack_car = make_shared<SequenceNode>();
-	follow_and_attack_car->AddChild<EnemyFollowCar>(entity_id_, XMVectorZero());
-	follow_and_attack_car->AddChild<EnemyAttack>(entity_id_);
-	follow_player_or_car->AddChild<SequenceNode>(*follow_and_attack_car);
+	follow_player_or_car->AddChild<EnemyFollowPlayer>(entity_id_, XMVectorZero());
+	follow_player_or_car->AddChild<EnemyFollowCar>(entity_id_, XMVectorZero());	
 
 	shared_ptr<InfiniteRepeatNode> repeat_node = make_shared<InfiniteRepeatNode>(follow_player_or_car);
 
@@ -180,18 +184,11 @@ void Enemy::ChasePlayer()
 	sight_ray.start = _XMFLOAT3(GetTipBaseAB(c_enemy_capsule->capsule)[3]);
 	sight_ray.end = _XMFLOAT3(GetTipBaseAB(c_player_capsule->capsule)[3]);
 
-	UINT casted_triangle = 0;
-	const auto& triangles = QUADTREE->GetCarTriangles();
-	for (const auto& tri : triangles)
-	{
-		auto callback = RayToTriangle(sight_ray, tri);
-		if (callback.success)
-			casted_triangle++;
-	}
-	if (casted_triangle == 0)
-		player_in_sight_ = true;
-	else
+	auto callback = QUADTREE->RaycastCarOnly(sight_ray);
+	if (callback.success)
 		player_in_sight_ = false;
+	else
+		player_in_sight_ = true;
 }
 
 float Enemy::GetCurHp() const

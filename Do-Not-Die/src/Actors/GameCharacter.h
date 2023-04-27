@@ -22,6 +22,7 @@ public:
 		return cur_hp_;
 	};
 
+	string tag;
 protected:
 	float max_hp_;
 	float cur_hp_;

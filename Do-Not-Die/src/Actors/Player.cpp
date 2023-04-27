@@ -16,6 +16,7 @@ using namespace reality;
 void Player::OnInit(entt::registry& registry)
 {
 	Character::OnInit(registry);
+	tag = "player";
 
 	movement_component_->speed = 0;
 	movement_component_->acceleration = 300;
@@ -267,7 +268,7 @@ void Player::Fire()
 		// Make Shot Impact Effect
 		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
  		RayShape ray = ingame_scene->GetCameraSystem().CreateFrontRay();
-		EVENT->PushEvent<AttackEvent>(vector<RayShape>{ray}, entity_id_);
+		EVENT->PushEvent<AttackEvent_SingleRay>(ray, entity_id_);
 	}
 }
 

@@ -32,6 +32,7 @@ private:
 
 private:
 	reality::BehaviorTree behavior_tree_;
+	float attack_distance_ = 40.0f;
 
 public:
 	bool is_hit_ = false;
@@ -39,8 +40,10 @@ public:
 	bool player_in_sight_ = true;
 	bool is_attacking_ = false;
 	bool is_attack_ended = false;
+	int* targeting_car_health = nullptr;
 
 private:
+	
 	bool is_moving_ = false;
 
 public:
