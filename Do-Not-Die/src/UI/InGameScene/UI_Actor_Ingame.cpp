@@ -320,6 +320,9 @@ void UI_Actor_Ingame::UpdateIngameUI()
 {
 	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 
+	float win_size_1920_width = E_Resolution_Size[E_Resolution::R1920x1080].x;
+	float win_size_1920_height = E_Resolution_Size[E_Resolution::R1920x1080].y;
+
 	// Time Icon Move Update
 	{
 		static float bar_init_width = duration_bar_->rect_transform_[R1920x1080].local_rect.width;
@@ -378,6 +381,17 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	static int kill = 0;
 	kill = TIMER->game_time;
 	kill_text_->SetText(to_string(kill));
+
+	// Weapon UI Update
+	{
+		float weapon_ui_height = win_size_1920_height - 500.0f;
+		float height_step = 78.0f;
+		float width = weapon_select_ui_->rect_transform_[R1920x1080].world_rect.width;
+		float height = weapon_select_ui_->rect_transform_[R1920x1080].world_rect.height;
+		;
+		weapon_select_ui_->SetLocalRectByMin({ 100.0f, weapon_ui_height + height_step * (int)player_->cur_equipped_weapon_ }, width, height);
+	}
+
 
 	// Vehicle Duration Update
 	{
