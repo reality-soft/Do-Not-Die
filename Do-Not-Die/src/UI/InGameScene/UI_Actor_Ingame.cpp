@@ -271,7 +271,7 @@ void UI_Actor_Ingame::CreateIngameUI()
 
 	// Event Message UI
 	event_msg_text_ = make_shared<UI_Text>();
-	event_msg_text_->InitText("Event Test", E_Font::BASIC, { win_size_1920_width / 2.0f - 100.0f, win_size_1920_height - 300.0f });
+	event_msg_text_->InitText("Event Test", E_Font::ROBOTO, { win_size_1920_width / 2.0f - 100.0f, win_size_1920_height - 300.0f });
 	
 }
 
@@ -378,9 +378,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	}
 
 	// Kill Update
-	static int kill = 0;
-	kill = TIMER->game_time;
-	kill_text_->SetText(to_string(kill));
+	kill_text_->SetText(to_string(player_->GetKillScore()));
 
 	// Weapon UI Update
 	{
@@ -413,6 +411,22 @@ void UI_Actor_Ingame::UpdateIngameUI()
 
 		string car_health_str = to_string(wave_sys.car_health);
 		duration_text_->SetText(car_health_str);
+	}
+
+	// Vehicle Parts Update
+	{
+		static float bar_init_width = repair_bar_->rect_transform_[R1920x1080].local_rect.width;
+		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		auto& wave_sys = ingame_scene->GetWaveSystem();
+
+		// Set bar width with health
+		XMFLOAT2 min = repair_bar_->rect_transform_[R1920x1080].local_rect.min;
+		float width = bar_init_width * wave_sys.car_repair_count / 12;
+		float height = repair_bar_->rect_transform_[R1920x1080].local_rect.height;
+		repair_bar_->SetLocalRectByMin(min, width, height);
+
+		string repair_str = to_string(wave_sys.car_repair_count) + " / 12";
+		repair_text_->SetText(repair_str);
 	}
 
 	// Cross Hair Update

@@ -45,13 +45,14 @@ public:
 public:
 	void ResetPos();
 	void SetPos(const XMVECTOR& position = { 0.f, 100.f, 0.f, 0.f });
+	int  GetKillScore() { return kill_score_; }
+	void AddKillScore() { kill_score_++; }
 
 public:
 	virtual float GetMaxHp() const override;
 	virtual void SetCurHp(int hp) override;
 	virtual void TakeDamage(int damage) override;
 	virtual float GetCurHp() const override;
-
 private:
 	void AddFlashLight();
 	void UpdateFlashLight();
@@ -65,6 +66,8 @@ private:
 	int cur_weapon_using_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 0, 0, 1, 0 };
 	int cur_weapon_total_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 0, 0, 0, 0 };
 
+public:
+	int kill_score_ = 0;
 public:
 	EQUIPPED_WEAPON cur_equipped_weapon_ = EQUIPPED_WEAPON::HAND_GUN;
 	bool is_firing_ = false;

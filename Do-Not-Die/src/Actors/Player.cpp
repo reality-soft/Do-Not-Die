@@ -300,8 +300,10 @@ void Player::ThrowGrenade()
 	auto grenade_actor = SCENE_MGR->GetActor<Grenade>(grenade_entity); 
 	XMVECTOR pos = XMVectorAdd(cur_position_, XMVectorSet(0.0f, 50.0f, 0.0f, 0.0f));
 	grenade_actor->SetPos(pos);
-	XMVECTOR dir = XMVectorAdd(front_, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
-	grenade_actor->SetDir(dir, 4.0f);
+	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+	XMVECTOR dir = ingame_scene->GetCameraSystem().GetCamera()->look;
+	//XMVECTOR dir = XMVectorAdd(front_, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+	grenade_actor->SetDir(dir, 10.0f);
 }
 
 bool Player::IsAiming()
