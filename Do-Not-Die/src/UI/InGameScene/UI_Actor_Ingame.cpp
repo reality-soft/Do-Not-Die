@@ -378,9 +378,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	}
 
 	// Kill Update
-	static int kill = 0;
-	kill = TIMER->game_time;
-	kill_text_->SetText(to_string(kill));
+	kill_text_->SetText(to_string(player_->GetKillScore()));
 
 	// Weapon UI Update
 	{

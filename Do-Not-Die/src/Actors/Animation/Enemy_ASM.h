@@ -203,7 +203,9 @@ public:
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
+			EVENT->PushEvent<KillEvent>();
 			EVENT->PushEvent<DeleteActorEvent>(animation_state_machine->GetOwnerId());
+
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
@@ -422,15 +424,12 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			animation_state_machine->SetAnimation("", 0.8f);
-			SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId())->is_hit_ = false;
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
-			Enemy* enemy = SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId());
-			enemy->CancelMovement();
 		}
 	};
 
@@ -444,12 +443,9 @@ public:
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			EVENT->PushEvent<DeleteActorEvent>(animation_state_machine->GetOwnerId());
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
-			Enemy* enemy = SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId());
-			enemy->CancelMovement();
 		}
 	};
 

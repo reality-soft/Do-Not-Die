@@ -143,4 +143,16 @@ private:
 	float damage_;
 };
 
-
+class KillEvent : public Event
+{
+public:
+	KillEvent() {};
+	virtual void Process() override {
+		auto player = SCENE_MGR->GetPlayer<Player>(0);
+		player->AddKillScore();
+	};
+private:
+	XMVECTOR pos_;
+	float range_;
+	float damage_;
+};
