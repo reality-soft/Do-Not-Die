@@ -262,7 +262,7 @@ public:
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 			Enemy* enemy = SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId());
-			enemy->CancelMovement();
+			//enemy->CancelMovement();
 		}
 	};
 };

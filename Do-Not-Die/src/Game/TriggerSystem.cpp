@@ -30,39 +30,6 @@ void reality::TriggerSystem::OnUpdate(entt::registry& reg)
 
 	CheckCurrentTriggerValid(reg);
 
-	//UINT sensor_count = sensor_view.size();
-	//UINT trigger_count = trigger_view.size();
-
-	//for (const auto& ent_sensor : sensor_view)
-	//{
-	//	const auto& trigger_sensor = reg.get<C_TriggerSensor>(ent_sensor);
-
-	//	for (const auto& ent_trigger : trigger_view)
-	//	{
-	//		const auto& trigger_volume = reg.get<C_TriggerVolume>(ent_trigger);
-
-	//		if (trigger_sensor.can_sense_tags.find(trigger_volume.tag) != trigger_sensor.can_sense_tags.end())
-	//		{
-	//			if (IsActorInTrigger(ent_sensor, trigger_volume))
-	//			{
-	//				if (IsAlreadyTrigged(ent_sensor, ent_trigger))
-	//					continue;
-
-	//				current_triggers.insert(make_pair(ent_sensor, ent_trigger));
-	//				EVENT->PushEvent<TriggerEvent>(ent_sensor, ent_trigger, true);
-	//			}
-	//			else
-	//			{
-	//				if (IsAlreadyTrigged(ent_sensor, ent_trigger))
-	//				{
-	//					EVENT->PushEvent<TriggerEvent>(ent_sensor, ent_trigger, false);
-	//					current_triggers.erase(make_pair(ent_sensor, ent_trigger));
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
 	// player
 	auto player = SCENE_MGR->GetPlayer<Player>(0);
 	if (player == nullptr)

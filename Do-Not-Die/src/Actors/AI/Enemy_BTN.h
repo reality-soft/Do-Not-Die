@@ -33,11 +33,11 @@ protected:
 	entt::entity owner_id_;
 };
 
-class EnemyFollowPlayer : public EnemyMoveToTarget
+class EnemyFollowPlayer : public reality::ActionNode
 {
 public:
 	EnemyFollowPlayer(entt::entity enemy_id, XMVECTOR target_position)
-		: EnemyMoveToTarget(enemy_id, target_position)
+		: owner_id_(enemy_id), target_position_(target_position)
 	{
 	};
 
@@ -47,35 +47,45 @@ public:
 		search_time += TM_DELTATIME;
 
 		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
+		Enemy* enemy = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
 
-		if (status_ == BehaviorStatus::IDLE) {
-			target_position_ = player->GetCurPosition();
-			search_time = 0.0f;
-		}
-		if (search_time >= 1.5f) {
-			target_position_ = player->GetCurPosition();
-			search_time = 0.0f;
-		}
-
-		Enemy* owner = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
-		if (owner->player_in_sight_ == false || player->player_in_defense_ == false) {
+		XMVECTOR direction_to_player = XMVector3Normalize(player->GetCurPosition() - enemy->GetCurPosition());
+		target_position_ = player->GetCurPosition();
+		
+		if (enemy->player_in_sight_ == false || player->player_in_defense_ == false)
 			return reality::BehaviorStatus::FAILURE;
+		
+
+		float distance_to_player = Distance(player->GetCurPosition(), enemy->GetCurPosition());
+
+		if (distance_to_player >= 30)
+		{
+			enemy->SetMovement(direction_to_player);
 		}
-		return EnemyMoveToTarget::Action();
+		if (Distance(player->GetCurPosition(), enemy->GetCurPosition()) < 50.0f)
+		{			
+			enemy->Attack();
+		}
+
+		return reality::BehaviorStatus::RUNNING;
 	}
+
+protected:
+	XMVECTOR target_position_;
+	entt::entity owner_id_;
 };
 
-class EnemyFollowCar : public EnemyMoveToTarget
+class EnemyFollowCar : public reality::ActionNode
 {
 public:
 	EnemyFollowCar(entt::entity enemy_id, XMVECTOR target_position)
-		: EnemyMoveToTarget(enemy_id, target_position)
+		: owner_id_(enemy_id), target_position_(target_position)
 	{
 	};
 
 	virtual reality::BehaviorStatus Action() override
 	{
-		Enemy* owner = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
+  		Enemy* owner = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
 		XMVECTOR owner_pos = owner->GetCurPosition();
 
 		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
@@ -83,24 +93,42 @@ public:
 			return reality::BehaviorStatus::FAILURE;
 		}
 
-		if (status_ == reality::BehaviorStatus::IDLE) {
-			map<UINT, XMVECTOR> car_attack_poses = reality::QUADTREE->GetGuideLines("DND_CarAttack_1")->at(0).line_nodes;
+		map<UINT, XMVECTOR> car_attack_poses = reality::QUADTREE->GetGuideLines("DND_CarAttack_1")->at(0).line_nodes;
 
-			float min_distance = FLT_MAX;
+		float min_distance = FLT_MAX;
 
-			for (const auto& car_attack_pos_pair : car_attack_poses) {
-				const XMVECTOR& car_attack_pos = car_attack_pos_pair.second;
+		for (const auto& car_attack_pos_pair : car_attack_poses) {
+			const XMVECTOR& car_attack_pos = car_attack_pos_pair.second;
 
-				float cur_distance = XMVector3Length(car_attack_pos - owner_pos).m128_f32[0];
-				if (cur_distance <= min_distance) {
-					min_distance = cur_distance;
-					target_position_ = car_attack_pos;
-				}
+			float cur_distance = XMVector3Length(car_attack_pos - owner_pos).m128_f32[0];
+			if (cur_distance <= min_distance) {
+				min_distance = cur_distance;
+				target_position_ = car_attack_pos;
 			}
 		}
 
-		return EnemyMoveToTarget::Action();
+		XMVECTOR dir = XMVector3Normalize(target_position_ - owner_pos);
+		owner->SetMovement(dir);
+
+		float distance = 0;
+		C_CapsuleCollision* c_capsule = owner->reg_scene_->try_get<C_CapsuleCollision>(owner_id_);
+		if (c_capsule)
+		{
+			auto capsule_info = GetTipBaseAB(c_capsule->capsule);
+			distance = XMVector3LinePointDistance(capsule_info[0], capsule_info[1], target_position_).m128_f32[0];
+		}
+		
+		if (distance <= 10)
+		{
+			owner->Attack();
+		}
+
+		return reality::BehaviorStatus::RUNNING;
 	}
+
+protected:
+	XMVECTOR target_position_;
+	entt::entity owner_id_;
 };
 
 class EnemyAttack : public reality::ActionNode
