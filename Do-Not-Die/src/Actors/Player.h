@@ -9,7 +9,7 @@ class ItemBase;
 
 using namespace reality;
 
-#define AUTO_RIFLE_MAX 32
+#define AUTO_RIFLE_MAX 30
 #define HAND_GUN_MAX 8
 
 enum class EQUIPPED_WEAPON {
