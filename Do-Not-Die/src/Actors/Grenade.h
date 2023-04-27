@@ -14,5 +14,10 @@ private:
 	bool		exploded_;
 	float		timer_;
 	float		explosion_time_;
+	float		range_;
+	float		damage_;
+public:
+	float GetRange() { return range_; }
+	float GetDamage() { return damage_; }
 };
 

@@ -28,6 +28,8 @@ void Grenade::OnInit(entt::registry& registry)
 
 	timer_ = 0.0f;
 	explosion_time_ = 3.0f;
+	range_ = 100.0f;
+	damage_ = 300.0f;
 }
 
 void Grenade::OnUpdate()
@@ -41,7 +43,6 @@ void Grenade::OnUpdate()
 		auto player = SCENE_MGR->GetPlayer<Player>(0);
 		player->GetCurPosition();
 		EVENT->PushEvent<CameraShakeEvent>(player->GetEntityId(), 0.3f, 10.0f, 0.2f);
-
 		EVENT->PushEvent<DeleteActorEvent>(GetEntityId());
 	}
 	else 

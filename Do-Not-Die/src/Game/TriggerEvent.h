@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine_include.h"
 #include "Player.h"
+#include "Enemy.h"
 #include "Item.h"
 
 namespace reality
@@ -10,7 +11,8 @@ namespace reality
 		ITEM_TO_PLAYER,
 		REPAIR_PART_EXTRACT,
 		CAR_REPAIR,
-		CAR_DEFENSE
+		CAR_DEFENSE,
+		GRENADE_EXPLOSION
 	};
 
 	class TriggerEvent : public Event
@@ -36,5 +38,6 @@ namespace reality
 		void PlayerCanRepair(bool can_repair);
 		void PlayerDefense(bool can_defense);
 		void ZombieDefense(bool can_defense);
+		void GrenadeExplosion(Enemy* enemy_actor, float range, float damage);
 	};
 }

@@ -1,6 +1,6 @@
 #include "TriggerEvent.h"
 #include "ItemObjects.h"
-#include "Enemy.h"
+#include "Grenade.h"
 using namespace reality;
 
 TriggerEvent::TriggerEvent(entt::entity target_actor, entt::entity trigger_actor, bool is_begin)
@@ -39,6 +39,10 @@ TriggerEvent::TriggerEvent(entt::entity target_actor, entt::entity trigger_actor
 	if (trigger_component->tag == "defense")
 	{
 		trigger_type_ = TriggerType::CAR_DEFENSE;
+	}
+	if (trigger_component->tag == "grenade")
+	{
+		trigger_type_ = TriggerType::GRENADE_EXPLOSION;
 	}
 }
 
@@ -105,6 +109,10 @@ void reality::TriggerEvent::ZombiePeocess()
 			ZombieDefense(true);
 		else
 			ZombieDefense(false);
+		break;
+	case TriggerType::GRENADE_EXPLOSION:
+		auto grenade = SCENE_MGR->GetActor<Grenade>(trigger_actor_);
+		GrenadeExplosion(SCENE_MGR->GetActor<Enemy>(target_actor_), grenade->GetRange(), grenade->GetDamage());
 		break;
 	}
 }
@@ -179,4 +187,16 @@ void reality::TriggerEvent::PlayerDefense(bool can_defense)
 		return;
 
 	player->player_in_defense_ = can_defense;
+}
+
+void reality::TriggerEvent::GrenadeExplosion(Enemy* enemy_actor, float range, float damage)
+{
+	auto grenade = SCENE_MGR->GetActor<Grenade>(trigger_actor_);
+	float distance = XMVectorGetX(XMVector3Length(grenade->GetCurPosition() - enemy_actor->GetCurPosition()));
+	
+	float weight = range / distance;
+	weight = min(1.0f, weight);
+	weight = 1.0f - weight;
+	
+	enemy_actor->TakeDamage(damage * weight);
 }
