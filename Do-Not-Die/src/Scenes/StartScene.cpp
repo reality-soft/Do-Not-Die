@@ -25,8 +25,8 @@ void StartScene::OnInit()
 	intro_scene_ui.OnInit(reg_scene_);
 	intro_scene_ui.SetIntroTime(6.0f);
 
-	sequence_camera_ = Scene::AddActor<SequenceCameraActor>();
-	sequence_camera_actor = Scene::GetActor<SequenceCameraActor>(sequence_camera_);
+	sequence_camera_ = AddActor<SequenceCameraActor>();
+	sequence_camera_actor = GetActor<SequenceCameraActor>(sequence_camera_);
 	sequence_camera_actor->ImportSequenceTrack("DND_SequenceTrack_2.mapdat");
 	start_scene_ui.OnInit(reg_scene_);
 
