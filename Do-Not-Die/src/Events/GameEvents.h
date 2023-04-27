@@ -113,4 +113,34 @@ public:
 	}
 };
 
+class GrenadeEvent : public Event
+{
+public:
+	GrenadeEvent(XMVECTOR pos, float range, float damage) : pos_(pos), range_(range), damage_(damage) {};
+	virtual void Process() override {
+		auto ingamescene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		for (auto& pair : ingamescene->GetActors())
+		{
+			
+			auto enemy = SCENE_MGR->GetActor<Enemy>(pair.first);
+
+			if (enemy == nullptr)
+				continue;
+
+			float distance = XMVectorGetX(XMVector3Length(pos_ - enemy->GetCurPosition()));
+
+			if (distance > range_)
+				continue;
+
+			float weight = distance / range_;
+
+			enemy->TakeDamage(damage_ * weight);
+		}
+	};
+private:
+	XMVECTOR pos_;
+	float range_;
+	float damage_;
+};
+
 
