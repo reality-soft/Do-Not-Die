@@ -217,6 +217,18 @@ void Player::Jump()
 
 void Player::Attack()
 {
+	if (cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE)
+	{
+		ThrowGrenade();
+		return;
+	}
+
+	if (cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON)
+	{
+		MeeleAttack();
+		return;
+	}
+		
 	if (is_aiming_ && !is_attacking_ && cur_weapon_using_remained_[static_cast<int>(cur_equipped_weapon_)] > 0) {
 		cur_weapon_using_remained_[static_cast<int>(cur_equipped_weapon_)]--;
 		is_attacking_ = true;
@@ -272,6 +284,9 @@ void Player::ThrowGrenade()
 
 	grenade_timer_ -= grenade_cooltime_;
 
+	if (cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] <= 0)
+		return;
+
 	cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE]--;
 
 	auto grenade_entity = SCENE_MGR->AddActor<Grenade>();
@@ -282,6 +297,10 @@ void Player::ThrowGrenade()
 	XMVECTOR dir = ingame_scene->GetCameraSystem().GetCamera()->look;
 	//XMVECTOR dir = XMVectorAdd(front_, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
 	grenade_actor->SetDir(dir, 10.0f);
+}
+
+void Player::MeeleAttack()
+{
 }
 
 bool Player::IsAiming()

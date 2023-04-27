@@ -35,6 +35,7 @@ public:
 	void Aim(bool active);
 	void Reload();
 	void ThrowGrenade();
+	void MeeleAttack();
 	void PickClosestItem();
 	void SetCharacterMovementAnimation();
 

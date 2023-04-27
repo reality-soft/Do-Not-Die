@@ -631,6 +631,19 @@ public:
 		{
 			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
 			player->is_reloading_ = false;
+
+			int count_to_reload = AUTO_RIFLE_MAX - player->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE];
+			if (count_to_reload >= player->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE])
+			{
+				player->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE] += player->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE];
+				player->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE] = 0;
+			}
+			else
+			{
+				player->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE] += count_to_reload;
+				player->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE] -= count_to_reload;
+			}
+			
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
@@ -649,6 +662,18 @@ public:
 		{
 			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
 			player->is_reloading_ = false;
+
+			int count_to_reload = HAND_GUN_MAX - player->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::HAND_GUN];
+			if (count_to_reload >= player->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::HAND_GUN])
+			{
+				player->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::HAND_GUN] += player->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::HAND_GUN];
+				player->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::HAND_GUN] = 0;
+			}
+			else
+			{
+				player->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::HAND_GUN] += count_to_reload;
+				player->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::HAND_GUN] -= count_to_reload;
+			}
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
