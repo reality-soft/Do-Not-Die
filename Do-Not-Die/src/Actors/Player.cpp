@@ -296,6 +296,8 @@ void Player::ThrowGrenade()
 
 	grenade_timer_ -= grenade_cooltime_;
 
+	cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE]--;
+
 	auto grenade_entity = SCENE_MGR->AddActor<Grenade>();
 	auto grenade_actor = SCENE_MGR->GetActor<Grenade>(grenade_entity); 
 	XMVECTOR pos = XMVectorAdd(cur_position_, XMVectorSet(0.0f, 50.0f, 0.0f, 0.0f));

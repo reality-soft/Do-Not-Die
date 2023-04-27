@@ -115,14 +115,18 @@ void UI_Actor_Ingame::CreateIngameUI()
 		inven_select_->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
 		status_ui->AddChildUI("2_InvenSelect", inven_select_);
 
+		XMFLOAT2 inven_slot_min = { 5.0f, 5.0f };
+		XMFLOAT2 inven_count_min = { 60.0f, 58.0f };
+		float inven_count_text_size = 0.6f;
+
 		inven_[0] = make_shared<UI_Image>();
 		inven_[0]->InitImage("");
 		inven_[0]->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
 		inven_count_text_[0] = make_shared<UI_Text>();
-		inven_count_text_[0]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_count_text_[0]->InitText("", E_Font::BASIC, inven_count_min, inven_count_text_size, {0.0f, 0.0f, 0.0f, 1.0f});
 		inven_[0]->AddChildUI("2_InvenCountText", inven_count_text_[0]);
 		inven_slot_text_[0] = make_shared<UI_Text>();
-		inven_slot_text_[0]->InitText("1", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_slot_text_[0]->InitText("1", E_Font::BASIC, inven_slot_min, 1.0f, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[0]->AddChildUI("2_InvenSlotText", inven_slot_text_[0]);
 		inven_cooltime_img_[0] = make_shared<UI_Image>();
 		inven_cooltime_img_[0]->InitImage("T_ItemCoolTime.png");
@@ -133,10 +137,10 @@ void UI_Actor_Ingame::CreateIngameUI()
 		inven_[1]->InitImage("");
 		inven_[1]->SetLocalRectByCenter({ 203.5f, 76.5f }, 90.0f, 90.0f);
 		inven_count_text_[1] = make_shared<UI_Text>();
-		inven_count_text_[1]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_count_text_[1]->InitText("", E_Font::BASIC, inven_count_min, inven_count_text_size, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[1]->AddChildUI("2_InvenCountText", inven_count_text_[1]);
 		inven_slot_text_[1] = make_shared<UI_Text>();
-		inven_slot_text_[1]->InitText("2", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_slot_text_[1]->InitText("2", E_Font::BASIC, inven_slot_min, 1.0f, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[1]->AddChildUI("2_InvenSlotText", inven_slot_text_[1]);
 		inven_cooltime_img_[1] = make_shared<UI_Image>();
 		inven_cooltime_img_[1]->InitImage("T_ItemCoolTime.png");
@@ -147,10 +151,10 @@ void UI_Actor_Ingame::CreateIngameUI()
 		inven_[2]->InitImage("");
 		inven_[2]->SetLocalRectByCenter({ 306.5f, 76.5f }, 90.0f, 90.0f);
 		inven_count_text_[2] = make_shared<UI_Text>();
-		inven_count_text_[2]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_count_text_[2]->InitText("", E_Font::BASIC, inven_count_min, inven_count_text_size, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[2]->AddChildUI("2_InvenCountText", inven_count_text_[2]);
 		inven_slot_text_[2] = make_shared<UI_Text>();
-		inven_slot_text_[2]->InitText("3", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_slot_text_[2]->InitText("3", E_Font::BASIC, inven_slot_min, 1.0f, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[2]->AddChildUI("2_InvenSlotText", inven_slot_text_[2]);
 		inven_cooltime_img_[2] = make_shared<UI_Image>();
 		inven_cooltime_img_[2]->InitImage("T_ItemCoolTime.png");
@@ -161,10 +165,10 @@ void UI_Actor_Ingame::CreateIngameUI()
 		inven_[3]->InitImage("");
 		inven_[3]->SetLocalRectByCenter({ 410.5f, 76.5f }, 90.0f, 90.0f);
 		inven_count_text_[3] = make_shared<UI_Text>();
-		inven_count_text_[3]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_count_text_[3]->InitText("", E_Font::BASIC, inven_count_min, inven_count_text_size, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[3]->AddChildUI("2_InvenCountText", inven_count_text_[3]);
 		inven_slot_text_[3] = make_shared<UI_Text>();
-		inven_slot_text_[3]->InitText("4", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_slot_text_[3]->InitText("4", E_Font::BASIC, inven_slot_min, 1.0f, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[3]->AddChildUI("2_InvenSlotText", inven_slot_text_[3]);
 		inven_cooltime_img_[3] = make_shared<UI_Image>();
 		inven_cooltime_img_[3]->InitImage("T_ItemCoolTime.png");
@@ -386,8 +390,24 @@ void UI_Actor_Ingame::UpdateIngameUI()
 		float height_step = 78.0f;
 		float width = weapon_select_ui_->rect_transform_[R1920x1080].world_rect.width;
 		float height = weapon_select_ui_->rect_transform_[R1920x1080].world_rect.height;
-		;
-		weapon_select_ui_->SetLocalRectByMin({ 100.0f, weapon_ui_height + height_step * (int)player_->cur_equipped_weapon_ }, width, height);
+		
+		int cur_weapon = (int)player_->cur_equipped_weapon_;
+
+		weapon_select_ui_->SetLocalRectByMin({ 100.0f, weapon_ui_height + height_step * cur_weapon }, width, height);
+
+		int total_ar_ammo = player_->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE] +
+			player_->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE];
+		int total_hand_gun_ammo = player_->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::HAND_GUN] +
+			player_->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::HAND_GUN];
+		int total_grenade_ammo = player_->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] +
+			player_->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::GRENADE];
+
+		ar_ammo_text_->SetText(to_string(total_ar_ammo));
+		handgun_ammo_text_->SetText(to_string(total_hand_gun_ammo));
+		grenade_ammo_text_->SetText(to_string(total_grenade_ammo));
+
+		ammo_cur_text_->SetText(to_string( player_->cur_weapon_using_remained_[cur_weapon]));
+		ammo_max_text_->SetText(to_string( player_->cur_weapon_total_remained_[cur_weapon]));
 	}
 
 

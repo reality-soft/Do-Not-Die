@@ -7,8 +7,6 @@
 
 void InGameScene::OnInit()
 {
-	ShowCursor(false);
-
 	// LOADING : MANAGER_LOADING
 	loading_progress = LOADING_MANAGER;
 
@@ -195,14 +193,14 @@ void InGameScene::CursorStateUpdate()
 
 void InGameScene::SetCursorVisible()
 {
-	b_show_cursor = true;
-	ShowCursor(b_show_cursor);
+	b_show_cursor = true; 
+	while (ShowCursor(b_show_cursor) <= 0);
 }
 
 void InGameScene::SetCursorInvisible()
 {
 	b_show_cursor = false;
-	ShowCursor(b_show_cursor);
+	while (ShowCursor(b_show_cursor) >= 0);
 	SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
 }
 
