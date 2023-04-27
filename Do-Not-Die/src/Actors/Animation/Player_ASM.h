@@ -310,7 +310,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ AIM_POSE_GR, Transition(IDLE_POSE_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_GR, Transition(AIM_POSE_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
