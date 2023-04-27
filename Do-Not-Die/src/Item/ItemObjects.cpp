@@ -62,6 +62,7 @@ void ARAmmoItem::OnCreate()
 
 void ARAmmoItem::UseItem()
 {
+	owner_->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE] += AUTO_RIFLE_MAX;
 }
 
 void PistolAmmoItem::OnCreate()
@@ -73,6 +74,7 @@ void PistolAmmoItem::OnCreate()
 
 void PistolAmmoItem::UseItem()
 {
+	owner_->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::HAND_GUN] += HAND_GUN_MAX;
 }
 
 void GrenadeItem::OnCreate()
@@ -84,6 +86,7 @@ void GrenadeItem::OnCreate()
 
 void GrenadeItem::UseItem()
 {
+	owner_->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] += 1;
 }
 
 void RepairPartItem::OnCreate()
