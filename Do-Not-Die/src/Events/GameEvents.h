@@ -35,7 +35,7 @@ public:
 		for (const auto& cur_ray : rays_) {
 			RayCallback raycallback = QUADTREE->Raycast(cur_ray);
 			
-			if (raycallback.ent != actor_id_) {
+			if (raycallback.ent == actor_id_) {
 				continue;
 			}
 
