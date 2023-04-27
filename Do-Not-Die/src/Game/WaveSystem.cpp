@@ -17,7 +17,7 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 	fx_corpse_fire_ = QUADTREE->GetGuideLines("DND_FX_CorpseFire_1")->at(0);
 
 	CreateExtractPoints(reg);
-	CreateCarEventTriggers(_XMFLOAT3(car_event_.line_nodes.begin()->second), 500, 700);
+	CreateCarEventTriggers(_XMFLOAT3(car_event_.line_nodes.begin()->second), 200, 700);
 	//CreateStaticEffects();
 }
 
