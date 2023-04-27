@@ -19,6 +19,8 @@ public:
 	virtual void OnInit() override {
 		states_.insert({ IDLE_BASE, make_shared<Idle_Base>() });
 		states_.insert({ MOVE_BASE, make_shared<Move_Base>() });
+		states_.insert({ HIT_BASE, make_shared<Hit_Base>() });
+		states_.insert({ DIE_BASE, make_shared<Die_Base>() });
 		transitions_.insert({ IDLE_BASE, Transition(MOVE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
 				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
 				if (enemy->IsMoving()) {
