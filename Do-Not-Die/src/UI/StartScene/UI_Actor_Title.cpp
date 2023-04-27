@@ -40,19 +40,19 @@ void UI_Actor_Title::CreateUI()
 
 	float button_x = title_img_->rect_transform_[R1920x1080].world_rect.center.x;
 
-	float img_width = 300.0f;
-	float img_height = 300.0f;
+	float img_width = 200.0f;
+	float img_height = 200.0f;
 
 	// Direct X IMG
 	direct_x_img_ = make_shared<UI_Image>();
 	direct_x_img_->InitImage("T_Directx11.png");
-	direct_x_img_->SetLocalRectByMin({ 10.0f, win_size_1920_height * 3.0f / 4.0f }, img_width, img_height);
+	direct_x_img_->SetLocalRectByMin({ 50.0f, win_size_1920_height * 5.0f / 6.0f }, img_width, img_height);
 	ui_comp_->ui_list.insert({ "DirectX Image", direct_x_img_ });
 
 	// FMOD IMG
 	fmod_img_ = make_shared<UI_Image>();
 	fmod_img_->InitImage("T_Fmod.png");
-	fmod_img_->SetLocalRectByMin({ img_width + 50.0f, win_size_1920_height * 3.0f / 4.0f }, img_width, img_height);
+	fmod_img_->SetLocalRectByMin({ img_width + 80.0f, win_size_1920_height * 5.0f / 6.0f }, img_width, img_height);
 	ui_comp_->ui_list.insert({ "FMOD Image", fmod_img_ });
 
 	// New Game Button
