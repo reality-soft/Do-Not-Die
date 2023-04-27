@@ -98,6 +98,9 @@ void StartScene::FinishProgress()
 	bool sound_finished = sys_sound.FadeOutDelete(3.0f);
 	start_scene_ui.DisappearUI();
 
+	// Hide Cursor
+	while (ShowCursor(false) >= 0);
+
 	if (sound_finished)
 		SCENE_MGR->ChangeScene(E_SceneType::INGAME);
 }
