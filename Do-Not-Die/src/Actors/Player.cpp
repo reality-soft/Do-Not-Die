@@ -460,11 +460,6 @@ void Player::ChangeWeapon()
 		cur_equipped_weapon = num_of_weapon_type - 1;
 	}
 	cur_equipped_weapon_ = static_cast<EQUIPPED_WEAPON>(cur_equipped_weapon);
-
-	wstringstream wss;
-	wss << static_cast<int>(cur_equipped_weapon_) << '\n';
-
-	OutputDebugStringW(wss.str().c_str());
 }
 
 void Player::UpdateTimer()
