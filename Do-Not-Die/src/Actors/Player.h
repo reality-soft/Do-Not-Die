@@ -68,6 +68,8 @@ private:
 public:
 	int cur_weapon_using_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 30, 8, 1, 5 };
 	int cur_weapon_total_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 60, 16, 0, 0 };
+	string socket_ids_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)];
+	string stm_ids_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)];
 public:
 	int kill_score_ = 0;
 public:

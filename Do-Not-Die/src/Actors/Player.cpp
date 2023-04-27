@@ -57,62 +57,38 @@ void Player::OnInit(entt::registry& registry)
 	XMMATRIX socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
 		* XMMatrixRotationX(XMConvertToRadians(180))
 		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
-	socket_component.AddSocket("RightHand", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+	socket_component.AddSocket("Pistol", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+	socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(180))
+		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
+	socket_component.AddSocket("Rifle", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+	socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(180))
+		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
+	socket_component.AddSocket("Axe", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+	socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(180))
+		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
+	socket_component.AddSocket("Grenade", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 	registry.emplace<C_Socket>(entity_id_, socket_component);
 
-#define AXE
+	socket_ids_[0] = "Rifle";
+	socket_ids_[1] = "Pistol";
+	socket_ids_[2] = "Axe";
+	socket_ids_[3] = "Grenade";
 
-#ifdef PISTOL
+	stm_ids_[0] = "WEP_Rifle.stmesh";
+	stm_ids_[1] = "WEP_Pistol.stmesh";
+	stm_ids_[2] = "WEP_Axe.stmesh";
+	stm_ids_[3] = "WEP_Pistol.stmesh";
+
 	C_StaticMesh static_mesh_component;
 	static_mesh_component.local = TransformR(XMFLOAT3(0, 180, 0));
 	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
-	static_mesh_component.static_mesh_id = "WEP_Pistol.stmesh";
+	static_mesh_component.static_mesh_id = stm_ids_[static_cast<int>(cur_equipped_weapon_)];
 	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
-	static_mesh_component.socket_name = "RightHand";
+	static_mesh_component.socket_name = socket_ids_[static_cast<int>(cur_equipped_weapon_)];
 	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
-#endif
-
-#ifdef RIFLE
-	C_StaticMesh static_mesh_component;
-	
-	static_mesh_component.local = TransformR(XMFLOAT3(-10, 170, 0)) * TransformT(XMFLOAT3(5, 0, -10));
-	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
-	static_mesh_component.static_mesh_id = "WEP_Rifle.stmesh";
-	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
-	static_mesh_component.socket_name = "RightHand";
-	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
-#endif
-
-#ifdef AK47
-	C_StaticMesh static_mesh_component;
-
-	static_mesh_component.local = TransformR(XMFLOAT3(-10, 170, 0)) * TransformT(XMFLOAT3(5, 0, 5));
-	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
-	static_mesh_component.static_mesh_id = "WEP_AK47.stmesh";
-	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
-	static_mesh_component.socket_name = "RightHand";
-	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
-#endif
-
-#ifdef AXE
-	C_StaticMesh static_mesh_component;
-	static_mesh_component.local = TransformR(XMFLOAT3(0, 180, 0));
-	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
-	static_mesh_component.static_mesh_id = "WEP_Axe.stmesh";
-	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
-	static_mesh_component.socket_name = "RightHand";
-	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
-#endif
-
-#ifdef CROSSBAR
-	C_StaticMesh static_mesh_component;
-	static_mesh_component.local = TransformR(XMFLOAT3(0, 180, 0));
-	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
-	static_mesh_component.static_mesh_id = "WEP_Crossbar.stmesh";
-	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
-	static_mesh_component.socket_name = "RightHand";
-	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
-#endif
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_CapsuleCollision));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SkeletalMesh));
@@ -480,6 +456,11 @@ void Player::ChangeWeapon()
 	if (cur_equipped_weapon < 0) {
 		cur_equipped_weapon = num_of_weapon_type - 1;
 	}
+
+	C_StaticMesh* stm_ptr = reg_scene_->try_get<C_StaticMesh>(entity_id_);
+	stm_ptr->socket_name = socket_ids_[cur_equipped_weapon];
+	stm_ptr->static_mesh_id = stm_ids_[cur_equipped_weapon];
+
 	cur_equipped_weapon_ = static_cast<EQUIPPED_WEAPON>(cur_equipped_weapon);
 }
 
