@@ -15,6 +15,7 @@ namespace reality
 		float countdown_timer_ = 0;
 		UINT wave_count_ = 0;
 		int car_health = 40;
+		int car_repair_count = 0;
 
 	private:
 		void CreateExtractPoints(entt::registry& reg);
