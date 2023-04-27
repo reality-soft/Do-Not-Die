@@ -63,9 +63,9 @@ private:
 
 private:
 	bool is_aiming_ = false;
-	int cur_weapon_using_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 0, 0, 1, 0 };
-	int cur_weapon_total_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 0, 0, 0, 0 };
-
+public:
+	int cur_weapon_using_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 30, 8, 1, 5 };
+	int cur_weapon_total_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 60, 16, 0, 0 };
 public:
 	int kill_score_ = 0;
 public:

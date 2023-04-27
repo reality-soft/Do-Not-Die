@@ -386,8 +386,24 @@ void UI_Actor_Ingame::UpdateIngameUI()
 		float height_step = 78.0f;
 		float width = weapon_select_ui_->rect_transform_[R1920x1080].world_rect.width;
 		float height = weapon_select_ui_->rect_transform_[R1920x1080].world_rect.height;
-		;
-		weapon_select_ui_->SetLocalRectByMin({ 100.0f, weapon_ui_height + height_step * (int)player_->cur_equipped_weapon_ }, width, height);
+		
+		int cur_weapon = (int)player_->cur_equipped_weapon_;
+
+		weapon_select_ui_->SetLocalRectByMin({ 100.0f, weapon_ui_height + height_step * cur_weapon }, width, height);
+
+		int total_ar_ammo = player_->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE] +
+			player_->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE];
+		int total_hand_gun_ammo = player_->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::HAND_GUN] +
+			player_->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::HAND_GUN];
+		int total_grenade_ammo = player_->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] +
+			player_->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::GRENADE];
+
+		ar_ammo_text_->SetText(to_string(total_ar_ammo));
+		handgun_ammo_text_->SetText(to_string(total_hand_gun_ammo));
+		grenade_ammo_text_->SetText(to_string(total_grenade_ammo));
+
+		ammo_cur_text_->SetText(to_string( player_->cur_weapon_using_remained_[cur_weapon]));
+		ammo_max_text_->SetText(to_string( player_->cur_weapon_total_remained_[cur_weapon]));
 	}
 
 
