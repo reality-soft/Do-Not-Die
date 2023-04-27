@@ -111,11 +111,6 @@ void Enemy::SetMovement(const XMVECTOR& direction)
 
 	angle = XMConvertToDegrees(angle);
 
-	wstringstream wss;
-	wss << angle << '\n';
-
-	OutputDebugStringW(wss.str().c_str());
-
 	rotation_ = XMMatrixRotationY(angle);
 
 	movement_component_->accelaration_vector[2] = 1;

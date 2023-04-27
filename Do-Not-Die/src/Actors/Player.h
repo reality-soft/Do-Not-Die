@@ -9,6 +9,14 @@ class ItemBase;
 
 using namespace reality;
 
+enum class EQUIPPED_WEAPON {
+	AUTO_RIFLE,
+	HAND_GUN,
+	MELEE_WEAPON,
+	GRENADE,
+	NUM_OF_WEAPON_TYPE
+};
+
 class Player : public GameCharacter
 {
 public:
@@ -46,11 +54,13 @@ private:
 
 private:
 	void CalculateMovementAngle();
+	void ChangeWeapon();
 
 private:
 	bool is_aiming_ = false;
 
 public:
+	EQUIPPED_WEAPON cur_equipped_weapon_ = EQUIPPED_WEAPON::HAND_GUN;
 	bool is_firing_ = false;
 	float angle_ = 0.0f;
 	XMVECTOR direction_;

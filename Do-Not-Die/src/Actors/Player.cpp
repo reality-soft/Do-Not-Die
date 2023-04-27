@@ -113,9 +113,6 @@ void Player::OnInit(entt::registry& registry)
 	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
 #endif
 
-
-
-
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_CapsuleCollision));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SkeletalMesh));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_Camera));
@@ -144,8 +141,6 @@ void Player::OnInit(entt::registry& registry)
 	
 	cur_hp_ = 0;
 	tag = "player";
-
-
 }
 
 void Player::SetCharacterMovementAnimation()
@@ -193,6 +188,7 @@ void Player::OnUpdate()
 	Character::OnUpdate();
 	CalculateMovementAngle();
 	SetCharacterMovementAnimation();
+	ChangeWeapon();
 
 	// FlashLight Update
 	UpdateFlashLight();
@@ -245,7 +241,6 @@ void Player::Jump()
 void Player::Fire()
 {
 	if (is_aiming_ && !is_firing_) {
-
 		is_firing_ = true;
 
 		// Make Muzzle when Shot
@@ -431,6 +426,24 @@ void Player::CalculateMovementAngle()
 	
 	angle_ = XMConvertToDegrees(angle_);
 	angle_ += 0.2f;
+}
+
+void Player::ChangeWeapon()
+{
+	int cur_equipped_weapon = static_cast<int>(cur_equipped_weapon_);
+	cur_equipped_weapon += DINPUT->GetMouseWheel() / 120 * -1;
+
+	int num_of_weapon_type = static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE);
+	if (cur_equipped_weapon >= num_of_weapon_type) {
+		cur_equipped_weapon %= num_of_weapon_type;
+	}
+	if (cur_equipped_weapon < 0) {
+		cur_equipped_weapon = num_of_weapon_type - 1;
+	}
+	cur_equipped_weapon_ = static_cast<EQUIPPED_WEAPON>(cur_equipped_weapon);
+
+	wstringstream wss;
+	wss << static_cast<int>(cur_equipped_weapon_) << '\n';
 }
 
 void Player::UpdateTimer()
