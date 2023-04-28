@@ -32,6 +32,21 @@ void UI_Actor_Ingame::SetGameTimer(float timer)
 	wave_timer_ = timer;
 }
 
+bool reality::UI_Actor_Ingame::FadeOut()
+{
+	static float timer = 0.0f;
+	static float alpha = 0.0f;
+
+	if (alpha > 1.0f)
+		return true;
+
+	timer += TM_DELTATIME;
+	alpha = FadeInAlpha(0.0f, 3.0f, timer);
+
+	background_img_->SetAlpha(alpha);
+	return false;
+}
+
 void UI_Actor_Ingame::CreateIngameUI()
 {
 	float win_size_1920_width = E_Resolution_Size[E_Resolution::R1920x1080].x;
@@ -100,8 +115,14 @@ void UI_Actor_Ingame::CreateIngameUI()
 		ammo_max_text_->InitText("150", ROBOTO, { 130.0f, 15.0f }, 0.8f, {0.3f, 0.3f, 0.3f, 1.0f});
 		ammo_ui_->AddChildUI("1_AmmoMax", ammo_max_text_);
 
-
 		ui_comp_->ui_list.insert({ "Weapon_Ammo UI", ammo_ui_ });
+
+		// Background UI
+		background_img_ = make_shared<UI_Image>();
+		background_img_->InitImage("T_Intro_Background.png");
+		background_img_->SetLocalRectByMin({ 0, 0 }, win_size_1920_width, win_size_1920_height);
+		ui_comp_->ui_list.insert({ "Z_Background Image", background_img_ });
+		background_img_->SetAlpha(0.0f);
 	}
 
 	// 상태 + 아이템 UI
