@@ -55,6 +55,7 @@ public:
 	virtual void SetCurHp(int hp) override;
 	virtual void TakeDamage(int damage) override;
 	virtual float GetCurHp() const override;
+
 private:
 	void AddFlashLight();
 	void UpdateFlashLight();
@@ -112,6 +113,7 @@ public:
 	bool can_repair_car_ = false;
 
 	bool is_reloading_ = false;
+	bool is_hit_;
 	
 	entt::entity repair_extract_trigger;
 

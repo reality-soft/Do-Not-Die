@@ -294,9 +294,7 @@ void Player::ThrowGrenade()
 	if (cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] <= 0)
 		return;
 
-
 	is_attacking_ = true;
-
 
 	cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE]--;
 

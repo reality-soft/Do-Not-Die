@@ -20,7 +20,10 @@ public:
 		ATTACK_GR,
 		RELOAD_AR,
 		RELOAD_HG,
-		HIT,
+		HIT_AR,
+		HIT_HG,
+		HIT_MELEE,
+		HIT_GR,
 		DIE
 	};
 
@@ -39,7 +42,10 @@ public:
 		states_.insert({ ATTACK_GR, make_shared<AttackGR>() });
 		states_.insert({ RELOAD_HG, make_shared<ReloadHG>() });
 		states_.insert({ RELOAD_AR, make_shared<ReloadAR>() });
-		states_.insert({ HIT, make_shared<Hit>() });
+		states_.insert({ HIT_AR, make_shared<HitAR>() });
+		states_.insert({ HIT_HG, make_shared<HitHG>() });
+		states_.insert({ HIT_MELEE, make_shared<HitMelee>() });
+		states_.insert({ HIT_GR, make_shared<HitGr>() });
 		states_.insert({ DIE, make_shared<Die>() });
 
 		// Auto Rifle
@@ -161,6 +167,30 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->is_attacking_ == true) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ ATTACK_AR, Transition(AIM_POSE_AR,[this](const AnimationStateMachine* animation_state_machine) {
+						if (IsAnimationEnded()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+			}
+
+			// Hit
+			{
+				transitions_.insert({ AIM_POSE_AR, Transition(ATTACK_AR,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
 							return true;
 						}
 						else {
@@ -682,9 +712,54 @@ public:
 		}
 	};
 
-	class Hit : public AnimationState {
+	class HitAR : public AnimationState {
 	public:
-		Hit() : AnimationState(HIT) {}
+		HitAR() : AnimationState(HIT_AR) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_base) override
+		{
+		}
+		virtual void Exit(AnimationStateMachine* animation_base) override
+		{
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		{
+		}
+	};
+
+	class HitHG : public AnimationState {
+	public:
+		HitHG() : AnimationState(HIT_HG) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_base) override
+		{
+		}
+		virtual void Exit(AnimationStateMachine* animation_base) override
+		{
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		{
+		}
+	};
+
+	class HitMelee : public AnimationState {
+	public:
+		HitMelee() : AnimationState(HIT_MELEE) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_base) override
+		{
+		}
+		virtual void Exit(AnimationStateMachine* animation_base) override
+		{
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		{
+		}
+	};
+
+	class HitGR : public AnimationState {
+	public:
+		HitGR() : AnimationState(HIT_GR) {}
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
