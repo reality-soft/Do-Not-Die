@@ -55,6 +55,7 @@ public:
 	virtual void SetCurHp(int hp) override;
 	virtual void TakeDamage(int damage) override;
 	virtual float GetCurHp() const override;
+
 private:
 	void AddFlashLight();
 	void UpdateFlashLight();
@@ -70,6 +71,7 @@ public:
 	int cur_weapon_total_remained_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)] = { 60, 16, 0, 0 };
 	string socket_ids_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)];
 	string stm_ids_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)];
+	XMMATRIX stm_local_[static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE)];
 public:
 	int kill_score_ = 0;
 public:
@@ -111,6 +113,7 @@ public:
 	bool can_repair_car_ = false;
 
 	bool is_reloading_ = false;
+	bool is_hit_;
 	
 	entt::entity repair_extract_trigger;
 
