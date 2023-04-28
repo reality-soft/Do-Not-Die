@@ -54,21 +54,27 @@ void Player::OnInit(entt::registry& registry)
 	C_Socket socket_component;
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
 	int skeleton_id = skeletal_mesh->skeleton.bone_name_id_map["Hand_R"];
-	XMMATRIX socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
-		* XMMatrixRotationX(XMConvertToRadians(180))
-		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
+	XMMATRIX socket_offset = XMMatrixRotationZ(XMConvertToRadians(90))
+		* XMMatrixRotationY(XMConvertToRadians(-10))
+		* XMMatrixRotationX(XMConvertToRadians(20))
+		* XMMatrixTranslationFromVector({ 0, 8, -20, 0 });
 	socket_component.AddSocket("Rifle", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
-	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90))
-		* XMMatrixTranslationFromVector({ 0, -4, 4, 0 });
+
+	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90)) 
+		* XMMatrixRotationY(XMConvertToRadians(-10))
+		* XMMatrixTranslationFromVector({ 0, 4, -8, 0 });
 	socket_component.AddSocket("Pistol", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
-	socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
-		* XMMatrixRotationX(XMConvertToRadians(180))
-		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
+
+	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90))
+		* XMMatrixRotationY(XMConvertToRadians(-10))
+		* XMMatrixTranslationFromVector({ 0, 4, -8, 0 });
 	socket_component.AddSocket("Axe", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
-	socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
-		* XMMatrixRotationX(XMConvertToRadians(180))
-		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
+
+	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90))
+		* XMMatrixRotationY(XMConvertToRadians(-10))
+		* XMMatrixTranslationFromVector({ 0, 4, -8, 0 });
 	socket_component.AddSocket("Grenade", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+
 	registry.emplace<C_Socket>(entity_id_, socket_component);
 
 	socket_ids_[0] = "Rifle";
@@ -76,10 +82,15 @@ void Player::OnInit(entt::registry& registry)
 	socket_ids_[2] = "Axe";
 	socket_ids_[3] = "Grenade";
 
-	stm_ids_[0] = "WEP_Rifle.stmesh";
+	stm_ids_[0] = "WEP_AK47.stmesh";
 	stm_ids_[1] = "WEP_Pistol.stmesh";
 	stm_ids_[2] = "WEP_Axe.stmesh";
-	stm_ids_[3] = "WEP_Pistol.stmesh";
+	stm_ids_[3] = "Grenade.stmesh";
+
+	stm_local_[0] = XMMatrixScalingFromVector({ 0.8f, 0.8f, 0.8f, 0.8f });
+	stm_local_[1] = XMMatrixScalingFromVector({ 0.8f, 0.8f, 0.8f, 0.8f });
+	stm_local_[2] = XMMatrixIdentity();
+	stm_local_[3] = XMMatrixIdentity();
 
 	C_StaticMesh static_mesh_component;
 	static_mesh_component.local = TransformR(XMFLOAT3(0, 180, 0));
@@ -278,13 +289,14 @@ void Player::Reload()
 
 void Player::ThrowGrenade()
 {
-	if (grenade_timer_ < grenade_cooltime_)
+	if (is_attacking_)
 		return;
-
-	grenade_timer_ -= grenade_cooltime_;
-
 	if (cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] <= 0)
 		return;
+
+
+	is_attacking_ = true;
+
 
 	cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE]--;
 
@@ -466,6 +478,7 @@ void Player::ChangeWeapon()
 	C_StaticMesh* stm_ptr = reg_scene_->try_get<C_StaticMesh>(entity_id_);
 	stm_ptr->socket_name = socket_ids_[cur_equipped_weapon];
 	stm_ptr->static_mesh_id = stm_ids_[cur_equipped_weapon];
+	stm_ptr->local = stm_local_[cur_equipped_weapon];
 
 	cur_equipped_weapon_ = static_cast<EQUIPPED_WEAPON>(cur_equipped_weapon);
 }
