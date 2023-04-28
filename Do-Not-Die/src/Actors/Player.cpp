@@ -115,7 +115,6 @@ void Player::OnInit(entt::registry& registry)
 	inventory_.resize(INVENTORY_MAX);
 	inventory_timer_.resize(INVENTORY_MAX);
 	
-	cur_hp_ = 0;
 	tag = "player";
 }
 
