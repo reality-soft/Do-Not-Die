@@ -386,6 +386,10 @@ void Player::SetCurHp(int hp)
 
 void Player::TakeDamage(int damage)
 {
+	if (is_hit_ == true) {
+		return;
+	}
+
 	is_hit_ = true;
 	cur_hp_ -= damage;	
 }

@@ -71,12 +71,16 @@ namespace reality
 		shared_ptr<UI_Image>	game_over_ui_;
 			shared_ptr<UI_Image>	game_over_img_;
 			shared_ptr<UI_Button> game_over_exit_button_;
+
+			//FadeOutBackground
+		shared_ptr<UI_Image>	background_img_;
 	private:
 		float wave_timer_ = 0.0f;
 		float event_msg_time_ = 3.0f;
 		float event_msg_timer_ = 0.0f;
 	public:
 		void SetGameTimer(float timer);
+		bool FadeOut();
 	private:
 		void CreateIngameUI();
 		void CreateMenuUI();
