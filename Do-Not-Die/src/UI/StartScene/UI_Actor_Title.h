@@ -20,6 +20,7 @@ namespace reality
 		shared_ptr<UI_Image>	background_img_;
 		shared_ptr<UI_Image>	direct_x_img_;
 		shared_ptr<UI_Image>	fmod_img_;
+		shared_ptr<UI_Image>	kgca_img_;
 		shared_ptr<UI_Button>	newgame_button_;
 		shared_ptr<UI_Button>	loadinggame_button;
 		shared_ptr<UI_Button>	option_button_;
