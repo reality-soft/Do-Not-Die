@@ -1,6 +1,6 @@
 #include "PopScene.h"
 #include "StartScene.h"
-
+#include "EndingScene.h"
 using namespace reality;
 
 void PopScene::OnInit()
@@ -126,4 +126,5 @@ void PopScene::LoadingScenes()
 {
 	SCENE_MGR->AddScene<StartScene>(START);
 	SCENE_MGR->AddScene<InGameScene>(INGAME);
+	SCENE_MGR->AddScene<EndingScene>(ENDING);
 }
