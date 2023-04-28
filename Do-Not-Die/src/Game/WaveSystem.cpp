@@ -42,9 +42,13 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
-	SpawnZombies(0.3f, 30);
+	SpawnZombies(0.3f, 1);
 
-	if (wave_count_ > 1)
+	if (wave_count_ > 1 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0)
+	{
+		EVENT->PushEvent<GameClearEvent>();
+	}
+	if (car_health <= 0)
 	{
 		EVENT->PushEvent<GameOverEvent>();
 	}
