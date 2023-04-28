@@ -276,6 +276,21 @@ void UI_Actor_Ingame::CreateIngameUI()
 	// Event Message UI
 	event_msg_text_ = make_shared<UI_Text>();
 	event_msg_text_->InitText("Event Test", E_Font::ROBOTO, { win_size_1920_width / 2.0f - 100.0f, win_size_1920_height - 300.0f });
+
+	// Game Over UI
+	game_over_ui_ = make_shared<UI_Image>();
+	game_over_ui_->InitImage("T_GameOver_Background.png");
+	game_over_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
+
+	game_over_img_ = make_shared<UI_Image>();
+	game_over_img_->InitImage("T_GameOver_Image.png");
+	game_over_ui_->AddChildUI("GameOver Img", game_over_img_);
+	game_over_img_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height * 2.0f / 5.0f }, 1200.0f, 250.0f);
+
+	game_over_exit_button_ = make_shared<UI_Button>();
+	game_over_exit_button_->InitButton("T_Gameover_ExitBtn_Normal.png", "T_Gameover_ExitBtn_Hover.png");
+	game_over_ui_->AddChildUI("Exit Button", game_over_exit_button_);
+	game_over_exit_button_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height * 3.0f / 4.0f }, 500.0f, 150.0f);
 	
 }
 
@@ -326,6 +341,14 @@ void UI_Actor_Ingame::UpdateIngameUI()
 
 	float win_size_1920_width = E_Resolution_Size[E_Resolution::R1920x1080].x;
 	float win_size_1920_height = E_Resolution_Size[E_Resolution::R1920x1080].y;
+
+	// If Game Over, Exit Button Check
+	{
+		if (game_over_exit_button_->GetCurrentState() == E_UIState::UI_SELECT)
+		{
+			DestroyWindow(ENGINE->GetWindowHandle());
+		}
+	}
 
 	// Time Icon Move Update
 	{
@@ -643,6 +666,13 @@ void UI_Actor_Ingame::SetEventMsg(string msg)
 	event_msg_text_->SetText(msg);
 	event_msg_timer_ = 0.0f; 
 	ui_comp_->ui_list.insert({ "Event Message UI", event_msg_text_ });
+}
+
+void UI_Actor_Ingame::GameOver()
+{
+	ui_comp_->ui_list.clear();
+	ui_comp_->ui_list.insert({"Game Over UI", game_over_ui_});
+	while (ShowCursor(true) <= 0);
 }
 
 void UI_Actor_Ingame::OpenMenu()

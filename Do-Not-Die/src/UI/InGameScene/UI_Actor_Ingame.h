@@ -63,10 +63,14 @@ namespace reality
 			shared_ptr<UI_Image>	interaction_icon_;
 			shared_ptr<UI_Image>	interaction_progressbar_;
 			shared_ptr<UI_Text>		interaction_text_;
-
+		// Addictive Window
 		shared_ptr<UI_Image>	addicted_ui_;
-
+		// Text Event
 		shared_ptr<UI_Text>		event_msg_text_;
+		// Game Over UI
+		shared_ptr<UI_Image>	game_over_ui_;
+			shared_ptr<UI_Image>	game_over_img_;
+			shared_ptr<UI_Button> game_over_exit_button_;
 	private:
 		float wave_timer_ = 0.0f;
 		float event_msg_time_ = 3.0f;
@@ -80,6 +84,7 @@ namespace reality
 		void UpdateIngameUI();
 		void UpdateMenuUI();
 		void SetEventMsg(string msg);
+		void GameOver();
 	private:
 		void OpenMenu();
 		void CloseMenu();
