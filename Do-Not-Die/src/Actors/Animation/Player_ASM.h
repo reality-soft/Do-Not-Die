@@ -10,7 +10,6 @@ public:
 	enum States {
 		IDLE_POSE_AR,
 		IDLE_POSE_HG,
-		IDLE_POSE_GR,
 		AIM_POSE_AR,
 		AIM_POSE_HG,
 		AIM_POSE_MELEE,
@@ -30,7 +29,6 @@ public:
 	virtual void OnInit() override {
 		states_.insert({ IDLE_POSE_AR, make_shared<IdlePoseAR>() });
 		states_.insert({ IDLE_POSE_HG, make_shared<IdlePoseHG>() });
-		states_.insert({ IDLE_POSE_GR, make_shared<IdlePoseGR>() });
 		states_.insert({ AIM_POSE_AR, make_shared<AimPoseAR>() });
 		states_.insert({ AIM_POSE_HG, make_shared<AimPoseHG>() });
 		states_.insert({ AIM_POSE_MELEE, make_shared<AimPoseMelee>() });
@@ -70,7 +68,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ IDLE_POSE_AR, Transition(IDLE_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ IDLE_POSE_AR, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
@@ -186,7 +184,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ IDLE_POSE_HG, Transition(IDLE_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ IDLE_POSE_HG, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
@@ -300,7 +298,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ AIM_POSE_MELEE, Transition(IDLE_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_MELEE, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
@@ -342,7 +340,7 @@ public:
 		{
 			// Pose Switch
 			{
-				transitions_.insert({ IDLE_POSE_GR, Transition(IDLE_POSE_AR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_GR, Transition(IDLE_POSE_AR,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE) {
@@ -353,7 +351,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ IDLE_POSE_GR, Transition(AIM_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_GR, Transition(AIM_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
@@ -364,7 +362,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ IDLE_POSE_GR, Transition(AIM_POSE_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_GR, Transition(AIM_POSE_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
@@ -376,33 +374,6 @@ public:
 					})
 					});
 			}
-
-			// Aim
-			{
-				transitions_.insert({ IDLE_POSE_GR, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
-						entt::entity owner_id = animation_state_machine->GetOwnerId();
-						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
-						if (player->IsAiming() == true) {
-							return true;
-						}
-						else {
-							return false;
-						}
-					})
-					});
-				transitions_.insert({ AIM_POSE_GR, Transition(IDLE_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
-						entt::entity owner_id = animation_state_machine->GetOwnerId();
-						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
-						if (player->IsAiming() == false) {
-							return true;
-						}
-						else {
-							return false;
-						}
-					})
-					});
-			}
-
 
 			// Attack
 			{
@@ -442,7 +413,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_AR_01_Idle_Pose_Retargeted_Unreal Take.anim", 0.8f);
+			animation_base->SetAnimation("A_TP_CH_AR_01_Idle_Pose_Retargeted_Unreal Take.anim", 0.5f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -468,29 +439,13 @@ public:
 		}
 	};
 
-	class IdlePoseGR : public AnimationState {
-	public:
-		IdlePoseGR() : AnimationState(IDLE_POSE_GR) {}
-	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
-		{
-			animation_base->SetAnimation("", 0.5f);
-		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
-		{
-		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
-		{
-		}
-	};
-
 	class AimPoseAR : public AnimationState {
 	public:
 		AimPoseAR() : AnimationState(AIM_POSE_AR) {}
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_AR_01_Aim_Pose_Retargeted_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("Biker_AR_AimPose_Unreal Take.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -506,7 +461,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_Handgun_Aim_Pose_Retargeted_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("Biker_Pistol_AimPose_Unreal Take.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -537,7 +492,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.5f);
+			animation_base->SetAnimation("Biker_Throw_Pose_Unreal Take.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -553,7 +508,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_AR_Fire_Retargeted_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("Biker_Fire_Rifle_Unreal Take.anim", 0.0f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -571,7 +526,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_Handgun_Fire_Retargeted_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("Biker_Fire_Pistol_Unreal Take.anim", 0.0f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -589,7 +544,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.5f);
+			animation_base->SetAnimation("", 0.0f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -607,7 +562,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.5f);
+			animation_base->SetAnimation("Biker_Throw_Unreal Take.anim", 0.2f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -625,7 +580,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_AR_01_Reload_Retargeted_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("A_TP_CH_AR_01_Reload_Retargeted_Unreal Take.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -656,7 +611,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_Handgun_Reload_Retargeted_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("A_TP_CH_Handgun_Reload_Retargeted_Unreal Take.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -701,6 +656,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
+			animation_base->SetAnimation("Biker_Death_Unreal Take.anim", 0.5f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{

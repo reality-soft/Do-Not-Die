@@ -51,7 +51,6 @@ namespace reality
 		vector<std::string> enemy_meshes = {
 		"Zombie_Businessman_Male_01.skmesh",
 		"Zombie_Cheerleader_Female_01.skmesh",
-		"Zombie_Daughter_Female_01.skmesh",
 		"Zombie_Police_Male_01.skmesh",
 		"Zombie_RiotCop_Male_01.skmesh",
 		"Zombie_SchoolGirl_Female_01.skmesh",
