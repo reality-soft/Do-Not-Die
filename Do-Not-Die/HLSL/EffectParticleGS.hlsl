@@ -37,7 +37,7 @@ void GS(
 	GS_OUT vertex;
 	for (int i = 0; i < 4; i++)
 	{
-		float4 new_point = float4(input[0].p + float4(g_positions[i].xyz, 1.0f));
+		float4 new_point = float4(input[0].p + float4(g_positions[i].xyz, 0.0f));
 		//float4 local = mul(new_point, g_mat_particle);
 		//float4 world = mul(local, g_world);
 		//world.y += -9.81f * g_particle_values.x * g_particle_values.x;

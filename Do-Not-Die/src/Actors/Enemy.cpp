@@ -46,9 +46,9 @@ void Enemy::OnInit(entt::registry& registry)
 
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
-	animation_component.SetBaseAnimObject<ZombieAnimationStateMachine>(entity_id_, skm.skeletal_mesh_id, 0);
+	animation_component.SetBaseAnimObject<ZombieBaseAnimationStateMachine>(entity_id_, skm.skeletal_mesh_id, 0);
+	animation_component.AddNewAnimSlot<ZombieUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 3, "Spine_02");
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
-	SetCharacterAnimation("Zombie_Idle_1_v2_IPC_Anim_Unreal Take.anim");
 }
 
 void Enemy::OnUpdate()
@@ -121,11 +121,6 @@ void Enemy::SetMovement(const XMVECTOR& direction)
 	float angle = XMVectorGetX(XMVector3AngleBetweenVectors(front, dir));
 	if (XMVectorGetX(XMVector3Dot(right, dir)) < 0)
 		angle = XM_2PI - angle;
-
-	wstringstream wss;
-	wss << angle << '\n';
-
-	OutputDebugStringW(wss.str().c_str());
 
 	rotation_ = XMMatrixRotationY(angle);
 

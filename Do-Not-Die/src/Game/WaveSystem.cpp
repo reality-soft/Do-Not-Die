@@ -208,7 +208,8 @@ void reality::WaveSystem::PlayerRepairCar()
 		player->controller_enable_ = true;
 		player->UseRepairPart();
 		car_health = min(100, car_health + 20);
-		player->repair_during_time_ = 0.0f;
+		player->repair_during_time_ = 0.0f; 
+		car_repair_count++;
 		EVENT->PushEvent<MakeTextEvent>("Repair Success!");
 	}
 }

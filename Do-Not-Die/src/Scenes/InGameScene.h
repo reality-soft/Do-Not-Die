@@ -50,6 +50,7 @@ public:
 	reality::CameraSystem GetCameraSystem() { return sys_camera; }
 	reality::WaveSystem& GetWaveSystem() { return sys_wave_; }
 	UI_Actor_Ingame& GetUIActor() { return ingame_ui; }
+	Environment& GetEnviroment() { return environment_; }
 
 private:
 #ifdef _DEBUG

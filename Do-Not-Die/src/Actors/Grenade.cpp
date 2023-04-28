@@ -3,6 +3,7 @@
 #include "FX_Explosion.h"
 #include "EventMgr.h"
 #include "Player.h"
+#include "GameEvents.h"
 
 using namespace reality;
 
@@ -28,6 +29,8 @@ void Grenade::OnInit(entt::registry& registry)
 
 	timer_ = 0.0f;
 	explosion_time_ = 3.0f;
+	range_ = 500.0f;
+	damage_ = 300.0f;
 }
 
 void Grenade::OnUpdate()
@@ -40,9 +43,15 @@ void Grenade::OnUpdate()
 
 		auto player = SCENE_MGR->GetPlayer<Player>(0);
 		player->GetCurPosition();
-		EVENT->PushEvent<CameraShakeEvent>(player->GetEntityId(), 0.3f, 10.0f, 0.2f);
+		C_TriggerVolume trigger_volume;
+		XMStoreFloat3(&trigger_volume.sphere_volume.center, GetCurPosition());
+		trigger_volume.sphere_volume.radius = range_;
+		trigger_volume.tag = "grenade";
+
 
 		EVENT->PushEvent<DeleteActorEvent>(GetEntityId());
+		EVENT->PushEvent<CameraShakeEvent>(player->GetEntityId(), 0.3f, 10.0f, 0.2f);
+		EVENT->PushEvent<GrenadeEvent>(GetCurPosition(), range_, damage_);
 	}
 	else 
 	{

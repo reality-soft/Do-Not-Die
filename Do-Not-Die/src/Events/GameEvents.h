@@ -8,6 +8,17 @@
 #include "InGameScene.h"
 using namespace reality;
 
+class GameOverEvent : public Event
+{
+public:
+	GameOverEvent() {};
+	virtual void Process() override {
+		bool game_over = true;
+		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		ingame_scene->GetUIActor().GameOver();
+	}
+};
+
 class TakeDamageEvent : public reality::Event
 {
 public:
@@ -51,7 +62,10 @@ public:
 			auto callback_car = QUADTREE->RaycastCarOnly(ray);
 			if (callback_car.success)
 			{
-				*enemy_actor->targeting_car_health -= 5;
+				*enemy_actor->targeting_car_health = max(0, *enemy_actor->targeting_car_health - 5);
+
+				if (*enemy_actor->targeting_car_health == 0)
+					EVENT->PushEvent<GameOverEvent>();
 			}
 			else
 			{
@@ -104,12 +118,46 @@ private:
 	string text_;
 };
 
-class GameOverEvent : public Event
+class GrenadeEvent : public Event
 {
 public:
-	GameOverEvent() {};
+	GrenadeEvent(XMVECTOR pos, float range, float damage) : pos_(pos), range_(range), damage_(damage) {};
 	virtual void Process() override {
-	}
+		auto ingamescene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		for (auto& pair : ingamescene->GetActors())
+		{
+			
+			auto enemy = SCENE_MGR->GetActor<Enemy>(pair.first);
+
+			if (enemy == nullptr)
+				continue;
+
+			float distance = XMVectorGetX(XMVector3Length(pos_ - enemy->GetCurPosition()));
+
+			if (distance > range_)
+				continue;
+
+			float weight = distance / range_;
+
+			enemy->TakeDamage(damage_ * weight);
+		}
+	};
+private:
+	XMVECTOR pos_;
+	float range_;
+	float damage_;
 };
 
-
+class KillEvent : public Event
+{
+public:
+	KillEvent() {};
+	virtual void Process() override {
+		auto player = SCENE_MGR->GetPlayer<Player>(0);
+		player->AddKillScore();
+	};
+private:
+	XMVECTOR pos_;
+	float range_;
+	float damage_;
+};
