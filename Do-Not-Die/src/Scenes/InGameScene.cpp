@@ -89,7 +89,7 @@ void InGameScene::OnInit()
 	loading_progress = LOADING_ACTOR;
 	
 	environment_.CreateEnvironment();
-	environment_.SetWorldTime(0, 120);
+	environment_.SetWorldTime(60, 120);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(0.2f, 0.2f);
@@ -138,7 +138,6 @@ void InGameScene::OnUpdate()
 	{
 		if (GameClearProcess() == true)
 		{
-			int b = 0;
 			SCENE_MGR->ChangeScene(ENDING);
 		}
 	}
@@ -227,8 +226,10 @@ bool InGameScene::GameOverProcess()
 
 bool InGameScene::GameClearProcess()
 {
-	ingame_ui.FadeOut();
-	return true;
+	if (ingame_ui.FadeOut() == true)
+		return true;
+
+	return false;
 }
 
 

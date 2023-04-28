@@ -37,10 +37,14 @@ bool reality::UI_Actor_Ingame::FadeOut()
 	static float timer = 0.0f;
 	static float alpha = 0.0f;
 
+	if (alpha > 1.0f)
+		return true;
+
 	timer += TM_DELTATIME;
 	alpha = FadeInAlpha(0.0f, 3.0f, timer);
 
-	background_img_->SetAlpha(alpha);	
+	background_img_->SetAlpha(alpha);
+	return false;
 }
 
 void UI_Actor_Ingame::CreateIngameUI()
@@ -117,7 +121,7 @@ void UI_Actor_Ingame::CreateIngameUI()
 		background_img_ = make_shared<UI_Image>();
 		background_img_->InitImage("T_Intro_Background.png");
 		background_img_->SetLocalRectByMin({ 0, 0 }, win_size_1920_width, win_size_1920_height);
-		ui_comp_->ui_list.insert({ "999_Background Image", background_img_ });
+		ui_comp_->ui_list.insert({ "Z_Background Image", background_img_ });
 		background_img_->SetAlpha(0.0f);
 	}
 
