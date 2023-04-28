@@ -14,6 +14,8 @@ public:
 	GameOverEvent() {};
 	virtual void Process() override {
 		bool game_over = true;
+		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		ingame_scene->GetUIActor().GameOver();
 	}
 };
 
