@@ -125,6 +125,5 @@ void PopScene::OnRelease()
 void PopScene::LoadingScenes()
 {
 	SCENE_MGR->AddScene<StartScene>(START);
-	Sleep(1000);
 	SCENE_MGR->AddScene<InGameScene>(INGAME);
 }
