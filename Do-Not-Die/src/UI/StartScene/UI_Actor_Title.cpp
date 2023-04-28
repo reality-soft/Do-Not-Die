@@ -52,8 +52,14 @@ void UI_Actor_Title::CreateUI()
 	// FMOD IMG
 	fmod_img_ = make_shared<UI_Image>();
 	fmod_img_->InitImage("T_Fmod.png");
-	fmod_img_->SetLocalRectByMin({ img_width + 80.0f, win_size_1920_height * 5.0f / 6.0f }, img_width, img_height);
+	fmod_img_->SetLocalRectByMin({ 50.0f + img_width + 30.0f, win_size_1920_height * 5.0f / 6.0f }, img_width, img_height);
 	ui_comp_->ui_list.insert({ "FMOD Image", fmod_img_ });
+
+	// KGCA IMG
+	kgca_img_ = make_shared<UI_Image>();
+	kgca_img_->InitImage("T_KGCA.png");
+	kgca_img_->SetLocalRectByMin({ 50.0f + img_width * 2.0f + 70.0f, win_size_1920_height * 5.0f / 6.0f }, img_width, img_height);
+	ui_comp_->ui_list.insert({ "KGCA Image", kgca_img_ });
 
 	// New Game Button
 	newgame_button_ = make_shared<UI_Button>();
@@ -86,7 +92,8 @@ void UI_Actor_Title::CreateUI()
 	title_img_->SetAlpha(0.0f);
 	background_img_->SetAlpha(0.0f); 
 	direct_x_img_->SetAlpha(0.0f);
-	fmod_img_->SetAlpha(0.0f);
+	fmod_img_->SetAlpha(0.0f); 
+	kgca_img_->SetAlpha(0.0f);
 	newgame_button_->SetAlpha(0.0f);
 	loadinggame_button->SetAlpha(0.0f);
 	option_button_->SetAlpha(0.0f);
@@ -118,6 +125,7 @@ void reality::UI_Actor_Title::FadeInUI()
 	title_img_->SetAlpha(alpha);
 	direct_x_img_->SetAlpha(alpha);
 	fmod_img_->SetAlpha(alpha);
+	kgca_img_->SetAlpha(alpha);
 	newgame_button_->SetAlpha(alpha);
 	loadinggame_button->SetAlpha(alpha);
 	option_button_->SetAlpha(alpha);
@@ -136,6 +144,7 @@ void reality::UI_Actor_Title::DisappearUI()
 	direct_x_img_->SetAlpha(alpha);
 	fmod_img_->SetAlpha(alpha);
 	title_img_->SetAlpha(alpha);
+	kgca_img_->SetAlpha(alpha);
 	newgame_button_->SetAlpha(alpha);
 	loadinggame_button->SetAlpha(alpha);
 	option_button_->SetAlpha(alpha);

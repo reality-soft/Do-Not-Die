@@ -113,7 +113,8 @@ public:
 	bool can_repair_car_ = false;
 
 	bool is_reloading_ = false;
-	bool is_hit_;
+	bool is_hit_ = false;
+	bool is_dead_ = false;
 	
 	entt::entity repair_extract_trigger;
 

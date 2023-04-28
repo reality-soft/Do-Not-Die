@@ -232,7 +232,14 @@ void Player::Attack()
 {
 	if (cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE)
 	{
-		ThrowGrenade();
+		if (is_attacking_)
+			return;
+
+		if (cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] <= 0)
+			return;
+
+		is_attacking_ = true;
+
 		return;
 	}
 
@@ -248,9 +255,19 @@ void Player::Attack()
 
 		// Make Muzzle when Shot
 		XMVECTOR player_position = GetCurPosition();
-		player_position += front_ * 30.0f;
-		player_position += right_ * 6.0f;
-		player_position += XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) * 40.0f;
+		if (cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE)
+		{
+			player_position += front_ * 40.0f;
+			player_position += right_ * -3.0f;
+			player_position += XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) * 40.0f;
+		}
+		else if (cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN)
+		{
+			player_position += front_ * 35.0f;
+			player_position += right_ * 6.0f;
+			player_position += XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) * 45.0f;
+		}
+		
 		EFFECT_MGR->SpawnEffect<FX_Muzzle>(player_position);
 
 		// Make Shot Sound when Shot
@@ -292,18 +309,16 @@ void Player::Reload()
 
 void Player::ThrowGrenade()
 {
-	if (is_attacking_)
-		return;
-	if (cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] <= 0)
-		return;
-
-	is_attacking_ = true;
+	
 
 	cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE]--;
 
 	auto grenade_entity = SCENE_MGR->AddActor<Grenade>();
 	auto grenade_actor = SCENE_MGR->GetActor<Grenade>(grenade_entity); 
-	XMVECTOR pos = XMVectorAdd(cur_position_, XMVectorSet(0.0f, 50.0f, 0.0f, 0.0f));
+	XMVECTOR pos = cur_position_;
+	pos += right_ * 5.0f;
+	//pos += front_;
+	pos += XMVectorSet(0.0f, 5.0f, 0.0f, 0.0f);
 	grenade_actor->SetPos(pos);
 	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 	XMVECTOR dir = ingame_scene->GetCameraSystem().GetCamera()->look;
@@ -371,6 +386,10 @@ void Player::SetCurHp(int hp)
 
 void Player::TakeDamage(int damage)
 {
+	if (is_hit_ == true) {
+		return;
+	}
+
 	is_hit_ = true;
 	cur_hp_ -= damage;	
 }
