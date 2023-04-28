@@ -655,17 +655,36 @@ public:
 	public:
 		AttackGR() : AnimationState(ATTACK_GR) {}
 	public:
+		bool executed;
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
+			executed = false;
 			animation_base->SetAnimation("Biker_Throw_Unreal Take.anim", 0.2f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
-			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+			auto entity = animation_base->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(entity);
+			
 			player->is_attacking_ = false;
+			if (player->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] > 0)
+			{
+				auto static_mesh = player->reg_scene_->try_get<C_StaticMesh>(entity);
+				static_mesh->static_mesh_id = "Grenade.stmesh";
+			}
+			
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
+			if (animation_base->GetCurAnimation().cur_frame_ > 35.0f && !executed)
+			{
+				Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+				auto entity = animation_base->GetOwnerId();
+				player->ThrowGrenade();
+				auto static_mesh = player->reg_scene_->try_get<C_StaticMesh>(entity);
+				static_mesh->static_mesh_id = "";
+				executed = true;
+			}
 		}
 	};
 
