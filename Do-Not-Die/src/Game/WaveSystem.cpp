@@ -35,7 +35,6 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 		case Day::eNight:
 			WaveStart();
 			countdown_timer_ = fabs(world_env_->GetTimeLimits().y * 2);
-			wave_count_++;
 			break;
 		}
 	}
@@ -43,9 +42,9 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
-	SpawnZombies(0.3f, 1);
+	SpawnZombies(0.3f, 30);
 
-	if (wave_count_ > 5)
+	if (wave_count_ > 1)
 	{
 		EVENT->PushEvent<GameOverEvent>();
 	}
@@ -187,7 +186,7 @@ void reality::WaveSystem::PlayerRepairCar()
 
 	if(player->HasRepairPart() == false)
 	{
-		//EVENT->PushEvent<MakeTextEvent>("There is no Repair Part in Inventory!");
+		EVENT->PushEvent<MakeTextEvent>("There is no Repair Part in Inventory!");
 		return;
 	}
 		
@@ -283,6 +282,7 @@ void reality::WaveSystem::WaveStart()
 
 void reality::WaveSystem::WaveFinish()
 {
+	wave_count_++;
 	zombie_spawn_count_ = 0;
 	RandomSpawnItem(30);
 }

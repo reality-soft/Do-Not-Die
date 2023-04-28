@@ -109,7 +109,6 @@ class GameOverEvent : public Event
 public:
 	GameOverEvent() {};
 	virtual void Process() override {
-		bool game_over = true;
 	}
 };
 

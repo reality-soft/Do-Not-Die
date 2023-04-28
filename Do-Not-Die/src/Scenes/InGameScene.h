@@ -66,6 +66,7 @@ private:
 public:
 	void SetCursorVisible();
 	void SetCursorInvisible();
+	void GameOver(bool is_win);
 private:
 	E_IngameLoading loading_progress = LOADING_START;
 public:

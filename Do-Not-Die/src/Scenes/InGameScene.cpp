@@ -204,4 +204,18 @@ void InGameScene::SetCursorInvisible()
 	SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
 }
 
+void InGameScene::GameOver(bool is_win)
+{
+	if (is_win)
+	{
+
+
+
+	}
+	else
+	{
+
+	}
+}
+
 
