@@ -31,7 +31,7 @@ void Player::OnInit(entt::registry& registry)
 	registry.emplace<reality::C_TriggerSensor>(entity_id_, trigger_sensor);
 
 	reality::C_SkeletalMesh skm;
-	skm.skeletal_mesh_id = "Player_SKM.skmesh";
+	skm.skeletal_mesh_id = "Player_SKM (1).skmesh";
 	skm.vertex_shader_id = "SkinningVS.cso";
 	registry.emplace_or_replace<reality::C_SkeletalMesh>(entity_id_, skm);
 
@@ -57,11 +57,10 @@ void Player::OnInit(entt::registry& registry)
 	XMMATRIX socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
 		* XMMatrixRotationX(XMConvertToRadians(180))
 		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
-	socket_component.AddSocket("Pistol", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
-	socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
-		* XMMatrixRotationX(XMConvertToRadians(180))
-		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
 	socket_component.AddSocket("Rifle", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90))
+		* XMMatrixTranslationFromVector({ 0, -4, 4, 0 });
+	socket_component.AddSocket("Pistol", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 	socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
 		* XMMatrixRotationX(XMConvertToRadians(180))
 		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
@@ -105,7 +104,7 @@ void Player::OnInit(entt::registry& registry)
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.GetAnimSlotByName("Base")->SetAnimation("A_TP_CH_Breathing_Retargeted_Unreal Take.anim", 0.5);
+	animation_component.GetAnimSlotByName("Base")->SetAnimation("Biker_Idle_Unreal Take.anim", 0.5);
 	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
@@ -125,26 +124,26 @@ void Player::SetCharacterMovementAnimation()
 	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
 	AnimationBase* anim_slot = animation_component_ptr->GetAnimSlotByName("Base");
 
-	string anim_id = "A_TP_CH_Breathing_Retargeted_Unreal Take.anim";
+	string anim_id = "Biker_Idle_Unreal Take.anim";
 
 	if (movement_component_->speed >= 0.1f) {
 		if (angle_ >= 330.0f || angle_ < 30.0f) {
-			anim_id = "A_TP_CH_Jog_F_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_F_Unreal Take.anim";
 		}
 		else if (30.0f <= angle_ && angle_ < 110.0f) {
-			anim_id = "A_TP_CH_Jog_RF_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_RF_Unreal Take.anim";
 		}
 		else if (110.0f <= angle_ && angle_ < 160.0f) {
-			anim_id = "A_TP_CH_Jog_RB_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_RB_Unreal Take.anim";
 		}
 		else if (160.0f <= angle_ && angle_ < 200.0f) {
-			anim_id = "A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_B_Unreal Take.anim";
 		}
 		else if (200.0f <= angle_ && angle_ < 250.0f) {
-			anim_id = "A_TP_CH_Jog_LB_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_LB_Unreal Take.anim";
 		}
 		else if (250.0f <= angle_ && angle_ < 330.0f) {
-			anim_id = "A_TP_CH_Jog_LF_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_LF_Unreal Take.anim";
 		}
 	}
 
