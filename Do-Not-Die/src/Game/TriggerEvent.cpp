@@ -1,6 +1,6 @@
 #include "TriggerEvent.h"
 #include "ItemObjects.h"
-#include "Enemy.h"
+#include "Grenade.h"
 using namespace reality;
 
 TriggerEvent::TriggerEvent(entt::entity target_actor, entt::entity trigger_actor, bool is_begin)
@@ -180,3 +180,4 @@ void reality::TriggerEvent::PlayerDefense(bool can_defense)
 
 	player->player_in_defense_ = can_defense;
 }
+

@@ -130,32 +130,3 @@ protected:
 	XMVECTOR target_position_;
 	entt::entity owner_id_;
 };
-
-class EnemyAttack : public reality::ActionNode
-{
-public:
-	EnemyAttack(entt::entity owner_id)
-		: owner_id_(owner_id)
-	{
-	};
-
-	virtual reality::BehaviorStatus Action() override
-	{
-		Enemy* enemy = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
-
-		if (enemy->is_attacking_ == true) {
-			return reality::BehaviorStatus::RUNNING;
-		}
-		if (enemy->is_attacking_ == false && enemy->is_attack_ended == true) {
-			enemy->is_attack_ended = false;
-			return reality::BehaviorStatus::SUCCESS;
-		}
-		if (enemy->is_attacking_ == false && enemy->is_attack_ended == false) {
-			enemy->Attack();
-			return reality::BehaviorStatus::RUNNING;
-		}
-	}
-
-protected:
-	entt::entity owner_id_;
-};

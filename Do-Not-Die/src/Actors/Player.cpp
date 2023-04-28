@@ -31,7 +31,7 @@ void Player::OnInit(entt::registry& registry)
 	registry.emplace<reality::C_TriggerSensor>(entity_id_, trigger_sensor);
 
 	reality::C_SkeletalMesh skm;
-	skm.skeletal_mesh_id = "SM_Chr_Biker_Male_01.skmesh";
+	skm.skeletal_mesh_id = "Player_SKM (1).skmesh";
 	skm.vertex_shader_id = "SkinningVS.cso";
 	registry.emplace_or_replace<reality::C_SkeletalMesh>(entity_id_, skm);
 
@@ -57,62 +57,37 @@ void Player::OnInit(entt::registry& registry)
 	XMMATRIX socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
 		* XMMatrixRotationX(XMConvertToRadians(180))
 		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
-	socket_component.AddSocket("RightHand", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+	socket_component.AddSocket("Rifle", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90))
+		* XMMatrixTranslationFromVector({ 0, -4, 4, 0 });
+	socket_component.AddSocket("Pistol", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+	socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(180))
+		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
+	socket_component.AddSocket("Axe", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+	socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(180))
+		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
+	socket_component.AddSocket("Grenade", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 	registry.emplace<C_Socket>(entity_id_, socket_component);
 
-#define AXE
+	socket_ids_[0] = "Rifle";
+	socket_ids_[1] = "Pistol";
+	socket_ids_[2] = "Axe";
+	socket_ids_[3] = "Grenade";
 
-#ifdef PISTOL
+	stm_ids_[0] = "WEP_Rifle.stmesh";
+	stm_ids_[1] = "WEP_Pistol.stmesh";
+	stm_ids_[2] = "WEP_Axe.stmesh";
+	stm_ids_[3] = "WEP_Pistol.stmesh";
+
 	C_StaticMesh static_mesh_component;
 	static_mesh_component.local = TransformR(XMFLOAT3(0, 180, 0));
 	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
-	static_mesh_component.static_mesh_id = "WEP_Pistol.stmesh";
+	static_mesh_component.static_mesh_id = stm_ids_[static_cast<int>(cur_equipped_weapon_)];
 	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
-	static_mesh_component.socket_name = "RightHand";
+	static_mesh_component.socket_name = socket_ids_[static_cast<int>(cur_equipped_weapon_)];
 	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
-#endif
-
-#ifdef RIFLE
-	C_StaticMesh static_mesh_component;
-	
-	static_mesh_component.local = TransformR(XMFLOAT3(-10, 170, 0)) * TransformT(XMFLOAT3(5, 0, -10));
-	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
-	static_mesh_component.static_mesh_id = "WEP_Rifle.stmesh";
-	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
-	static_mesh_component.socket_name = "RightHand";
-	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
-#endif
-
-#ifdef AK47
-	C_StaticMesh static_mesh_component;
-
-	static_mesh_component.local = TransformR(XMFLOAT3(-10, 170, 0)) * TransformT(XMFLOAT3(5, 0, 5));
-	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
-	static_mesh_component.static_mesh_id = "WEP_AK47.stmesh";
-	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
-	static_mesh_component.socket_name = "RightHand";
-	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
-#endif
-
-#ifdef AXE
-	C_StaticMesh static_mesh_component;
-	static_mesh_component.local = TransformR(XMFLOAT3(0, 180, 0));
-	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
-	static_mesh_component.static_mesh_id = "WEP_Axe.stmesh";
-	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
-	static_mesh_component.socket_name = "RightHand";
-	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
-#endif
-
-#ifdef CROSSBAR
-	C_StaticMesh static_mesh_component;
-	static_mesh_component.local = TransformR(XMFLOAT3(0, 180, 0));
-	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
-	static_mesh_component.static_mesh_id = "WEP_Crossbar.stmesh";
-	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
-	static_mesh_component.socket_name = "RightHand";
-	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
-#endif
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_CapsuleCollision));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SkeletalMesh));
@@ -129,7 +104,7 @@ void Player::OnInit(entt::registry& registry)
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.GetAnimSlotByName("Base")->SetAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim", 0.5);
+	animation_component.GetAnimSlotByName("Base")->SetAnimation("Biker_Idle_Unreal Take.anim", 0.5);
 	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
@@ -149,26 +124,26 @@ void Player::SetCharacterMovementAnimation()
 	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
 	AnimationBase* anim_slot = animation_component_ptr->GetAnimSlotByName("Base");
 
-	string anim_id = "A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim";
+	string anim_id = "Biker_Idle_Unreal Take.anim";
 
 	if (movement_component_->speed >= 0.1f) {
 		if (angle_ >= 330.0f || angle_ < 30.0f) {
-			anim_id = "A_TP_CH_Jog_F_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_F_Unreal Take.anim";
 		}
 		else if (30.0f <= angle_ && angle_ < 110.0f) {
-			anim_id = "A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_RF_Unreal Take.anim";
 		}
 		else if (110.0f <= angle_ && angle_ < 160.0f) {
-			anim_id = "A_TP_CH_Jog_RB_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_RB_Unreal Take.anim";
 		}
 		else if (160.0f <= angle_ && angle_ < 200.0f) {
-			anim_id = "A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_B_Unreal Take.anim";
 		}
 		else if (200.0f <= angle_ && angle_ < 250.0f) {
-			anim_id = "A_TP_CH_Jog_LB_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_LB_Unreal Take.anim";
 		}
 		else if (250.0f <= angle_ && angle_ < 330.0f) {
-			anim_id = "A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "Biker_Jog_LF_Unreal Take.anim";
 		}
 	}
 
@@ -239,10 +214,23 @@ void Player::Jump()
 	//}
 }
 
-void Player::Fire()
+void Player::Attack()
 {
-	if (is_aiming_ && !is_firing_) {
-		is_firing_ = true;
+	if (cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE)
+	{
+		ThrowGrenade();
+		return;
+	}
+
+	if (cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON)
+	{
+		MeeleAttack();
+		return;
+	}
+		
+	if (is_aiming_ && !is_attacking_ && cur_weapon_using_remained_[static_cast<int>(cur_equipped_weapon_)] > 0) {
+		cur_weapon_using_remained_[static_cast<int>(cur_equipped_weapon_)]--;
+		is_attacking_ = true;
 
 		// Make Muzzle when Shot
 		XMVECTOR player_position = GetCurPosition();
@@ -281,6 +269,13 @@ void Player::Aim(bool active)
 	is_aiming_ = active;
 }
 
+void Player::Reload()
+{
+	if (is_reloading_ == false && cur_weapon_total_remained_[static_cast<int>(cur_equipped_weapon_)] > 0) {
+		is_reloading_ = true;
+	}
+}
+
 void Player::ThrowGrenade()
 {
 	if (grenade_timer_ < grenade_cooltime_)
@@ -288,17 +283,33 @@ void Player::ThrowGrenade()
 
 	grenade_timer_ -= grenade_cooltime_;
 
+	if (cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] <= 0)
+		return;
+
+	cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE]--;
+
 	auto grenade_entity = SCENE_MGR->AddActor<Grenade>();
 	auto grenade_actor = SCENE_MGR->GetActor<Grenade>(grenade_entity); 
 	XMVECTOR pos = XMVectorAdd(cur_position_, XMVectorSet(0.0f, 50.0f, 0.0f, 0.0f));
 	grenade_actor->SetPos(pos);
-	XMVECTOR dir = XMVectorAdd(front_, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
-	grenade_actor->SetDir(dir, 4.0f);
+	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+	XMVECTOR dir = ingame_scene->GetCameraSystem().GetCamera()->look;
+	//XMVECTOR dir = XMVectorAdd(front_, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+	grenade_actor->SetDir(dir, 10.0f);
+}
+
+void Player::MeeleAttack()
+{
 }
 
 bool Player::IsAiming()
 {
 	return is_aiming_;
+}
+
+bool Player::IsReloading()
+{
+	return is_reloading_;
 }
 
 void Player::InteractionRotate(XMVECTOR interaction_pos)
@@ -431,6 +442,9 @@ void Player::CalculateMovementAngle()
 
 void Player::ChangeWeapon()
 {
+	if (is_aiming_ == true || is_reloading_) {
+		return;
+	}
 	int cur_equipped_weapon = static_cast<int>(cur_equipped_weapon_);
 	cur_equipped_weapon += DINPUT->GetMouseWheel() / 120 * -1;
 
@@ -441,10 +455,12 @@ void Player::ChangeWeapon()
 	if (cur_equipped_weapon < 0) {
 		cur_equipped_weapon = num_of_weapon_type - 1;
 	}
-	cur_equipped_weapon_ = static_cast<EQUIPPED_WEAPON>(cur_equipped_weapon);
 
-	wstringstream wss;
-	wss << static_cast<int>(cur_equipped_weapon_) << '\n';
+	C_StaticMesh* stm_ptr = reg_scene_->try_get<C_StaticMesh>(entity_id_);
+	stm_ptr->socket_name = socket_ids_[cur_equipped_weapon];
+	stm_ptr->static_mesh_id = stm_ids_[cur_equipped_weapon];
+
+	cur_equipped_weapon_ = static_cast<EQUIPPED_WEAPON>(cur_equipped_weapon);
 }
 
 void Player::UpdateTimer()

@@ -7,8 +7,6 @@
 
 void InGameScene::OnInit()
 {
-	ShowCursor(false);
-
 	// LOADING : MANAGER_LOADING
 	loading_progress = LOADING_MANAGER;
 
@@ -56,12 +54,13 @@ void InGameScene::OnInit()
 	INPUT_EVENT->SubscribeKeyEvent( DIK_C, std::bind(&Player::DropItem, player_actor), KEY_PUSH);
 
 	INPUT_EVENT->SubscribeKeyEvent( DIK_SPACE, std::bind(&Player::Jump, player_actor), KEY_PUSH);
-	
+
+	INPUT_EVENT->SubscribeKeyEvent(DIK_R, std::bind(&Player::Reload, player_actor), KEY_PUSH);
+
 	INPUT_EVENT->SubscribeMouseEvent( MouseButton::R_BUTTON, std::bind(&Player::Aim, player_actor, true), KEY_PUSH);
 	INPUT_EVENT->SubscribeMouseEvent( MouseButton::R_BUTTON, std::bind(&Player::Aim, player_actor, false), KEY_UP);
 
-	INPUT_EVENT->SubscribeMouseEvent( MouseButton::L_BUTTON , std::bind(&Player::Fire, player_actor), KEY_PUSH);
-	INPUT_EVENT->SubscribeKeyEvent( DIK_G , std::bind(&Player::ThrowGrenade, player_actor), KEY_PUSH);
+	INPUT_EVENT->SubscribeMouseEvent( MouseButton::L_BUTTON , std::bind(&Player::Attack, player_actor), KEY_PUSH);
 	//INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
 
 	level.Create("DNDLevel_WithCollision_01.stmesh", "LevelVS.cso");
@@ -193,14 +192,14 @@ void InGameScene::CursorStateUpdate()
 
 void InGameScene::SetCursorVisible()
 {
-	b_show_cursor = true;
-	ShowCursor(b_show_cursor);
+	b_show_cursor = true; 
+	while (ShowCursor(b_show_cursor) <= 0);
 }
 
 void InGameScene::SetCursorInvisible()
 {
 	b_show_cursor = false;
-	ShowCursor(b_show_cursor);
+	while (ShowCursor(b_show_cursor) >= 0);
 	SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
 }
 

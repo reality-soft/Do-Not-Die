@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine_include.h"
 #include "Player.h"
+#include "Enemy.h"
 #include "Item.h"
 
 namespace reality
@@ -10,7 +11,7 @@ namespace reality
 		ITEM_TO_PLAYER,
 		REPAIR_PART_EXTRACT,
 		CAR_REPAIR,
-		CAR_DEFENSE
+		CAR_DEFENSE,
 	};
 
 	class TriggerEvent : public Event

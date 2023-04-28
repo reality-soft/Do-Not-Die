@@ -115,14 +115,18 @@ void UI_Actor_Ingame::CreateIngameUI()
 		inven_select_->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
 		status_ui->AddChildUI("2_InvenSelect", inven_select_);
 
+		XMFLOAT2 inven_slot_min = { 5.0f, 5.0f };
+		XMFLOAT2 inven_count_min = { 60.0f, 58.0f };
+		float inven_count_text_size = 0.6f;
+
 		inven_[0] = make_shared<UI_Image>();
 		inven_[0]->InitImage("");
 		inven_[0]->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
 		inven_count_text_[0] = make_shared<UI_Text>();
-		inven_count_text_[0]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_count_text_[0]->InitText("", E_Font::BASIC, inven_count_min, inven_count_text_size, {0.0f, 0.0f, 0.0f, 1.0f});
 		inven_[0]->AddChildUI("2_InvenCountText", inven_count_text_[0]);
 		inven_slot_text_[0] = make_shared<UI_Text>();
-		inven_slot_text_[0]->InitText("1", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_slot_text_[0]->InitText("1", E_Font::BASIC, inven_slot_min, 1.0f, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[0]->AddChildUI("2_InvenSlotText", inven_slot_text_[0]);
 		inven_cooltime_img_[0] = make_shared<UI_Image>();
 		inven_cooltime_img_[0]->InitImage("T_ItemCoolTime.png");
@@ -133,10 +137,10 @@ void UI_Actor_Ingame::CreateIngameUI()
 		inven_[1]->InitImage("");
 		inven_[1]->SetLocalRectByCenter({ 203.5f, 76.5f }, 90.0f, 90.0f);
 		inven_count_text_[1] = make_shared<UI_Text>();
-		inven_count_text_[1]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_count_text_[1]->InitText("", E_Font::BASIC, inven_count_min, inven_count_text_size, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[1]->AddChildUI("2_InvenCountText", inven_count_text_[1]);
 		inven_slot_text_[1] = make_shared<UI_Text>();
-		inven_slot_text_[1]->InitText("2", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_slot_text_[1]->InitText("2", E_Font::BASIC, inven_slot_min, 1.0f, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[1]->AddChildUI("2_InvenSlotText", inven_slot_text_[1]);
 		inven_cooltime_img_[1] = make_shared<UI_Image>();
 		inven_cooltime_img_[1]->InitImage("T_ItemCoolTime.png");
@@ -147,10 +151,10 @@ void UI_Actor_Ingame::CreateIngameUI()
 		inven_[2]->InitImage("");
 		inven_[2]->SetLocalRectByCenter({ 306.5f, 76.5f }, 90.0f, 90.0f);
 		inven_count_text_[2] = make_shared<UI_Text>();
-		inven_count_text_[2]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_count_text_[2]->InitText("", E_Font::BASIC, inven_count_min, inven_count_text_size, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[2]->AddChildUI("2_InvenCountText", inven_count_text_[2]);
 		inven_slot_text_[2] = make_shared<UI_Text>();
-		inven_slot_text_[2]->InitText("3", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_slot_text_[2]->InitText("3", E_Font::BASIC, inven_slot_min, 1.0f, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[2]->AddChildUI("2_InvenSlotText", inven_slot_text_[2]);
 		inven_cooltime_img_[2] = make_shared<UI_Image>();
 		inven_cooltime_img_[2]->InitImage("T_ItemCoolTime.png");
@@ -161,10 +165,10 @@ void UI_Actor_Ingame::CreateIngameUI()
 		inven_[3]->InitImage("");
 		inven_[3]->SetLocalRectByCenter({ 410.5f, 76.5f }, 90.0f, 90.0f);
 		inven_count_text_[3] = make_shared<UI_Text>();
-		inven_count_text_[3]->InitText("", E_Font::ROTUNDA, { 70.0f, 70.0f }, 0.8f);
+		inven_count_text_[3]->InitText("", E_Font::BASIC, inven_count_min, inven_count_text_size, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[3]->AddChildUI("2_InvenCountText", inven_count_text_[3]);
 		inven_slot_text_[3] = make_shared<UI_Text>();
-		inven_slot_text_[3]->InitText("4", E_Font::ROTUNDA, { 5.0f, 12.0f });
+		inven_slot_text_[3]->InitText("4", E_Font::BASIC, inven_slot_min, 1.0f, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[3]->AddChildUI("2_InvenSlotText", inven_slot_text_[3]);
 		inven_cooltime_img_[3] = make_shared<UI_Image>();
 		inven_cooltime_img_[3]->InitImage("T_ItemCoolTime.png");
@@ -271,7 +275,22 @@ void UI_Actor_Ingame::CreateIngameUI()
 
 	// Event Message UI
 	event_msg_text_ = make_shared<UI_Text>();
-	event_msg_text_->InitText("Event Test", E_Font::BASIC, { win_size_1920_width / 2.0f - 100.0f, win_size_1920_height - 300.0f });
+	event_msg_text_->InitText("Event Test", E_Font::ROBOTO, { win_size_1920_width / 2.0f - 100.0f, win_size_1920_height - 300.0f });
+
+	// Game Over UI
+	game_over_ui_ = make_shared<UI_Image>();
+	game_over_ui_->InitImage("T_GameOver_Background.png");
+	game_over_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
+
+	game_over_img_ = make_shared<UI_Image>();
+	game_over_img_->InitImage("T_GameOver_Image.png");
+	game_over_ui_->AddChildUI("GameOver Img", game_over_img_);
+	game_over_img_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height * 2.0f / 5.0f }, 1200.0f, 250.0f);
+
+	game_over_exit_button_ = make_shared<UI_Button>();
+	game_over_exit_button_->InitButton("T_Gameover_ExitBtn_Normal.png", "T_Gameover_ExitBtn_Hover.png");
+	game_over_ui_->AddChildUI("Exit Button", game_over_exit_button_);
+	game_over_exit_button_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height * 3.0f / 4.0f }, 500.0f, 150.0f);
 	
 }
 
@@ -319,6 +338,17 @@ void UI_Actor_Ingame::CreateMenuUI()
 void UI_Actor_Ingame::UpdateIngameUI()
 {
 	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+
+	float win_size_1920_width = E_Resolution_Size[E_Resolution::R1920x1080].x;
+	float win_size_1920_height = E_Resolution_Size[E_Resolution::R1920x1080].y;
+
+	// If Game Over, Exit Button Check
+	{
+		if (game_over_exit_button_->GetCurrentState() == E_UIState::UI_SELECT)
+		{
+			DestroyWindow(ENGINE->GetWindowHandle());
+		}
+	}
 
 	// Time Icon Move Update
 	{
@@ -375,9 +405,34 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	}
 
 	// Kill Update
-	static int kill = 0;
-	kill = TIMER->game_time;
-	kill_text_->SetText(to_string(kill));
+	kill_text_->SetText(to_string(player_->GetKillScore()));
+
+	// Weapon UI Update
+	{
+		float weapon_ui_height = win_size_1920_height - 500.0f;
+		float height_step = 78.0f;
+		float width = weapon_select_ui_->rect_transform_[R1920x1080].world_rect.width;
+		float height = weapon_select_ui_->rect_transform_[R1920x1080].world_rect.height;
+		
+		int cur_weapon = (int)player_->cur_equipped_weapon_;
+
+		weapon_select_ui_->SetLocalRectByMin({ 100.0f, weapon_ui_height + height_step * cur_weapon }, width, height);
+
+		int total_ar_ammo = player_->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE] +
+			player_->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE];
+		int total_hand_gun_ammo = player_->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::HAND_GUN] +
+			player_->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::HAND_GUN];
+		int total_grenade_ammo = player_->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] +
+			player_->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::GRENADE];
+
+		ar_ammo_text_->SetText(to_string(total_ar_ammo));
+		handgun_ammo_text_->SetText(to_string(total_hand_gun_ammo));
+		grenade_ammo_text_->SetText(to_string(total_grenade_ammo));
+
+		ammo_cur_text_->SetText(to_string( player_->cur_weapon_using_remained_[cur_weapon]));
+		ammo_max_text_->SetText(to_string( player_->cur_weapon_total_remained_[cur_weapon]));
+	}
+
 
 	// Vehicle Duration Update
 	{
@@ -399,6 +454,22 @@ void UI_Actor_Ingame::UpdateIngameUI()
 
 		string car_health_str = to_string(wave_sys.car_health);
 		duration_text_->SetText(car_health_str);
+	}
+
+	// Vehicle Parts Update
+	{
+		static float bar_init_width = repair_bar_->rect_transform_[R1920x1080].local_rect.width;
+		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		auto& wave_sys = ingame_scene->GetWaveSystem();
+
+		// Set bar width with health
+		XMFLOAT2 min = repair_bar_->rect_transform_[R1920x1080].local_rect.min;
+		float width = bar_init_width * wave_sys.car_repair_count / 12;
+		float height = repair_bar_->rect_transform_[R1920x1080].local_rect.height;
+		repair_bar_->SetLocalRectByMin(min, width, height);
+
+		string repair_str = to_string(wave_sys.car_repair_count) + " / 12";
+		repair_text_->SetText(repair_str);
 	}
 
 	// Cross Hair Update
@@ -595,6 +666,13 @@ void UI_Actor_Ingame::SetEventMsg(string msg)
 	event_msg_text_->SetText(msg);
 	event_msg_timer_ = 0.0f; 
 	ui_comp_->ui_list.insert({ "Event Message UI", event_msg_text_ });
+}
+
+void UI_Actor_Ingame::GameOver()
+{
+	ui_comp_->ui_list.clear();
+	ui_comp_->ui_list.insert({"Game Over UI", game_over_ui_});
+	while (ShowCursor(true) <= 0);
 }
 
 void UI_Actor_Ingame::OpenMenu()
