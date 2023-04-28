@@ -52,6 +52,8 @@ public:
 	UI_Actor_Ingame& GetUIActor() { return ingame_ui; }
 	Environment& GetEnviroment() { return environment_; }
 
+	bool game_over = false;
+	bool game_clear = false;
 private:
 #ifdef _DEBUG
 	TestWidget	test_window_;
@@ -67,6 +69,8 @@ private:
 public:
 	void SetCursorVisible();
 	void SetCursorInvisible();
+	bool GameOverProcess();
+	bool GameClearProcess();
 private:
 	E_IngameLoading loading_progress = LOADING_START;
 public:
