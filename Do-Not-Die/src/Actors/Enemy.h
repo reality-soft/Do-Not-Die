@@ -32,7 +32,7 @@ private:
 
 private:
 	reality::BehaviorTree behavior_tree_;
-	float attack_distance_ = 40.0f;
+	float attack_distance_ = 80.0f;
 
 public:
 	bool is_hit_ = false;

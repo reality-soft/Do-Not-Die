@@ -22,7 +22,8 @@ void Player::OnInit(entt::registry& registry)
 	movement_component_->acceleration = 300;
 	movement_component_->max_speed = 150;
 	max_hp_ = cur_hp_ = 100;
-	
+	damage_ = 30.0f;
+
 	C_TriggerSensor trigger_sensor;
 	trigger_sensor.can_sense_tags.insert("item");
 	trigger_sensor.can_sense_tags.insert("extract");
@@ -115,7 +116,7 @@ void Player::OnInit(entt::registry& registry)
 	inventory_.resize(INVENTORY_MAX);
 	inventory_timer_.resize(INVENTORY_MAX);
 	
-	cur_hp_ = 0;
+	cur_hp_ = 100;
 	tag = "player";
 }
 
@@ -155,6 +156,9 @@ void Player::SetCharacterMovementAnimation()
 
 void Player::OnUpdate()
 {
+	if (cur_hp_ <= 0)
+		EVENT->PushEvent<GameOverEvent>();
+
 	if (controller_enable_)
 	{
 		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
@@ -168,7 +172,6 @@ void Player::OnUpdate()
 
 	// FlashLight Update
 	UpdateFlashLight();
-
 	UpdateTimer();
 }
 

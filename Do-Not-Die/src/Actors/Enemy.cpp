@@ -16,6 +16,7 @@ void Enemy::OnInit(entt::registry& registry)
 	movement_component_->max_speed = 100;
 	movement_component_->acceleration = 100;
 	max_hp_ = cur_hp_ = 100;
+	damage_ = 10.0f;
 
 	// set trigger sensor
 	C_TriggerSensor trigger_sensor;
