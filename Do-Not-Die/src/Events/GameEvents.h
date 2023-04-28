@@ -8,6 +8,15 @@
 #include "InGameScene.h"
 using namespace reality;
 
+class GameOverEvent : public Event
+{
+public:
+	GameOverEvent() {};
+	virtual void Process() override {
+		bool game_over = true;
+	}
+};
+
 class TakeDamageEvent : public reality::Event
 {
 public:
@@ -51,7 +60,10 @@ public:
 			auto callback_car = QUADTREE->RaycastCarOnly(ray);
 			if (callback_car.success)
 			{
-				*enemy_actor->targeting_car_health -= 5;
+				*enemy_actor->targeting_car_health = max(0, *enemy_actor->targeting_car_health - 5);
+
+				if (*enemy_actor->targeting_car_health == 0)
+					EVENT->PushEvent<GameOverEvent>();
 			}
 			else
 			{
@@ -102,15 +114,6 @@ public:
 	};
 private:
 	string text_;
-};
-
-class GameOverEvent : public Event
-{
-public:
-	GameOverEvent() {};
-	virtual void Process() override {
-		bool game_over = true;
-	}
 };
 
 class GrenadeEvent : public Event
