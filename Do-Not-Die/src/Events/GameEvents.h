@@ -13,9 +13,20 @@ class GameOverEvent : public Event
 public:
 	GameOverEvent() {};
 	virtual void Process() override {
-		bool game_over = true;
 		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
-		ingame_scene->GetUIActor().GameOver();
+		if (ingame_scene)
+			ingame_scene->game_over = true;
+	}
+};
+
+class GameClearEvent : public Event
+{
+public:
+	GameClearEvent() {};
+	virtual void Process() override {
+		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		if (ingame_scene)
+			ingame_scene->game_clear = true;
 	}
 };
 
@@ -44,13 +55,6 @@ public:
 		if (character == nullptr)
 			return;
 
-		XMVECTOR enemy_to_player = SCENE_MGR->GetPlayer<Character>(0)->GetCurPosition() - character->GetCurPosition();
-		enemy_to_player = XMVector3Normalize(enemy_to_player);
-
-		XMVECTOR enemy_attack_dir = _XMVECTOR3(ray.end) - _XMVECTOR3(ray.start);
-		enemy_attack_dir = XMVector3Normalize(enemy_attack_dir);
-
-
 		entt::entity actor_hit;
 		float damage = character->GetCharacterDamage();
 
@@ -69,7 +73,7 @@ public:
 			}
 			else
 			{
-				auto callback_actor = QUADTREE->RaycastActorOnly(ray);
+				auto callback_actor = QUADTREE->RaycastActorOnly(ray, actor_id_);
 				if (callback_actor.success)
 				{
 					if (SCENE_MGR->GetActor<GameCharacter>(callback_actor.ent)->tag == "player")
