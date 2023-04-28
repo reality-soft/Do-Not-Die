@@ -45,7 +45,7 @@ public:
 		states_.insert({ HIT_AR, make_shared<HitAR>() });
 		states_.insert({ HIT_HG, make_shared<HitHG>() });
 		states_.insert({ HIT_MELEE, make_shared<HitMelee>() });
-		states_.insert({ HIT_GR, make_shared<HitGr>() });
+		states_.insert({ HIT_GR, make_shared<HitGR>() });
 		states_.insert({ DIE, make_shared<Die>() });
 
 		// Auto Rifle
@@ -187,7 +187,7 @@ public:
 
 			// Hit
 			{
-				transitions_.insert({ AIM_POSE_AR, Transition(ATTACK_AR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->is_hit_ == true) {
@@ -198,7 +198,25 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ ATTACK_AR, Transition(AIM_POSE_AR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ ATTACK_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
+						if (IsAnimationEnded()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ RELOAD_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
+						if (IsAnimationEnded()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ HIT_AR, Transition(IDLE_POSE_AR,[this](const AnimationStateMachine* animation_state_machine) {
 						if (IsAnimationEnded()) {
 							return true;
 						}

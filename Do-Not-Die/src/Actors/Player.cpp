@@ -371,7 +371,8 @@ void Player::SetCurHp(int hp)
 
 void Player::TakeDamage(int damage)
 {
-	cur_hp_ -= damage;
+	is_hit_ = true;
+	cur_hp_ -= damage;	
 }
 
 float Player::GetCurHp() const
