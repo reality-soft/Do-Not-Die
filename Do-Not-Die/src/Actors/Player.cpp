@@ -115,7 +115,7 @@ void Player::OnInit(entt::registry& registry)
 	// Inventory
 	inventory_.resize(INVENTORY_MAX);
 	inventory_timer_.resize(INVENTORY_MAX);
-	
+
 	cur_hp_ = 100;
 	tag = "player";
 }
@@ -212,9 +212,9 @@ void Player::Jump()
 	if (controller_enable_ == false)
 		return;
 
-	//if (movement_component_->jump_pulse <= 0 && movement_component_->gravity_pulse <= 0) {
+	if (movement_component_->jump_pulse <= 0 && movement_component_->gravity_pulse <= 0) {
 		movement_component_->jump_pulse = 150.0f;
-	//}
+	}
 }
 
 void Player::Attack()
@@ -303,6 +303,13 @@ void Player::ThrowGrenade()
 
 void Player::MeeleAttack()
 {
+	is_attacking_ = true;
+	C_CapsuleCollision* capsule_collision = reg_scene_->try_get<reality::C_CapsuleCollision>(entity_id_);
+	RayShape ray;
+	XMVECTOR ray_start_pos = GetTipBaseAB(capsule_collision->capsule).at(0);
+	XMStoreFloat3(&ray.start, ray_start_pos);
+	XMStoreFloat3(&ray.end, (ray_start_pos + front_ * 40.0f));
+	EVENT->PushEvent<AttackEvent_SingleRay>(ray, entity_id_);
 }
 
 bool Player::IsAiming()

@@ -91,6 +91,9 @@ public:
 			auto callback_total = QUADTREE->Raycast(ray, actor_id_);
 			if (callback_total.success)
 			{
+				if (callback_total.ent == actor_id_) {
+
+				}
 				if (callback_total.is_actor)
 				{
 					actor_hit = callback_total.ent;
