@@ -187,6 +187,17 @@ public:
 
 			// Hit
 			{
+				transitions_.insert({ IDLE_POSE_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
 				transitions_.insert({ AIM_POSE_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
@@ -199,7 +210,10 @@ public:
 					})
 					});
 				transitions_.insert({ ATTACK_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
-						if (IsAnimationEnded()) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							player->is_attacking_ = false;
 							return true;
 						}
 						else {
@@ -208,7 +222,10 @@ public:
 					})
 					});
 				transitions_.insert({ RELOAD_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
-						if (IsAnimationEnded()) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							player->is_reloading_ = false;
 							return true;
 						}
 						else {
@@ -364,6 +381,65 @@ public:
 					})
 					});
 			}
+
+			// Hit
+			{
+				transitions_.insert({ IDLE_POSE_HG, Transition(HIT_HG,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ AIM_POSE_HG, Transition(HIT_HG,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ ATTACK_HG, Transition(HIT_HG,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							player->is_attacking_ = false;
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ RELOAD_HG, Transition(HIT_HG,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							player->is_reloading_ = false;
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ HIT_HG, Transition(IDLE_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
+						if (IsAnimationEnded()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+			}
 		}
 
 		// Melee Weapon
@@ -428,6 +504,42 @@ public:
 					})
 					});
 			}
+
+			// Hit
+			{
+				transitions_.insert({ AIM_POSE_MELEE, Transition(HIT_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ ATTACK_MELEE, Transition(HIT_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							player->is_attacking_ = false;
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ HIT_MELEE, Transition(AIM_POSE_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
+						if (IsAnimationEnded()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+			}
 		}
 
 		// Grenade
@@ -483,6 +595,42 @@ public:
 					})
 					});
 				transitions_.insert({ ATTACK_GR, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+						if (IsAnimationEnded()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+			}
+
+			// Hit
+			{
+				transitions_.insert({ AIM_POSE_GR, Transition(HIT_GR,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ ATTACK_GR, Transition(HIT_GR,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							player->is_attacking_ = false;
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ HIT_GR, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
 						if (IsAnimationEnded()) {
 							return true;
 						}
@@ -736,9 +884,13 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
+			animation_base->SetAnimation("Biker_Idle_Hit_Unreal Take.anim", 0.5f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
+			entt::entity owner_id = animation_base->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			player->is_hit_ = false;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
@@ -751,9 +903,13 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
+			animation_base->SetAnimation("Biker_Idle_Hit_Unreal Take.anim", 0.5f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
+			entt::entity owner_id = animation_base->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			player->is_hit_ = false;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
@@ -766,9 +922,14 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
+
+			animation_base->SetAnimation("Biker_Idle_Hit_Unreal Take.anim", 0.5f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
+			entt::entity owner_id = animation_base->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			player->is_hit_ = false;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
@@ -781,9 +942,13 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
+			animation_base->SetAnimation("Biker_Idle_Hit_Unreal Take.anim", 0.5f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
+			entt::entity owner_id = animation_base->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			player->is_hit_ = false;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
