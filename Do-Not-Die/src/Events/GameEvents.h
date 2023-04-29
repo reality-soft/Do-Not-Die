@@ -8,26 +8,16 @@
 #include "InGameScene.h"
 using namespace reality;
 
-class GameOverEvent : public Event
+class GameResultEvent : public Event
 {
 public:
-	GameOverEvent() {};
+	GameResultEvent(GameResultType result_type) : result(result_type) {};
 	virtual void Process() override {
 		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 		if (ingame_scene)
-			ingame_scene->game_over = true;
+			ingame_scene->game_result_type = result;
 	}
-};
-
-class GameClearEvent : public Event
-{
-public:
-	GameClearEvent() {};
-	virtual void Process() override {
-		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
-		if (ingame_scene)
-			ingame_scene->game_clear = true;
-	}
+	GameResultType result;
 };
 
 class TakeDamageEvent : public reality::Event
@@ -67,13 +57,10 @@ public:
 			if (callback_car.success)
 			{
 				*enemy_actor->targeting_car_health = max(0, *enemy_actor->targeting_car_health - 5);
-
-				if (*enemy_actor->targeting_car_health == 0)
-					EVENT->PushEvent<GameOverEvent>();
 			}
 			else
 			{
-				auto callback_actor = QUADTREE->RaycastActorOnly(ray, actor_id_);
+				auto callback_actor = QUADTREE->RaycastActorTargeted(ray, SCENE_MGR->GetPlayer<Player>(0)->entity_id_);
 				if (callback_actor.success)
 				{
 					if (SCENE_MGR->GetActor<GameCharacter>(callback_actor.ent)->tag == "player")
