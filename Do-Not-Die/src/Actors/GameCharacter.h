@@ -22,7 +22,6 @@ public:
 		return cur_hp_;
 	};
 
-	string tag;
 protected:
 	float damage_;
 	float max_hp_;
