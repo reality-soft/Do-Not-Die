@@ -91,12 +91,14 @@ public:
 			auto callback_total = QUADTREE->Raycast(ray, actor_id_);
 			if (callback_total.success)
 			{
-				if (callback_total.ent == actor_id_) {
-
-				}
 				if (callback_total.is_actor)
 				{
 					actor_hit = callback_total.ent;
+
+					Enemy* enemy_actor = SCENE_MGR->GetActor<Enemy>(actor_hit);
+					if (enemy_actor)
+						enemy_actor->AddImpulse(GetRayDirection(ray), 1000.0f);
+					
 					EVENT->PushEvent<TakeDamageEvent>(damage, actor_hit);
 					EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_total.point, callback_total.normal);
 				}

@@ -42,7 +42,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
-	SpawnZombies(0.3f, 30);
+	SpawnZombies(1.f, 30);
 
 	if (wave_count_ > 1 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0)
 	{
@@ -264,7 +264,7 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 
 		int guidline_index = rand() % zomebie_tracks_->size();
 		int mesh_index = rand() % enemy_meshes.size();
-
+		
 		guidline_index = 4;
 
 		vector<XMVECTOR> target_poses;
