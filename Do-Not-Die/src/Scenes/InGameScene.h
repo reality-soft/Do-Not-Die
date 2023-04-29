@@ -7,6 +7,15 @@
 #include "WaveSystem.h"
 using namespace reality;
 
+enum class GameResultType
+{
+	ePlayerDead,
+	eCarCrashed,
+	ePlayerInfected,
+	eGameCleared,
+	eNone
+};
+
 enum E_IngameLoading
 {
 	LOADING_START = 0,
@@ -41,7 +50,7 @@ private:
 
 	TriggerSystem sys_trigger_;
 	WaveSystem sys_wave_;
-
+	
 #ifdef _DEBUG
 	PropertyWidget* prop_widget_ = nullptr;
 #endif
@@ -52,8 +61,7 @@ public:
 	UI_Actor_Ingame& GetUIActor() { return ingame_ui; }
 	Environment& GetEnviroment() { return environment_; }
 
-	bool game_over = false;
-	bool game_clear = false;
+	GameResultType game_result_type = GameResultType::eNone;
 private:
 #ifdef _DEBUG
 	TestWidget	test_window_;
@@ -62,15 +70,16 @@ private:
 	UI_Actor_Ingame ingame_ui;
 	void CursorStateUpdate();
 	
-private:
-	int cur_zombie_created = 0;
-private:
-	bool b_show_cursor = false;
 public:
+	int cur_zombie_created = 0;
+	bool b_show_cursor = false;
 	void SetCursorVisible();
 	void SetCursorInvisible();
-	bool GameOverProcess();
-	bool GameClearProcess();
+
+private:
+	void ShowCarCrashing();
+	void GameResultProcess();
+
 private:
 	E_IngameLoading loading_progress = LOADING_START;
 public:

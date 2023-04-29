@@ -299,19 +299,20 @@ void UI_Actor_Ingame::CreateIngameUI()
 	event_msg_text_->InitText("Event Test", E_Font::ROBOTO, { win_size_1920_width / 2.0f - 100.0f, win_size_1920_height - 300.0f });
 
 	// Game Over UI
-	game_over_ui_ = make_shared<UI_Image>();
-	game_over_ui_->InitImage("T_GameOver_Background.png");
-	game_over_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
+	player_dead_ui_ = make_shared<UI_Image>();
+	player_dead_ui_->InitImage("T_YouAreDead.png");
+	player_dead_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
 
-	game_over_img_ = make_shared<UI_Image>();
-	game_over_img_->InitImage("T_GameOver_Image.png");
-	game_over_ui_->AddChildUI("GameOver Img", game_over_img_);
-	game_over_img_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height * 2.0f / 5.0f }, 1200.0f, 250.0f);
+	car_is_crashed_ui_ = make_shared<UI_Image>();
+	car_is_crashed_ui_->InitImage("T_CarIsCrashed.png");
+	car_is_crashed_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
+	
 
 	game_over_exit_button_ = make_shared<UI_Button>();
 	game_over_exit_button_->InitButton("T_Gameover_ExitBtn_Normal.png", "T_Gameover_ExitBtn_Hover.png");
-	game_over_ui_->AddChildUI("Exit Button", game_over_exit_button_);
 	game_over_exit_button_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height * 3.0f / 4.0f }, 500.0f, 150.0f);
+	player_dead_ui_->AddChildUI("Exit Button", game_over_exit_button_);
+	car_is_crashed_ui_->AddChildUI("Exit Button", game_over_exit_button_);
 	
 }
 
@@ -689,11 +690,24 @@ void UI_Actor_Ingame::SetEventMsg(string msg)
 	ui_comp_->ui_list.insert({ "Event Message UI", event_msg_text_ });
 }
 
-void UI_Actor_Ingame::GameOver()
+void UI_Actor_Ingame::ShowPlayerDead()
 {
 	ui_comp_->ui_list.clear();
-	ui_comp_->ui_list.insert({"Game Over UI", game_over_ui_});
+	ui_comp_->ui_list.insert({ "Player Dead UI", player_dead_ui_ });
 	while (ShowCursor(true) <= 0);
+}
+
+void UI_Actor_Ingame::ShowPlayerInfected()
+{
+
+}
+
+void UI_Actor_Ingame::ShowCarCrashed()
+{
+	ui_comp_->ui_list.clear();
+	ui_comp_->ui_list.insert({ "Car Crashed UI", car_is_crashed_ui_ });
+	while (ShowCursor(true) <= 0);
+
 }
 
 void UI_Actor_Ingame::OpenMenu()
