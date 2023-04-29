@@ -32,7 +32,7 @@ public:
 
 	bool PlaySequence();
 	bool playable = false;
-
+	
 	void ImportSequenceTrack(string mapdat_file);
 
 	UINT current_track_ = 0;
