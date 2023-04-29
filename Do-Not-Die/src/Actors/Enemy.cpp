@@ -105,6 +105,18 @@ void Enemy::TakeDamage(int damage)
 	cur_hp_ -= damage;
 }
 
+void Enemy::AddImpulse(XMVECTOR direction, float strength)
+{
+	CancelMovement();
+	auto c_capsule = GetCapsuleComponent();
+	if (c_capsule)
+	{
+		c_capsule->impulse_vector = direction;
+		c_capsule->impulse_strength = strength;	
+		GetMovementComponent()->gravity_pulse = 0;
+	}
+}
+
 void Enemy::SetMovement(const XMVECTOR& direction)
 {
 	if (XMVector3Length(direction).m128_f32[0] <= 0.00001f) {
