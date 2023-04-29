@@ -168,7 +168,7 @@ void Player::SetCharacterMovementAnimation()
 void Player::OnUpdate()
 {
 	if (cur_hp_ <= 0)
-		EVENT->PushEvent<GameOverEvent>();
+		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
 
 	if (controller_enable_)
 	{

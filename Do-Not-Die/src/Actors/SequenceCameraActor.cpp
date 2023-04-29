@@ -99,13 +99,13 @@ bool SequenceCameraActor::PlaySequence()
 	float lerp_time = time / 20;
 	speed = 30 * pow(pow(2.71828182846, time), 2 * lerp_time) * 0.01f;
 	speed = min(30, speed);
-
+	
 
 	auto track = sequence_tracks_[current_track_];
 	
 	XMVECTOR movement_vector = XMVector3Normalize(track.move_vector);
 	float track_length = Vector3Length(track.move_vector);
-
+	
 	XMVECTOR movement = movement_vector * speed * TM_DELTATIME;
 	world_pos_ += movement;
 	float current_pitch = pitch + track.rotate_pitch_yaw.x * lerp_value;
