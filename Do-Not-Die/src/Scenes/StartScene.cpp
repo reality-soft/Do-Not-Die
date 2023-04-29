@@ -43,7 +43,6 @@ void StartScene::OnInit()
 	{
 		int random_scale = RandomFloatInRange(10.0f, 15.0f);
 		entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Flame>(START, node.second, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
-		Scene::GetActor<Actor>(ent)->visible = true;
 	}
 
 	loading_progress = START_FINISHED;
@@ -51,6 +50,9 @@ void StartScene::OnInit()
 
 void StartScene::OnUpdate()
 {
+	if (DINPUT->GetKeyState(DIK_TAB))
+		scene_finished = true;
+	
 	if (scene_finished)
 		FinishProgress();
 	else
