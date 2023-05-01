@@ -30,10 +30,7 @@ void UI_Actor_Ending::OnUpdate()
 		timer += TM_DELTATIME;
 
 	if (timer > 15.0f)
-		ending_finished = FadeInBg();
-
-	if (ending_finished)
-		DestroyWindow(ENGINE->GetWindowHandle());
+		ending_finished = true;
 }
 
 

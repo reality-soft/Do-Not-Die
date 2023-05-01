@@ -22,7 +22,7 @@ void StartScene::OnInit()
 	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
 
 	loading_progress = START_ACTOR;
-
+	
 	intro_scene_ui.OnInit(reg_scene_);
 	intro_scene_ui.SetIntroTime(6.0f);
 
@@ -58,12 +58,13 @@ void StartScene::OnUpdate()
 		FinishProgress();
 	else
 	{
-		//sys_sound.PlayBackground("MichaelFK_Empyrean_cut.wav", true, 10.0f, 1.0f);
+		sys_sound.PlayBackground("MichaelFK_Empyrean_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("TonyAnderson_Nuit_cut.wav", true, 10.0f, 1.0f);
-		sys_sound.PlayBackground("NathanWhitehead_DaysGone_cut.wav", true, 10.0f, 1.0f);
+		//sys_sound.PlayBackground("NathanWhitehead_DaysGone_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("ZackHemsey_TheWay_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("Saw_HelloZepp_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("FarCry5_OhJohn_cut.wav", true, 10.0f, 1.0f);
+		//sys_sound.PlayBackground("MichaelFK_FleetingBeauty_cut.wav", true, 10.0f, 1.0f);
 		
 	}
 
@@ -98,12 +99,12 @@ void StartScene::OnRelease()
 
 void StartScene::FinishProgress()
 {
-	bool sound_finished = sys_sound.FadeOutDelete(3.0f);
+	bool sound_finished = sys_sound.FadeOut(3.0f);
+	
 	start_scene_ui.DisappearUI();
-
 	// Hide Cursor
 	while (ShowCursor(false) >= 0);
-
+	
 	if (sound_finished)
 		SCENE_MGR->ChangeScene(E_SceneType::INGAME);
 }

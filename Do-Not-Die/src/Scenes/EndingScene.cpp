@@ -7,12 +7,14 @@ void EndingScene::OnInit()
 	loading_progress = ENDING_MANAGER;
 
 	loading_progress = ENDING_SYSTEM;
+	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
+
 	sys_render.OnCreate(reg_scene_);
 	sys_ui.OnCreate(reg_scene_);
 	sys_sound.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
 	sys_light.OnCreate(reg_scene_);
-	sys_light.SetGlobalLightPos({ -5000, 5000, -5000 });
+	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
 	sys_animation.OnCreate(reg_scene_);
 
 	loading_progress = ENDING_ACTOR;
@@ -44,18 +46,12 @@ void EndingScene::OnUpdate()
 	if (DINPUT->GetKeyState(DIK_TAB))
 		scene_finished = true;
 
+	scene_finished = ending_ui_.ending_finished;
 	if (scene_finished)
 		FinishProgress();
-
 	else
 	{
-		sys_sound.PlayBackground("MichaelFK_Empyrean_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("TonyAnderson_Nuit_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("NathanWhitehead_DaysGone_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("ZackHemsey_TheWay_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("Saw_HelloZepp_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("FarCry5_OhJohn_cut.wav", true, 10.0f, 1.0f);
-
+		sys_sound.PlayBackground("MichaelFK_FleetingBeauty_cut.wav", false, 0.0f, 1.0f);
 	}
 
 	sys_animation.OnUpdate(reg_scene_);
@@ -80,6 +76,7 @@ void EndingScene::OnRender()
 
 void EndingScene::OnRelease()
 {
+	reality::RESOURCE->Release();
 }
 
 void EndingScene::StartingProgress()
@@ -88,5 +85,9 @@ void EndingScene::StartingProgress()
 }
 void EndingScene::FinishProgress()
 {
+	bool sound_finished = sys_sound.FadeOut(5.0f);
+	bool fade_out_finished = ending_ui_.FadeInBg();
 
+	if (sound_finished && fade_out_finished)
+		DestroyWindow(ENGINE->GetWindowHandle());
 }

@@ -101,8 +101,6 @@ void InGameScene::OnInit()
 	sys_wave_.OnCreate(reg_scene_);
 	sys_wave_.SetWorldEnv(&environment_);
 	sys_trigger_.OnCreate(reg_scene_);
-
-	QUADTREE->ImportFloydRout("DND_FloydRout_1.mapdat");
 	QUADTREE->view_collisions_ = true;
 
 #ifdef _DEBUG
@@ -177,7 +175,6 @@ void InGameScene::OnRender()
 void InGameScene::OnRelease()
 {
 	QUADTREE->Release();
-	reality::RESOURCE->Release();
 }
 
 void InGameScene::CursorStateUpdate()
@@ -254,7 +251,10 @@ void InGameScene::GameResultProcess()
 	case GameResultType::ePlayerInfected:
 		break;
 	case GameResultType::eGameCleared:
-		if (ingame_ui.FadeOut() == true)
+		bool sound_finished = sys_sound.FadeOut(3.0f);
+		bool fade_out_finished = ingame_ui.FadeOut();
+
+		if (sound_finished && fade_out_finished)
 			SCENE_MGR->ChangeScene(ENDING);
 		break;
 	}	
