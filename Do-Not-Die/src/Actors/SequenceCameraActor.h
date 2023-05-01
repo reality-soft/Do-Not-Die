@@ -39,7 +39,9 @@ public:
 	vector<SequenceTrack> sequence_tracks_;
 	float track_length = 0;
 	float lerp_value = 0;
-
+	float acc = 0.01f;
+	float play_speed = 30.0f;
+	bool keep_sequence_at_last_direction = true;
 
 	XMVECTOR world_pos_;
 	float yaw;
