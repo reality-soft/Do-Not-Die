@@ -57,6 +57,7 @@ project "Do-Not-Die"
 		"Do-Not-Die/src/Scenes",
 		"Do-Not-Die/src/UI",
 		"Do-Not-Die/src/Item",
+		"Do-Not-Die/src/UI/EndingScene",
 		"Do-Not-Die/src/UI/InGameScene",
 		"Do-Not-Die/src/UI/StartScene",
 		"Do-Not-Die/src/UI/PopScene",

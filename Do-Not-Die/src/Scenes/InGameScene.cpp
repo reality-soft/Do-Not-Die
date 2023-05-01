@@ -127,6 +127,11 @@ void InGameScene::OnInit()
 
 void InGameScene::OnUpdate()
 {
+	if (DINPUT->GetKeyState(DIK_TAB) == KEY_PUSH)
+	{
+		sys_wave_.wave_count_++;
+	}
+
 	if (game_result_type != GameResultType::eNone)
 	{
 		GameResultProcess();

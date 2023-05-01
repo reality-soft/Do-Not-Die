@@ -37,7 +37,7 @@ bool reality::UI_Actor_Ingame::FadeOut()
 	static float timer = 0.0f;
 	static float alpha = 0.0f;
 
-	if (alpha > 1.0f)
+	if (alpha > 0.999f)
 		return true;
 
 	timer += TM_DELTATIME;
