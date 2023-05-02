@@ -17,12 +17,12 @@ void StartScene::OnInit()
 	sys_sound.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
 	sys_light.OnCreate(reg_scene_);
-	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
+	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 , 0 });
 
 	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
 
 	loading_progress = START_ACTOR;
-
+	
 	intro_scene_ui.OnInit(reg_scene_);
 	intro_scene_ui.SetIntroTime(6.0f);
 
@@ -37,7 +37,8 @@ void StartScene::OnInit()
 	environment_.SetWorldTime(120, 120);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
-	environment_.SetLightProperty(0.2f, 0.2f);
+	environment_.SetLightProperty(XMFLOAT4(0.8, 0.75, 0, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.2f, 0.6f);
+
 	fire_effects_.Import("DND_StartSceneFire_1.mapdat", GuideType::eSpawnPoint);
 
 	for (const auto& node : fire_effects_.line_nodes)
@@ -58,12 +59,13 @@ void StartScene::OnUpdate()
 		FinishProgress();
 	else
 	{
-		//sys_sound.PlayBackground("MichaelFK_Empyrean_cut.wav", true, 10.0f, 1.0f);
+		sys_sound.PlayBackground("MichaelFK_Empyrean_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("TonyAnderson_Nuit_cut.wav", true, 10.0f, 1.0f);
-		sys_sound.PlayBackground("NathanWhitehead_DaysGone_cut.wav", true, 10.0f, 1.0f);
+		//sys_sound.PlayBackground("NathanWhitehead_DaysGone_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("ZackHemsey_TheWay_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("Saw_HelloZepp_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("FarCry5_OhJohn_cut.wav", true, 10.0f, 1.0f);
+		//sys_sound.PlayBackground("MichaelFK_FleetingBeauty_cut.wav", true, 10.0f, 1.0f);
 		
 	}
 
@@ -100,10 +102,10 @@ void StartScene::FinishProgress()
 {
 	bool sound_finished = sys_sound.FadeOutDelete("NathanWhitehead_DaysGone_cut.wav", 3.0f);
 	start_scene_ui.DisappearUI();
-
+  
 	// Hide Cursor
 	while (ShowCursor(false) >= 0);
-
+	
 	if (sound_finished)
 		SCENE_MGR->ChangeScene(E_SceneType::INGAME);
 }

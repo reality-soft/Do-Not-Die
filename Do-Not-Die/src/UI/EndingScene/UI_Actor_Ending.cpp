@@ -43,10 +43,7 @@ void UI_Actor_Ending::OnUpdate()
 	ScrollCredit(timer, 15.0f);
 
 	if (timer > 15.0f)
-		ending_finished = FadeInBg();
-
-	if (ending_finished)
-		DestroyWindow(ENGINE->GetWindowHandle());
+		ending_finished = true;
 }
 
 

@@ -22,7 +22,7 @@ void InGameScene::OnInit()
 	sys_camera.SetFarZ(10000.f);
 	sys_camera.SetFov(XMConvertToRadians(45));
 	sys_camera.mouse_sensivity = 0.5f;
-	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
+	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 , 0 });
 	sys_light.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
 	sys_sound.OnCreate(reg_scene_);
@@ -59,13 +59,10 @@ void InGameScene::OnInit()
 
 	INPUT_EVENT->SubscribeMouseEvent( MouseButton::R_BUTTON, std::bind(&Player::Aim, player_actor, true), KEY_PUSH);
 	INPUT_EVENT->SubscribeMouseEvent( MouseButton::R_BUTTON, std::bind(&Player::Aim, player_actor, false), KEY_UP);
-
 	INPUT_EVENT->SubscribeMouseEvent( MouseButton::L_BUTTON , std::bind(&Player::Attack, player_actor), KEY_PUSH);
-	//INPUT_EVENT->SubscribeMouseEvent({ MouseButton::L_BUTTON }, idle, KEY_UP);
 
 	level.Create("DNDLevel_WithCollision_01.stmesh", "LevelVS.cso");
 
-	//QUADTREE->Init(&level, 3, reg_scene_);
 	QUADTREE->ImportGuideLines("DND_Blocking_1.mapdat", GuideType::eBlocking);
 	QUADTREE->ImportGuideLines("DND_NpcTrack_1.mapdat", GuideType::eNpcTrack);
 	QUADTREE->ImportGuideLines("DND_PlayerStart_1.mapdat", GuideType::eSpawnPoint);
@@ -89,10 +86,10 @@ void InGameScene::OnInit()
 	loading_progress = LOADING_ACTOR;
 	
 	environment_.CreateEnvironment();
-	environment_.SetWorldTime(10, 120);
+	environment_.SetWorldTime(10, 10);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
-	environment_.SetLightProperty(0.2f, 0.2f);
+	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.1f, 0.25f);
 
 	// LOADING FINISH
 	loading_progress = LOADING_FINISHED;
@@ -101,27 +98,11 @@ void InGameScene::OnInit()
 	sys_wave_.OnCreate(reg_scene_);
 	sys_wave_.SetWorldEnv(&environment_);
 	sys_trigger_.OnCreate(reg_scene_);
-
-	QUADTREE->ImportFloydRout("DND_FloydRout_1.mapdat");
 	QUADTREE->view_collisions_ = true;
 
 #ifdef _DEBUG
 	GUI->AddWidget<PropertyWidget>("property");
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("FPS", &TIMER->fps);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Time Countdown", &sys_wave_.countdown_timer_);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Waves", &sys_wave_.wave_count_);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("RaycastTri", &QUADTREE->raycast_calculated);
-	
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Jump", &player_actor->GetMovementComponent()->jump_pulse);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Gravity", &player_actor->GetMovementComponent()->gravity_pulse);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<UINT>("Selectable Items", &player_actor->selectable_counts_);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Car Repaired", &sys_wave_.car_health);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("Created Actors", &cur_zombie_created);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<bool>("In Repair Volume", &player_actor->can_repair_car_);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("Angle", &player_actor->angle_);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("direction_x", &player_actor->direction_.m128_f32[0]);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("direction_y", &player_actor->direction_.m128_f32[1]);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("direction_z", &player_actor->direction_.m128_f32[2]);
 #endif
 }
 
@@ -177,7 +158,6 @@ void InGameScene::OnRender()
 void InGameScene::OnRelease()
 {
 	QUADTREE->Release();
-	reality::RESOURCE->Release();
 }
 
 void InGameScene::CursorStateUpdate()
@@ -254,7 +234,10 @@ void InGameScene::GameResultProcess()
 	case GameResultType::ePlayerInfected:
 		break;
 	case GameResultType::eGameCleared:
-		if (ingame_ui.FadeOut() == true)
+		bool sound_finished = sys_sound.FadeOut(3.0f);
+		bool fade_out_finished = ingame_ui.FadeOut();
+
+		if (sound_finished && fade_out_finished)
 			SCENE_MGR->ChangeScene(ENDING);
 		break;
 	}	
