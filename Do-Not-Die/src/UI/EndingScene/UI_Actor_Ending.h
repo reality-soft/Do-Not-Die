@@ -10,9 +10,11 @@ public:
 	virtual void OnInit(entt::registry& registry);
 	virtual void OnUpdate();
 
+	bool FadeOutBg();
+	bool FadeInBg();
+
 	// Game Over UI
-	shared_ptr<UI_Image>	game_clear_ui_;
-	shared_ptr<UI_Image>	game_clear_img_;
-	shared_ptr<UI_Button> game_clear_exit_button_;
+	shared_ptr<UI_Image> ui_fade_background_;
+	bool ending_finished = false;
 };
 

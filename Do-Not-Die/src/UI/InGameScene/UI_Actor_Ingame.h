@@ -67,10 +67,12 @@ namespace reality
 		shared_ptr<UI_Image>	addicted_ui_;
 		// Text Event
 		shared_ptr<UI_Text>		event_msg_text_;
+
 		// Game Over UI
-		shared_ptr<UI_Image>	game_over_ui_;
-			shared_ptr<UI_Image>	game_over_img_;
-			shared_ptr<UI_Button> game_over_exit_button_;
+		shared_ptr<UI_Image>	player_dead_ui_;
+		shared_ptr<UI_Image>	car_is_crashed_ui_;
+
+		shared_ptr<UI_Button> game_over_exit_button_;
 
 			//FadeOutBackground
 		shared_ptr<UI_Image>	background_img_;
@@ -88,7 +90,9 @@ namespace reality
 		void UpdateIngameUI();
 		void UpdateMenuUI();
 		void SetEventMsg(string msg);
-		void GameOver();
+		void ShowPlayerDead();
+		void ShowPlayerInfected();
+		void ShowCarCrashed();
 	private:
 		void OpenMenu();
 		void CloseMenu();

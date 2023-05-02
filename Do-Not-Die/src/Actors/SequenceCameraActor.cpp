@@ -3,6 +3,8 @@
 
 void SequenceCameraActor::OnInit(entt::registry& registry)
 {
+	Actor::OnInit(registry);
+
 	auto viewport = DX11APP->GetViewPortAddress();
 	float aspect = viewport->Width / viewport->Height;
 	float fov = XMConvertToRadians(45);
@@ -89,7 +91,7 @@ void SequenceCameraActor::OnUpdate()
 
 bool SequenceCameraActor::PlaySequence()
 {
-	if (current_track_ >= sequence_tracks_.size())
+	if (current_track_ >= sequence_tracks_.size() && keep_sequence_at_last_direction == false)
 		return false;
 
 	// Lerp Speed By Time
@@ -97,15 +99,15 @@ bool SequenceCameraActor::PlaySequence()
 	static float time = 0.0f;
 	time += TM_DELTATIME;
 	float lerp_time = time / 20;
-	speed = 30 * pow(pow(2.71828182846, time), 2 * lerp_time) * 0.01f;
-	speed = min(30, speed);
-
+	speed = play_speed * pow(pow(2.71828182846, time), 2 * lerp_time) * acc;
+	speed = min(play_speed, speed);
+	
 
 	auto track = sequence_tracks_[current_track_];
 	
 	XMVECTOR movement_vector = XMVector3Normalize(track.move_vector);
 	float track_length = Vector3Length(track.move_vector);
-
+	
 	XMVECTOR movement = movement_vector * speed * TM_DELTATIME;
 	world_pos_ += movement;
 	float current_pitch = pitch + track.rotate_pitch_yaw.x * lerp_value;
@@ -117,10 +119,14 @@ bool SequenceCameraActor::PlaySequence()
 
 	if (move_legnth > track_length)
 	{
-		current_track_++;
 		pitch = current_pitch;
 		yaw = current_yaw;
 		move_legnth = 0;
+
+		if (keep_sequence_at_last_direction == false && current_track_ < sequence_tracks_.size() - 1)
+		{
+			current_track_++;
+		}
 	}
 
 	lerp_value = move_legnth / Vector3Length(track.move_vector);

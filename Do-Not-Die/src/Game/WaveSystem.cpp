@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include "Item.h"
 #include "FX_Flame.h"
+#include "FX_Smoke.h"
 
 using namespace reality;
 
@@ -13,12 +14,12 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 	repair_spawns_ = QUADTREE->GetGuideLines("DND_RepairPart_1")->at(0);
 	car_event_ = QUADTREE->GetGuideLines("DND_CarEvent_1")->at(0);
 	zomebie_tracks_ = QUADTREE->GetGuideLines("DND_NpcTrack_1");
-	//fx_car_fire_ = QUADTREE->GetGuideLines("DND_FX_CarFire_1")->at(0);
+	fx_car_fire_ = QUADTREE->GetGuideLines("DND_FX_CarFire_1")->at(0);
 	fx_corpse_fire_ = QUADTREE->GetGuideLines("DND_FX_CorpseFire_1")->at(0);
 
 	CreateExtractPoints(reg);
 	CreateCarEventTriggers(_XMFLOAT3(car_event_.line_nodes.begin()->second), 150, 800);
-	//CreateStaticEffects();
+	CreateStaticEffects();
 }
 
 void reality::WaveSystem::OnUpdate(entt::registry& reg)
@@ -38,19 +39,20 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 			break;
 		}
 	}
-
+	zombie_count = SCENE_MGR->GetNumOfActor("enemy");
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
-	SpawnZombies(0.3f, 30);
+	SpawnZombies(1.f, 1);
+	SpawnCarSmokes();
 
 	if (wave_count_ > 1 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0)
 	{
-		EVENT->PushEvent<GameClearEvent>();
+		EVENT->PushEvent<GameResultEvent>(GameResultType::eGameCleared);
 	}
 	if (car_health <= 0)
 	{
-		EVENT->PushEvent<GameOverEvent>();
+		EVENT->PushEvent<GameResultEvent>(GameResultType::eCarCrashed);
 	}
 }
 
@@ -106,17 +108,10 @@ void reality::WaveSystem::CreateCarEventTriggers(XMFLOAT3 point, float repair_ra
 void reality::WaveSystem::CreateStaticEffects()
 {
 	srand(time(NULL));
-	//for (const auto& node : fx_car_fire_.line_nodes)
-	//{
-	//	float random_scale = (float)(rand() % 5 + 5);
-	//	entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Flame>(INGAME, node.second, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
-	//	car_fires_.insert(ent);
-	//}
 	for (const auto& node : fx_corpse_fire_.line_nodes)
 	{
 		int random_scale = rand() % 5 + 5;
 		entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Flame>(INGAME, node.second, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
-		corpse_fires_.insert(ent);
 	}
 }
 
@@ -264,7 +259,7 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 
 		int guidline_index = rand() % zomebie_tracks_->size();
 		int mesh_index = rand() % enemy_meshes.size();
-
+		
 		guidline_index = 4;
 
 		vector<XMVECTOR> target_poses;
@@ -279,6 +274,42 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 	}
 	
 }
+
+void reality::WaveSystem::SpawnCarSmokes()
+{
+	srand(time(NULL));
+	for (int i = 0; i < 100; i += 20)
+	{
+		int index = i / 20;
+
+		if (i >= car_health || car_health == 0)
+		{
+			if (spawned_car_fired_.find(index) != spawned_car_fired_.end())
+				continue;
+
+			auto node = fx_car_fire_.line_nodes.at(index);
+			int random_scale = rand() % 5 + 5;
+			entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Smoke>(INGAME, node, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
+			spawned_car_fired_.insert(make_pair(index, ent));
+		}
+		else
+		{
+			if (spawned_car_fired_.find(index) != spawned_car_fired_.end())
+			{
+				SCENE_MGR->DestroyActor(spawned_car_fired_.find(index)->second);
+				spawned_car_fired_.erase(index);
+			}
+		}
+
+
+	}
+}
+
+XMVECTOR reality::WaveSystem::GetCarPosition()
+{
+	return car_event_.line_nodes.begin()->second;
+}
+
 
 void reality::WaveSystem::WaveStart()
 {

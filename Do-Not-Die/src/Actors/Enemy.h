@@ -20,6 +20,7 @@ public:
 	float	 GetCurHp() const override;
 	void SetCurHp(int hp) override;
 	void TakeDamage(int damage) override;
+	void AddImpulse(XMVECTOR direction, float strength);
 
 public:
 	virtual void SetBehaviorTree(const vector<XMVECTOR>& target_poses);

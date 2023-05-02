@@ -89,7 +89,7 @@ void InGameScene::OnInit()
 	loading_progress = LOADING_ACTOR;
 	
 	environment_.CreateEnvironment();
-	environment_.SetWorldTime(60, 120);
+	environment_.SetWorldTime(10, 120);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(0.2f, 0.2f);
@@ -103,7 +103,7 @@ void InGameScene::OnInit()
 	sys_trigger_.OnCreate(reg_scene_);
 
 	QUADTREE->ImportFloydRout("DND_FloydRout_1.mapdat");
-
+	QUADTREE->view_collisions_ = true;
 
 #ifdef _DEBUG
 	GUI->AddWidget<PropertyWidget>("property");
@@ -127,25 +127,21 @@ void InGameScene::OnInit()
 
 void InGameScene::OnUpdate()
 {
-	if (game_over)
+	if (DINPUT->GetKeyState(DIK_TAB) == KEY_PUSH)
 	{
-		if (GameOverProcess() == true)
-		{
-			int a = 0;
-		}
-	}
-	if (game_clear)
-	{
-		if (GameClearProcess() == true)
-		{
-			SCENE_MGR->ChangeScene(ENDING);
-		}
+		sys_wave_.wave_count_++;
 	}
 
+	if (game_result_type != GameResultType::eNone)
+	{
+		GameResultProcess();
+	}
+	
 	QUADTREE->Frame(&sys_camera);
 	QUADTREE->UpdatePhysics();
 
 	sys_camera.OnUpdate(reg_scene_);
+	environment_.Update(sys_camera.GetCamera()->camera_pos, &sys_light);
 	sys_animation.OnUpdate(reg_scene_);
 	sys_effect.OnUpdate(reg_scene_);
 	sys_light.OnUpdate(reg_scene_);
@@ -155,7 +151,6 @@ void InGameScene::OnUpdate()
 	// Trigger And Wave System
 	sys_wave_.OnUpdate(reg_scene_);
 	sys_trigger_.OnUpdate(reg_scene_);
-	environment_.Update(sys_camera.GetCamera()->camera_pos, &sys_light);
 	ingame_ui.SetGameTimer(sys_wave_.countdown_timer_);
 	ingame_ui.OnUpdate();
 	
@@ -165,7 +160,7 @@ void InGameScene::OnUpdate()
 void InGameScene::OnRender()
 {
 	environment_.Render();	
-
+	
 	level.Update();
 	level.Render();
 
@@ -218,18 +213,50 @@ void InGameScene::SetCursorInvisible()
 	SetCursorPos(ENGINE->GetWindowSize().x / 2.0f, ENGINE->GetWindowSize().y / 2.0f);
 }
 
-bool InGameScene::GameOverProcess()
+void InGameScene::ShowCarCrashing()
 {
-	ingame_ui.GameOver();
-	return true;
+	SequenceInfo seq_info;
+	seq_info.sequence_start = sys_camera.world_matrix.r[3];
+	seq_info.sequence_end = sys_wave_.GetCarPosition() - XMVector3Normalize(sys_wave_.GetCarPosition() - seq_info.sequence_start) * 500;
+	seq_info.target_start = sys_camera.GetCamera()->target_pos;
+	seq_info.target_end = sys_wave_.GetCarPosition();
+	seq_info.play_time = 5.0f;
+	seq_info.acceler = 1.f;
+	seq_info.decceler = 0.1f;
+
+	if (sys_camera.PlaySequence(seq_info, -1) == true)
+	{
+		ingame_ui.ShowCarCrashed();
+
+		static float time = 0.0f;
+		static int index = 0;
+		time += TM_DELTATIME;
+		
+		if (time > 0.3 && index < sys_wave_.fx_car_fire_.line_nodes.size())
+		{
+			XMVECTOR spawn_pos = sys_wave_.fx_car_fire_.line_nodes.at(index++);
+			EFFECT_MGR->SpawnEffect<FX_Explosion>(spawn_pos);
+			time = 0.0f;
+		}			
+	}
 }
 
-bool InGameScene::GameClearProcess()
+void InGameScene::GameResultProcess()
 {
-	if (ingame_ui.FadeOut() == true)
-		return true;
-
-	return false;
+	switch (game_result_type)
+	{
+	case GameResultType::ePlayerDead:
+		ingame_ui.ShowPlayerDead();
+		break;
+	case GameResultType::eCarCrashed:
+		ShowCarCrashing();
+		break;
+	case GameResultType::ePlayerInfected:
+		break;
+	case GameResultType::eGameCleared:
+		if (ingame_ui.FadeOut() == true)
+			SCENE_MGR->ChangeScene(ENDING);
+		break;
+	}	
 }
-
 

@@ -1,6 +1,7 @@
 #include "StartScene.h"
 #include "FbxMgr.h"
 #include "FX_Flame.h"
+#include "FX_Smoke.h"
 
 void StartScene::OnInit()
 {
@@ -27,7 +28,7 @@ void StartScene::OnInit()
 
 	sequence_camera_ = AddActor<SequenceCameraActor>();
 	sequence_camera_actor = GetActor<SequenceCameraActor>(sequence_camera_);
-	sequence_camera_actor->ImportSequenceTrack("DND_SequenceTrack_2.mapdat");
+	sequence_camera_actor->ImportSequenceTrack("DND_OpeningSequence_1.mapdat");
 	start_scene_ui.OnInit(reg_scene_);
 
 	level.Create("DNDLevel_WithCollision_01.stmesh", "LevelVS.cso");
@@ -43,7 +44,6 @@ void StartScene::OnInit()
 	{
 		int random_scale = RandomFloatInRange(10.0f, 15.0f);
 		entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Flame>(START, node.second, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
-		Scene::GetActor<Actor>(ent)->visible = true;
 	}
 
 	loading_progress = START_FINISHED;
@@ -51,13 +51,16 @@ void StartScene::OnInit()
 
 void StartScene::OnUpdate()
 {
+	if (DINPUT->GetKeyState(DIK_TAB))
+		scene_finished = true;
+	
 	if (scene_finished)
 		FinishProgress();
 	else
 	{
-		sys_sound.PlayBackground("MichaelFK_Empyrean_cut.wav", true, 10.0f, 1.0f);
+		//sys_sound.PlayBackground("MichaelFK_Empyrean_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("TonyAnderson_Nuit_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("NathanWhitehead_DaysGone_cut.wav", true, 10.0f, 1.0f);
+		sys_sound.PlayBackground("NathanWhitehead_DaysGone_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("ZackHemsey_TheWay_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("Saw_HelloZepp_cut.wav", true, 10.0f, 1.0f);
 		//sys_sound.PlayBackground("FarCry5_OhJohn_cut.wav", true, 10.0f, 1.0f);
