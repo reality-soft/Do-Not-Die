@@ -649,6 +649,13 @@ public:
 		AnimationStateMachine::OnUpdate();
 	}
 
+	private:
+		Player* player_;
+	public:
+		Player* GetPlayer() { return player_; }
+		void SetPlayer(Player* player) { player_ = player; }
+
+	public:
 	class IdlePoseAR : public AnimationState {
 	public:
 		IdlePoseAR() : AnimationState(IDLE_POSE_AR) {}
@@ -843,6 +850,8 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 			animation_base->SetAnimation("A_TP_CH_AR_01_Reload_Retargeted_Unreal Take.anim", 0.3f);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_AR_01_Reload.wav", 0.5f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -874,6 +883,8 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 			animation_base->SetAnimation("A_TP_CH_Handgun_Reload_Retargeted_Unreal Take.anim", 0.3f);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Handgun_Reload.wav", 0.5f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{

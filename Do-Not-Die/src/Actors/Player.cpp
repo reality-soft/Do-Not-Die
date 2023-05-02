@@ -120,6 +120,8 @@ void Player::OnInit(entt::registry& registry)
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
 	animation_component.GetAnimSlotByName("Base")->SetAnimation("Biker_Idle_Unreal Take.anim", 0.5);
 	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
+	auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_component.GetAnimSlotByName("UpperBody");
+	sm->SetPlayer(this);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
 	// FlashLight
@@ -374,6 +376,20 @@ void Player::SetPos(const XMVECTOR& position)
 {
 	cur_position_ = position;
 	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
+}
+
+void Player::AddSoundQueue(SoundType type, string sound_name, float volume, bool is_looping)
+{
+	SoundQueue sound_queue;
+	sound_queue.sound_type = type;
+	sound_queue.sound_filename = sound_name;
+	sound_queue.sound_volume = volume;
+	sound_queue.is_looping = is_looping;
+
+	auto generator = reg_scene_->try_get<C_SoundGenerator>(GetEntityId());
+
+	if(generator)
+		generator->sound_queue_list.push(sound_queue);
 }
 
 float Player::GetMaxHp() const
