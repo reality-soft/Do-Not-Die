@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "Engine_include.h"
 #include "Shape.h"
-#include "Enemy.h"
+#include "GeneralZombie.h"
 #include "FX_BloodImpact.h"
 #include "FX_ConcreteImpact.h"
 #include "InGameScene.h"
@@ -57,7 +57,7 @@ public:
 		for (auto& pair : ingamescene->GetActors())
 		{
 			
-			auto enemy = SCENE_MGR->GetActor<Enemy>(pair.first);
+			auto enemy = SCENE_MGR->GetActor<GeneralZombie>(pair.first);
 
 			if (enemy == nullptr)
 				continue;

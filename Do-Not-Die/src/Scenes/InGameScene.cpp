@@ -1,6 +1,6 @@
 #include "InGameScene.h"
 #include "Player.h"
-#include "Enemy.h"
+#include "GeneralZombie.h"
 #include "FX_Flame.h"
 #include "FX_Explosion.h"
 #include "FbxMgr.h"
@@ -52,9 +52,7 @@ void InGameScene::OnInit()
 	
 	INPUT_EVENT->SubscribeKeyEvent( DIK_Q, std::bind(&Player::UseItem, player_actor), KEY_PUSH);
 	INPUT_EVENT->SubscribeKeyEvent( DIK_C, std::bind(&Player::DropItem, player_actor), KEY_PUSH);
-
 	INPUT_EVENT->SubscribeKeyEvent( DIK_SPACE, std::bind(&Player::Jump, player_actor), KEY_PUSH);
-
 	INPUT_EVENT->SubscribeKeyEvent(DIK_R, std::bind(&Player::Reload, player_actor), KEY_PUSH);
 
 	INPUT_EVENT->SubscribeMouseEvent( MouseButton::R_BUTTON, std::bind(&Player::Aim, player_actor, true), KEY_PUSH);
@@ -86,7 +84,7 @@ void InGameScene::OnInit()
 	loading_progress = LOADING_ACTOR;
 	
 	environment_.CreateEnvironment();
-	environment_.SetWorldTime(30, 0);
+	environment_.SetWorldTime(120, 120);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.1f, 0.25f);

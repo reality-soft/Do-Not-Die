@@ -1,5 +1,5 @@
 #include "Engine_include.h"
-#include "Enemy.h"
+#include "GeneralZombie.h"
 
 class EnemyMoveToTarget : public reality::ActionNode
 {
@@ -11,7 +11,7 @@ public:
 
 	virtual reality::BehaviorStatus Action() override
 	{
-		Enemy* enemy = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
+		GeneralZombie* enemy = reality::SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 
 		XMVECTOR cur_pos = enemy->GetCurPosition();
 		XMVECTOR target_pos = target_position_;
@@ -47,7 +47,7 @@ public:
 		search_time += TM_DELTATIME;
 
 		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
-		Enemy* enemy = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
+		GeneralZombie* enemy = reality::SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 
 		XMVECTOR direction_to_player = XMVector3Normalize(player->GetCurPosition() - enemy->GetCurPosition());
 		target_position_ = player->GetCurPosition();
@@ -85,7 +85,7 @@ public:
 
 	virtual reality::BehaviorStatus Action() override
 	{
-  		Enemy* owner = reality::SCENE_MGR->GetActor<Enemy>(owner_id_);
+  		GeneralZombie* owner = reality::SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 		XMVECTOR owner_pos = owner->GetCurPosition();
 
 		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);

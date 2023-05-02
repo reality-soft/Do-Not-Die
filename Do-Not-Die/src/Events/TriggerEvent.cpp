@@ -14,7 +14,7 @@ TriggerEvent::TriggerEvent(entt::entity target_actor, entt::entity trigger_actor
 	else
 		is_actor_player_ = false;
 
-	if (SCENE_MGR->GetActor<Enemy>(target_actor_) != nullptr)
+	if (SCENE_MGR->GetActor<GeneralZombie>(target_actor_) != nullptr)
 		is_actor_zombie_ = true;
 	else
 		is_actor_zombie_ = false;
@@ -164,7 +164,7 @@ void reality::TriggerEvent::PlayerCanRepair(bool can_repair)
 
 void reality::TriggerEvent::ZombieDefense(bool can_defense)
 {
-	auto zombie = SCENE_MGR->GetActor<Enemy>(target_actor_);
+	auto zombie = SCENE_MGR->GetActor<GeneralZombie>(target_actor_);
 	if (zombie == nullptr)
 		return;
 

@@ -2,7 +2,7 @@
 #include "Engine_include.h"
 #include "AnimationStateMachine.h"
 #include "AnimationState.h"
-#include "Enemy.h"
+#include "GeneralZombie.h"
 using namespace reality;
 
 class ZombieBaseAnimationStateMachine : public AnimationStateMachine {
@@ -22,7 +22,7 @@ public:
 		states_.insert({ HIT_BASE, make_shared<Hit_Base>() });
 		states_.insert({ DIE_BASE, make_shared<Die_Base>() });
 		transitions_.insert({ IDLE_BASE, Transition(MOVE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->IsMoving()) {
 					return true;
 				}
@@ -32,7 +32,7 @@ public:
 			})
 			});
 		transitions_.insert({ MOVE_BASE, Transition(IDLE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->IsMoving() == false) {
 					return true;
 				}
@@ -42,7 +42,7 @@ public:
 			})
 			});
 		transitions_.insert({ MOVE_BASE, Transition(HIT_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->is_hit_ && enemy->GetCurHp() > 0.0f) {
 					return true;
 				}
@@ -52,7 +52,7 @@ public:
 			})
 			});
 		transitions_.insert({ IDLE_BASE, Transition(HIT_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->is_hit_) {
 					return true;
 				}
@@ -62,7 +62,7 @@ public:
 			})
 			});
 		transitions_.insert({ HIT_BASE, Transition(HIT_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->is_hit_ == true && enemy->GetCurHp() > 0.0f) {
 					return true;
 				}
@@ -72,7 +72,7 @@ public:
 			})
 			});
 		transitions_.insert({ HIT_BASE, Transition(IDLE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (IsAnimationEnded() && enemy->GetCurHp() > 0.0f && enemy->IsMoving() == false) {
 					return true;
 				}
@@ -82,7 +82,7 @@ public:
 			})
 			});
 		transitions_.insert({ HIT_BASE, Transition(MOVE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (IsAnimationEnded() && enemy->GetCurHp() > 0 && enemy->IsMoving() == true) {
 					return true;
 				}
@@ -93,7 +93,7 @@ public:
 			});
 
 		transitions_.insert({ HIT_BASE, Transition(DIE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->GetCurHp() <= 0.0f) {
 					return true;
 				}
@@ -103,7 +103,7 @@ public:
 			})
 			});
 		transitions_.insert({ MOVE_BASE, Transition(DIE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->GetCurHp() <= 0.0f) {
 					return true;
 				}
@@ -113,7 +113,7 @@ public:
 			})
 			});
 		transitions_.insert({ IDLE_BASE, Transition(DIE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->GetCurHp() <= 0.0f) {
 					return true;
 				}
@@ -181,14 +181,14 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			animation_state_machine->SetAnimation("Zombie_Atk_KnockBack_1_IPC_Anim_Unreal Take.anim", 0.8f);
-			SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId())->is_hit_ = false;
+			SCENE_MGR->GetActor<GeneralZombie>(animation_state_machine->GetOwnerId())->is_hit_ = false;
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
-			Enemy* enemy = SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId());
+			GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(animation_state_machine->GetOwnerId());
 			enemy->CancelMovement();
 		}
 	};
@@ -209,7 +209,7 @@ public:
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
-			Enemy* enemy = SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId());
+			GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(animation_state_machine->GetOwnerId());
 			enemy->CancelMovement();
 		}
 	};
@@ -234,7 +234,7 @@ public:
 		states_.insert({ DIE, make_shared<Die>() });
 		states_.insert({ ATTACK, make_shared<Attack>() });
 		transitions_.insert({ IDLE, Transition(MOVE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->IsMoving()) {
 					return true;
 				}
@@ -244,7 +244,7 @@ public:
 			})
 		});
 		transitions_.insert({ MOVE, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->IsMoving() == false) {
 					return true;
 				}
@@ -254,7 +254,7 @@ public:
 			})
 		});
 		transitions_.insert({ MOVE, Transition(HIT,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->is_hit_ && enemy->GetCurHp() > 0.0f) {
 					return true;
 				}
@@ -264,7 +264,7 @@ public:
 			})
 		});
 		transitions_.insert({ IDLE, Transition(HIT,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->is_hit_) {
 					return true;
 				}
@@ -274,7 +274,7 @@ public:
 			})
 		});
 		transitions_.insert({ HIT, Transition(HIT,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->is_hit_ == true && enemy->GetCurHp() > 0.0f) {
 					return true;
 				}
@@ -284,7 +284,7 @@ public:
 			})
 		});
 		transitions_.insert({ HIT, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (IsAnimationEnded() && enemy->GetCurHp() > 0.0f && enemy->IsMoving() == false) {
 					return true;
 				}
@@ -294,7 +294,7 @@ public:
 			})
 		});
 		transitions_.insert({ HIT, Transition(MOVE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (IsAnimationEnded() && enemy->GetCurHp() > 0 && enemy->IsMoving() == true) {
 					return true;
 				}
@@ -305,7 +305,7 @@ public:
 		});
 
 		transitions_.insert({ HIT, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->GetCurHp() <= 0.0f) {
 					return true;
 				}
@@ -315,7 +315,7 @@ public:
 			})
 		});
 		transitions_.insert({ MOVE, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->GetCurHp() <= 0.0f) {
 					return true;
 				}
@@ -325,7 +325,7 @@ public:
 			})
 		});
 		transitions_.insert({ IDLE, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->GetCurHp() <= 0.0f) {
 					return true;
 				}
@@ -346,7 +346,7 @@ public:
 		});
 
 		transitions_.insert({ IDLE, Transition(ATTACK,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->is_attacking_ == true) {
 					return true;
 				}
@@ -357,7 +357,7 @@ public:
 		});
 
 		transitions_.insert({ MOVE, Transition(ATTACK,[this](const AnimationStateMachine* animation_state_machine) {
-				Enemy* enemy = SCENE_MGR->GetActor<Enemy>(owner_id_);
+				GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(owner_id_);
 				if (enemy->is_attacking_ == true) {
 					return true;
 				}
@@ -459,13 +459,13 @@ public:
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			Enemy* enemy = SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId());
+			GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(animation_state_machine->GetOwnerId());
 			enemy->is_attack_ended = true;
 			enemy->is_attacking_ = false;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
-			Enemy* enemy = SCENE_MGR->GetActor<Enemy>(animation_state_machine->GetOwnerId());
+			GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(animation_state_machine->GetOwnerId());
 			//enemy->CancelMovement();
 		}
 	};
