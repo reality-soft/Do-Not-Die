@@ -13,7 +13,7 @@ void reality::TriggerSystem::OnCreate(entt::registry& reg)
 	{
 		const auto& trigger_volume = reg.get<C_TriggerVolume>(ent_trigger);
 		if (trigger_volume.tag == "defense")
-			defense_trigger_ = ent_trigger; break;
+			defense_trigger_ = ent_trigger;
 	}
 	
 }

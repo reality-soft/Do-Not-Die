@@ -1,6 +1,7 @@
 #include "InGameScene.h"
 #include "Player.h"
 #include "GeneralZombie.h"
+#include "BossZombie.h"
 #include "FX_Flame.h"
 #include "FX_Explosion.h"
 #include "FbxMgr.h"
@@ -10,7 +11,6 @@ void InGameScene::OnInit()
 	// LOADING : MANAGER_LOADING
 	loading_progress = LOADING_MANAGER;
 
-	WRITER->Init();
 	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
 
 	// LOADING : LOADING_SYSTEM
@@ -95,13 +95,20 @@ void InGameScene::OnInit()
 	// Trigger And Wave System
 	sys_wave_.OnCreate(reg_scene_);
 	sys_wave_.SetWorldEnv(&environment_);
+	sys_wave_.RandomSpawnItem(30);
+
 	sys_trigger_.OnCreate(reg_scene_);
-	QUADTREE->view_collisions_ = true;
 
 #ifdef _DEBUG
+	QUADTREE->view_collisions_ = true;
 	GUI->AddWidget<PropertyWidget>("property");
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("FPS", &TIMER->fps);
 #endif
+
+	// BossZombie Test
+	BossZombie* boss = GetActor<BossZombie>(AddActor<BossZombie>());
+	if (boss)
+		boss->ApplyMovement(player_actor->GetCurPosition() + XMVectorSet(0, -100, 0, 0));
 }
 
 void InGameScene::OnUpdate()

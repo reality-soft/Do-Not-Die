@@ -21,9 +21,6 @@ void RidingCar::OnInit(entt::registry& registry)
 	animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_Car_Riding_Anim.anim", 0.0);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
-	C_SoundGenerator sound_generator;
-	registry.emplace<C_SoundGenerator>(entity_id_, sound_generator);
-
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_SkeletalMesh));
 	transform_tree_.root_node->OnUpdate(registry, entity_id_, XMMatrixTranslationFromVector(ride_track.line_nodes.at(0)));
 }

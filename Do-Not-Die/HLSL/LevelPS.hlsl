@@ -9,7 +9,6 @@ struct PS_OUT
     float3 origin : NORMAL1;    
     float lod : TEXCOORD1;
     float3 view_dir : TEXCOORD2;
-   
 };
 
 Texture2D textures[7] : register(t0);
@@ -32,8 +31,8 @@ float4 PS(PS_OUT input) : SV_Target
     albedo = ApplyHemisphericAmbient(input.n, albedo);
     
     final_color = ApplyCookTorrance(albedo, roughness.r, specular_strength, input.n, input.view_dir);
-    final_color += ApplyPointLight(WhiteColor(), input.n, input.origin, input.view_dir);
-    final_color += ApplySpotLight(WhiteColor(), input.n, input.origin, input.view_dir);    
+    final_color += ApplyPointLight(albedo, input.n, input.origin, input.view_dir);
+    final_color += ApplySpotLight(albedo, input.n, input.origin, input.view_dir);
     final_color = ApplyDistanceFog(final_color, input.origin);
 
     return final_color;
