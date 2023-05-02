@@ -50,7 +50,7 @@ project "Do-Not-Die"
 		"Do-Not-Die/src/Actors",
 		"Do-Not-Die/src/Actors/AI",
 		"Do-Not-Die/src/Actors/Animation",
-		"Do-Not-Die/src/Game",
+		"Do-Not-Die/src/Systems",
 		"Do-Not-Die/src/Events",
 		"Do-Not-Die/src/FX",
 		"Do-Not-Die/src/GUI",

@@ -31,10 +31,10 @@ void EndingScene::OnInit()
 	level.Create("DNDLevel_WithCollision_01.stmesh", "LevelVS.cso");
 
 	environment_.CreateEnvironment();
-	environment_.SetWorldTime(60, 0);
+	environment_.SetWorldTime(30, 0);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(10000, 5000);
-	environment_.SetLightProperty(XMFLOAT4(0.6, 0.2, 0.2, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.2f, 0.6f);
+	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.1f, 0.25f);
 
 	ending_ui_.OnInit(reg_scene_);
 
@@ -85,7 +85,7 @@ void EndingScene::StartingProgress()
 }
 void EndingScene::FinishProgress()
 {
-	bool sound_finished = sys_sound.FadeOut(5.0f);
+	bool sound_finished = sys_sound.FadeOutDelete("MichaelFK_FleetingBeauty_cut.wav", 5.0f);
 	bool fade_out_finished = ending_ui_.FadeInBg();
 
 	if (sound_finished && fade_out_finished)
