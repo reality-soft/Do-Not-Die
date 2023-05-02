@@ -68,8 +68,6 @@ void reality::WaveSystem::SetWorldEnv(Environment* env)
 
 void reality::WaveSystem::RandomSpawnItem(float trigger_radius)
 {
-	srand(time(NULL));
-
 	list<UINT> empty_item_index;
 	for (const auto& index : item_table_)
 	{
@@ -107,7 +105,6 @@ void reality::WaveSystem::CreateCarEventTriggers(XMFLOAT3 point, float repair_ra
 
 void reality::WaveSystem::CreateStaticEffects()
 {
-	srand(time(NULL));
 	for (const auto& node : fx_corpse_fire_.line_nodes)
 	{
 		int random_scale = rand() % 5 + 5;
@@ -117,8 +114,6 @@ void reality::WaveSystem::CreateStaticEffects()
 
 void reality::WaveSystem::CreateExtractPoints(entt::registry& reg)
 {
-
-
 	for (const auto& node : repair_spawns_.line_nodes)
 	{
 		C_TriggerVolume trigger;
@@ -277,7 +272,6 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 
 void reality::WaveSystem::SpawnCarSmokes()
 {
-	srand(time(NULL));
 	for (int i = 0; i < 100; i += 20)
 	{
 		int index = i / 20;
@@ -300,8 +294,6 @@ void reality::WaveSystem::SpawnCarSmokes()
 				spawned_car_fired_.erase(index);
 			}
 		}
-
-
 	}
 }
 
