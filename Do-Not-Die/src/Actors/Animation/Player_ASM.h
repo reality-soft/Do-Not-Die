@@ -798,7 +798,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Standing_Melee_Attack_Downward_refined_Anim_Retargeted_Unreal Take.anim", 0.0f);
+			animation_base->SetAnimation("Standing_Melee_Attack_Downward_refined_Anim_Retargeted_Unreal Take.anim", 0.1f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
