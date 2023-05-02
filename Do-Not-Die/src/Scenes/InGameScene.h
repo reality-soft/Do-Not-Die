@@ -5,6 +5,7 @@
 #include "UI_Actor_Ingame.h"
 #include "TriggerSystem.h"
 #include "WaveSystem.h"
+
 using namespace reality;
 
 enum class GameResultType

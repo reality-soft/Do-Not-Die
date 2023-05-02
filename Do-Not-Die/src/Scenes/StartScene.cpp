@@ -37,7 +37,7 @@ void StartScene::OnInit()
 	environment_.SetWorldTime(120, 120);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
-	environment_.SetLightProperty(XMFLOAT4(0.8, 0.75, 0, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.2f, 0.6f);
+	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.1f, 0.25f);
 
 	fire_effects_.Import("DND_StartSceneFire_1.mapdat", GuideType::eSpawnPoint);
 
@@ -59,14 +59,7 @@ void StartScene::OnUpdate()
 		FinishProgress();
 	else
 	{
-		sys_sound.PlayBackground("MichaelFK_Empyrean_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("TonyAnderson_Nuit_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("NathanWhitehead_DaysGone_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("ZackHemsey_TheWay_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("Saw_HelloZepp_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("FarCry5_OhJohn_cut.wav", true, 10.0f, 1.0f);
-		//sys_sound.PlayBackground("MichaelFK_FleetingBeauty_cut.wav", true, 10.0f, 1.0f);
-		
+		sys_sound.PlayBackground("MichaelFK_Empyrean_cut.wav", true, 10.0f, 1.0f);		
 	}
 
 	intro_scene_ui.OnUpdate();
@@ -100,7 +93,7 @@ void StartScene::OnRelease()
 
 void StartScene::FinishProgress()
 {
-	bool sound_finished = sys_sound.FadeOutDelete("NathanWhitehead_DaysGone_cut.wav", 3.0f);
+	bool sound_finished = sys_sound.FadeOutDelete("MichaelFK_Empyrean_cut.wav", 3.0f);
 	start_scene_ui.DisappearUI();
   
 	// Hide Cursor

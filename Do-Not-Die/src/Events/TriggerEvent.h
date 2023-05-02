@@ -1,7 +1,6 @@
 #pragma once
-#include "Engine_include.h"
+#include "GameEvents.h"
 #include "Player.h"
-#include "Enemy.h"
 #include "Item.h"
 
 namespace reality

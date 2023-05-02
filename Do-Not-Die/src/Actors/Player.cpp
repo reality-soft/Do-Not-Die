@@ -8,7 +8,7 @@
 #include "FX_Flame.h"
 #include "FX_Muzzle.h"
 #include "FX_Explosion.h"
-#include "GameEvents.h"
+#include "AttackEvent.h"
 #include "Player_ASM.h"
 
 using namespace reality;

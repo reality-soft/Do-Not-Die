@@ -234,10 +234,8 @@ void InGameScene::GameResultProcess()
 	case GameResultType::ePlayerInfected:
 		break;
 	case GameResultType::eGameCleared:
-		bool sound_finished = sys_sound.FadeOut(3.0f);
 		bool fade_out_finished = ingame_ui.FadeOut();
-
-		if (sound_finished && fade_out_finished)
+		if (fade_out_finished)
 			SCENE_MGR->ChangeScene(ENDING);
 		break;
 	}	
