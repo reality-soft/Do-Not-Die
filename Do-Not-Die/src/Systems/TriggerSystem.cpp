@@ -81,42 +81,6 @@ void reality::TriggerSystem::OnUpdate(entt::registry& reg)
 			}
 		}
 	}
-
-
-
-	//const auto& scene_actors = SCENE_MGR->GetScene(E_SceneType::INGAME)->GetActors();
-
-	//CheckCurrentTriggerValid(reg);
-
-	//for (const auto& target_actor : scene_actors)
-	//{
-	//	for (const auto& trigger_entity : trigger_view)
-	//	{
-	//		const auto& c_trigger = reg.get<C_TriggerVolume>(trigger_entity);
-	//		if (target_actor.second.get()->tag == "enemy" && c_trigger.tag == "item")
-	//			continue;
-
-	//		if (target_actor.second.get()->tag == "enemy" && c_trigger.tag == "extract")
-	//			continue;
-
-	//		if (IsActorInTrigger(target_actor.first, c_trigger))
-	//		{
-	//			if (IsAlreadyTrigged(target_actor.first, trigger_entity))
-	//				continue;
-
-	//			current_triggers.insert(make_pair(target_actor.first, trigger_entity));
-	//			EVENT->PushEvent<TriggerEvent>(target_actor.first, trigger_entity, true);
-	//		}
-	//		else
-	//		{
-	//			if (IsAlreadyTrigged(target_actor.first, trigger_entity))
-	//			{
-	//				EVENT->PushEvent<TriggerEvent>(target_actor.first, trigger_entity, false);
-	//				current_triggers.erase(make_pair(target_actor.first, trigger_entity));
-	//			}
-	//		}
-	//	}
-	//}
 }
 
 void reality::TriggerSystem::AddTriggerAtActor(entt::entity ent, float radius)
@@ -134,9 +98,22 @@ void reality::TriggerSystem::AddTriggerAtActor(entt::entity ent, float radius)
 
 bool reality::TriggerSystem::IsActorInTrigger(entt::entity ent, const C_TriggerVolume& trigger)
 {
-	XMVECTOR actor_position = SCENE_MGR->GetActor<Actor>(ent)->GetCurPosition();
-	if (Distance(actor_position, _XMVECTOR3(trigger.sphere_volume.center)) <= trigger.sphere_volume.radius)
-		return true;
+	//XMVECTOR actor_position = SCENE_MGR->GetActor<Actor>(ent)->GetCurPosition();
+	//if (Distance(actor_position, _XMVECTOR3(trigger.sphere_volume.center)) <= trigger.sphere_volume.radius)
+	//	return true;
+
+	auto c_capsule = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_CapsuleCollision>(ent);
+	if (c_capsule)
+	{		
+		if (CapsuleToSphere(c_capsule->capsule, trigger.sphere_volume) == CollideType::INTERSECT)
+			return true;
+	}
+	else
+	{
+		XMVECTOR actor_position = SCENE_MGR->GetActor<Actor>(ent)->GetCurPosition();
+		if (Distance(actor_position, _XMVECTOR3(trigger.sphere_volume.center)) <= trigger.sphere_volume.radius)
+			return true;
+	}
 
 	return false;
 }
