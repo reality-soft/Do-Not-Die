@@ -6,6 +6,7 @@
 #include "FX_BloodImpact.h"
 #include "FX_ConcreteImpact.h"
 #include "InGameScene.h"
+
 using namespace reality;
 
 class GameResultEvent : public Event
@@ -32,73 +33,6 @@ public:
 private:
 	float damage_;
 	entt::entity actor_hit_;
-};
-
-class AttackEvent_SingleRay : public Event
-{
-public:
-	AttackEvent_SingleRay(RayShape _ray, entt::entity actor_id) : ray(_ray), actor_id_(actor_id) {};
-
-	virtual void Process() override 
-	{
-		GameCharacter* character = SCENE_MGR->GetActor<GameCharacter>(actor_id_);
-		if (character == nullptr)
-			return;
-
-		entt::entity actor_hit;
-		float damage = character->GetCharacterDamage();
-
-		if (character->tag == "enemy")
-		{
-			auto enemy_actor = SCENE_MGR->GetActor<Enemy>(actor_id_);
-			enemy_actor->is_attacking_ = true;
-
-			auto callback_car = QUADTREE->RaycastCarOnly(ray);
-			if (callback_car.success)
-			{
-				*enemy_actor->targeting_car_health = max(0, *enemy_actor->targeting_car_health - 5);
-			}
-			else
-			{
-				auto callback_actor = QUADTREE->RaycastActorTargeted(ray, SCENE_MGR->GetPlayer<Player>(0)->entity_id_);
-				if (callback_actor.success)
-				{
-					if (SCENE_MGR->GetActor<GameCharacter>(callback_actor.ent)->tag == "player")
-					{
-						actor_hit = callback_actor.ent;
-						EVENT->PushEvent<TakeDamageEvent>(damage, actor_hit);
-						EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_actor.point, callback_actor.normal);
-					}
-				}
-			}
-			
-		}
-		else if (character->tag == "player")
-		{
-			auto callback_total = QUADTREE->Raycast(ray, actor_id_);
-			if (callback_total.success)
-			{
-				if (callback_total.is_actor)
-				{
-					actor_hit = callback_total.ent;
-
-					Enemy* enemy_actor = SCENE_MGR->GetActor<Enemy>(actor_hit);
-					if (enemy_actor)
-						enemy_actor->AddImpulse(GetRayDirection(ray), 1000.0f);
-					
-					EVENT->PushEvent<TakeDamageEvent>(damage, actor_hit);
-					EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_total.point, callback_total.normal);
-				}
-				else
-				{
-					EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(callback_total.point, callback_total.normal);
-				}
-			}
-		}
-	};
-private:
-	RayShape ray;
-	entt::entity actor_id_;
 };
 
 class MakeTextEvent : public Event
