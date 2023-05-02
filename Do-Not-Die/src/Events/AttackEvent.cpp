@@ -63,11 +63,20 @@ void AttackEvent_BoundSphere::Process()
 	GameCharacter* character_actor = SCENE_MGR->GetActor<GameCharacter>(actor_id_);
 	if (character_actor == nullptr)
 		return;
-
+	
 	if (character_actor->tag == "enemy")
 		EnemyProcess();
 	else if (character_actor->tag == "player")
 		PlayerProcess();
+
+	for (const auto& hit : hit_actors_)
+	{
+		EVENT->PushEvent<TakeDamageEvent>(damage_, hit);
+
+		XMVECTOR hit_point = _XMVECTOR3(sphere_.center);
+		XMVECTOR hit_normal = XMVector3Normalize(SCENE_MGR->GetActor<Actor>(hit)->GetCurPosition() - hit_point);
+		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(hit_point, hit_normal);
+	}
 
 	return;
 }
@@ -80,12 +89,28 @@ void AttackEvent_BoundSphere::EnemyProcess()
 		return;
 
 	if (CapsuleToSphere(player_actor->GetCapsuleComponent()->capsule, sphere_) == CollideType::INTERSECT)
-	{		
-		EVENT->PushEvent<TakeDamageEvent>(enemy_actor->GetCharacterDamage(), player_actor->entity_id_);
+	{
+		hit_actors_.push_back(player_actor->entity_id_);
 	}
 }
 
 void AttackEvent_BoundSphere::PlayerProcess()
 {
+	Player* player_actor = SCENE_MGR->GetPlayer<Player>(0);
+	if (player_actor == nullptr)
+		return;
 
+	const auto& capsule_view = player_actor->reg_scene_->view<C_CapsuleCollision>();
+	for (const auto& ent : capsule_view)
+	{
+		auto actor = SCENE_MGR->GetActor<Character>(ent);
+		if (actor == nullptr || actor->tag != "enemy")
+			continue;
+
+		const auto& capsule = player_actor->reg_scene_->get<C_CapsuleCollision>(ent).capsule;
+		if (CapsuleToSphere(capsule, sphere_) == CollideType::INTERSECT)
+		{
+			hit_actors_.push_back(ent);
+		}
+	}
 }
