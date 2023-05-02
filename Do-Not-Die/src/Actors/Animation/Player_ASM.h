@@ -356,6 +356,17 @@ public:
 						}
 					})
 					});
+				transitions_.insert({ RELOAD_HG, Transition(IDLE_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (IsAnimationEnded() && !player->IsAiming()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
 			}
 
 			// Attack
@@ -457,7 +468,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ AIM_POSE_MELEE, Transition(AIM_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_MELEE, Transition(IDLE_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
@@ -655,7 +666,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_AR_01_Idle_Pose_Retargeted_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("A_TP_CH_AR_01_Idle_Pose_Retargeted_Unreal Take.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -671,7 +682,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.5f);
+			animation_base->SetAnimation("", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -787,7 +798,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Meele_Attack_2_Anim_mixamo_com_Unreal Take.anim", 0.0f);
+			animation_base->SetAnimation("Standing_Melee_Attack_Downward_refined_Anim_Retargeted_Unreal Take.anim", 0.0f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
