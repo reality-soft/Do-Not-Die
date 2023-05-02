@@ -55,25 +55,27 @@ void Player::OnInit(entt::registry& registry)
 	C_Socket socket_component;
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
 	int skeleton_id = skeletal_mesh->skeleton.bone_name_id_map["Hand_R"];
-	XMMATRIX socket_offset = XMMatrixRotationZ(XMConvertToRadians(90))
-		* XMMatrixRotationY(XMConvertToRadians(-10))
-		* XMMatrixRotationX(XMConvertToRadians(20))
-		* XMMatrixTranslationFromVector({ 0, 8, -20, 0 });
+	XMMATRIX socket_offset = XMMatrixRotationZ(XMConvertToRadians(180))
+		* XMMatrixRotationY(XMConvertToRadians(110))
+		* XMMatrixTranslationFromVector({-15, -3, 5, 0 });
 	socket_component.AddSocket("Rifle", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 
 	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90)) 
-		* XMMatrixRotationY(XMConvertToRadians(-10))
-		* XMMatrixTranslationFromVector({ 0, 4, -8, 0 });
+		* XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(90))
+		* XMMatrixTranslationFromVector({ -10, 0, 4, 0 });
 	socket_component.AddSocket("Pistol", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 
 	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90))
-		* XMMatrixRotationY(XMConvertToRadians(-10))
-		* XMMatrixTranslationFromVector({ 0, 4, -8, 0 });
+		* XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(90))
+		* XMMatrixTranslationFromVector({ -10, 0, 4, 0 });
 	socket_component.AddSocket("Axe", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 
 	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90))
-		* XMMatrixRotationY(XMConvertToRadians(-10))
-		* XMMatrixTranslationFromVector({ 0, 4, -8, 0 });
+		* XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(90))
+		* XMMatrixTranslationFromVector({ -10, 0, 4, 0 });
 	socket_component.AddSocket("Grenade", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 
 	registry.emplace<C_Socket>(entity_id_, socket_component);
