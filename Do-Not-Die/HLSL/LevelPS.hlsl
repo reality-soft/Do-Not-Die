@@ -9,7 +9,6 @@ struct PS_OUT
     float3 origin : NORMAL1;    
     float lod : TEXCOORD1;
     float3 view_dir : TEXCOORD2;
-   
 };
 
 Texture2D textures[7] : register(t0);
