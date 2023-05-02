@@ -17,7 +17,7 @@ void StartScene::OnInit()
 	sys_sound.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
 	sys_light.OnCreate(reg_scene_);
-	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
+	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 , 0 });
 
 	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
 
@@ -37,7 +37,8 @@ void StartScene::OnInit()
 	environment_.SetWorldTime(120, 120);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
-	environment_.SetLightProperty(0.2f, 0.2f);
+	environment_.SetLightProperty(XMFLOAT4(0.8, 0.75, 0, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.2f, 0.6f);
+
 	fire_effects_.Import("DND_StartSceneFire_1.mapdat", GuideType::eSpawnPoint);
 
 	for (const auto& node : fire_effects_.line_nodes)

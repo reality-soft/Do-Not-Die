@@ -14,7 +14,7 @@ void EndingScene::OnInit()
 	sys_sound.OnCreate(reg_scene_);
 	sys_effect.OnCreate(reg_scene_);
 	sys_light.OnCreate(reg_scene_);
-	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 });
+	sys_light.SetGlobalLightPos({ 5000, 5000, -5000 , 0 });
 	sys_animation.OnCreate(reg_scene_);
 
 	loading_progress = ENDING_ACTOR;
@@ -34,7 +34,7 @@ void EndingScene::OnInit()
 	environment_.SetWorldTime(60, 0);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(10000, 5000);
-	environment_.SetLightProperty(0.2f, 0.2f);
+	environment_.SetLightProperty(XMFLOAT4(0.6, 0.2, 0.2, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.2f, 0.6f);
 
 	ending_ui_.OnInit(reg_scene_);
 
