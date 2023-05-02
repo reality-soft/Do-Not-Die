@@ -1,7 +1,7 @@
 #include "WaveSystem.h"
 #include "GameEvents.h"
 #include "Player.h"
-#include "Enemy.h"
+#include "GeneralZombie.h"
 #include "Item.h"
 #include "FX_Flame.h"
 #include "FX_Smoke.h"
@@ -246,7 +246,7 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 	if (cur_time < interval)
 		return;
 
-	auto enemy_entity = SCENE_MGR->AddActor<Enemy>();
+	auto enemy_entity = SCENE_MGR->AddActor<GeneralZombie>();
 	// setting a character into quad tree
 	if (QUADTREE->RegistDynamicCapsule(enemy_entity) == false)
 	{
@@ -254,7 +254,7 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 	}
 	else
 	{
-		auto enemy_actor = SCENE_MGR->GetActor<Enemy>(enemy_entity);
+		auto enemy_actor = SCENE_MGR->GetActor<GeneralZombie>(enemy_entity);
 		enemy_actor->targeting_car_health = &car_health;
 
 		int guidline_index = rand() % zomebie_tracks_->size();

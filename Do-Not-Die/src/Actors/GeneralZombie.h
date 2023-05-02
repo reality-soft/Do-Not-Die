@@ -1,8 +1,7 @@
 #pragma once
 #include "GameCharacter.h"
-#include "Player.h"
 
-class Enemy : public GameCharacter
+class GeneralZombie : public GameCharacter
 {
 public:
 	virtual void OnInit(entt::registry& registry) override;
