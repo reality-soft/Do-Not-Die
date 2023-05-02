@@ -38,7 +38,7 @@ VS_OUT VS(VS_IN input)
     output.lod = GetLod(input.p);
 
     output.p = projection;
-    output.n = input.n;
+    output.n = normalize(input.n);
     output.t = input.t;
 
     output.lod = GetLod(input.p);

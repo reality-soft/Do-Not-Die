@@ -48,7 +48,7 @@ VS_OUT VS(VS_IN input)
 
 	output.lod = 0;
 	output.p = proj_vector;
-	output.n = mul(anim_normal, world);
+    output.n = normalize(mul(anim_normal, world));
 	output.t = input.t;
 
 	output.lod = GetLod(input.p);
