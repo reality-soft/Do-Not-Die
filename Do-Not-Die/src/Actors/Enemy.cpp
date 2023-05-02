@@ -1,5 +1,5 @@
 #include "Enemy.h"
-#include "GameEvents.h"
+#include "AttackEvent.h"
 #include "AnimationStateMachine.h"
 #include "Player.h"
 #include "Enemy_ASM.h"
