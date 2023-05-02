@@ -100,9 +100,9 @@ void StartScene::OnRelease()
 
 void StartScene::FinishProgress()
 {
-	bool sound_finished = sys_sound.FadeOut(3.0f);
-	
+	bool sound_finished = sys_sound.FadeOutDelete("NathanWhitehead_DaysGone_cut.wav", 3.0f);
 	start_scene_ui.DisappearUI();
+  
 	// Hide Cursor
 	while (ShowCursor(false) >= 0);
 	
