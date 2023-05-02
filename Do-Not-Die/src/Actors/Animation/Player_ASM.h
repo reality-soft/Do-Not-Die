@@ -655,7 +655,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_Rifle_Idle_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("A_TP_CH_AR_01_Idle_Pose_Retargeted_Unreal Take.anim", 0.5f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -687,7 +687,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_AR_AimPose_Unreal Take.anim", 0.3f);
+			animation_base->SetAnimation("A_TP_CH_AR_01_Aim_Pose_Retargeted_Unreal Take.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -703,7 +703,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_Pistol_AimPose_Unreal Take.anim", 0.3f);
+			animation_base->SetAnimation("A_TP_CH_Handgun_Aim_Pose_Retargeted_Unreal Take.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -751,7 +751,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_Fire_Rifle_Unreal Take.anim", 0.0f);
+			animation_base->SetAnimation("A_TP_CH_AR_Fire_Retargeted_Unreal Take.anim", 0.0f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -769,7 +769,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_Fire_Pistol_Unreal Take.anim", 0.0f);
+			animation_base->SetAnimation("A_TP_CH_Handgun_Fire_Retargeted_Unreal Take.anim", 0.0f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -787,7 +787,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_Meele_Unreal Take.anim", 0.0f);
+			animation_base->SetAnimation("Meele_Attack_2_Anim_mixamo_com_Unreal Take.anim", 0.0f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -823,7 +823,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_Rifle_Reload_Unreal Take.anim", 0.3f);
+			animation_base->SetAnimation("A_TP_CH_AR_01_Reload_Retargeted_Unreal Take.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -854,7 +854,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_Pistol_Reload_Unreal Take.anim", 0.3f);
+			animation_base->SetAnimation("A_TP_CH_Handgun_Reload_Retargeted_Unreal Take.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
