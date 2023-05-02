@@ -46,7 +46,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	SpawnZombies(1.f, 1);
 	SpawnCarSmokes();
 
-	if (wave_count_ > 1 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0)
+	if (wave_count_ > 4 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0)
 	{
 		EVENT->PushEvent<GameResultEvent>(GameResultType::eGameCleared);
 	}
