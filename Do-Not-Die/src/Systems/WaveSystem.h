@@ -11,6 +11,7 @@ namespace reality
 		virtual void OnUpdate(entt::registry& reg) override;
 
 		void SetWorldEnv(Environment* env);
+		void RandomSpawnItem(float trigger_radius);
 		XMVECTOR GetCarPosition();
 
 		float countdown_timer_ = 0;
@@ -24,7 +25,6 @@ namespace reality
 		void CreateCarEventTriggers(XMFLOAT3 point, float repair_radius, float zombie_target_radius);
 		void CreateStaticEffects();
 
-		void RandomSpawnItem(float trigger_radius);
 		void PlayerExtractRepair();
 		void PlayerRepairCar();
 		void SpawnRepairItem(XMFLOAT3 position);

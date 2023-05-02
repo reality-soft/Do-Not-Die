@@ -82,7 +82,7 @@ void reality::WaveSystem::RandomSpawnItem(float trigger_radius)
 		ItemType item_type = (ItemType)(rand() % 7);
 
 		const auto& spawn = item_spawns_.line_nodes[index];
-		SCENE_MGR->AddActor<Item>(item_type, _XMFLOAT3(spawn), trigger_radius);
+		SCENE_MGR->GetScene(INGAME)->AddActor<Item>(item_type, _XMFLOAT3(spawn), trigger_radius);
 		item_table_[index] = true;
 	}
 }
