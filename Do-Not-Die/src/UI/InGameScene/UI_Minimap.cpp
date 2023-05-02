@@ -50,8 +50,11 @@ void UI_Minimap::UpdateThisUI()
 		else
 		{
 			auto zombie = SCENE_MGR->GetActor<GeneralZombie>(entity);
-			XMMATRIX zombie_world = XMMatrixTranslationFromVector(zombie->GetCurPosition());
-			RenderZombieIcon(zombie_world);
+			if (zombie)
+			{
+				XMMATRIX zombie_world = XMMatrixTranslationFromVector(zombie->GetCurPosition());
+				RenderZombieIcon(zombie_world);
+			}
 		}
 	}
 
