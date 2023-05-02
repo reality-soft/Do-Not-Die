@@ -11,7 +11,7 @@ void AttackEvent_SingleRay::Process()
 
 	if (character->tag == "enemy")
 	{
-		auto enemy_actor = SCENE_MGR->GetActor<Enemy>(actor_id_);
+		auto enemy_actor = SCENE_MGR->GetActor<GeneralZombie>(actor_id_);
 		enemy_actor->is_attacking_ = true;
 
 		auto callback_car = QUADTREE->RaycastCarOnly(ray);
@@ -43,7 +43,7 @@ void AttackEvent_SingleRay::Process()
 			{
 				actor_hit = callback_total.ent;
 
-				Enemy* enemy_actor = SCENE_MGR->GetActor<Enemy>(actor_hit);
+				GeneralZombie* enemy_actor = SCENE_MGR->GetActor<GeneralZombie>(actor_hit);
 				if (enemy_actor)
 					enemy_actor->AddImpulse(GetRayDirection(ray), 1000.0f);
 
@@ -74,7 +74,7 @@ void AttackEvent_BoundSphere::Process()
 
 void AttackEvent_BoundSphere::EnemyProcess()
 {
-	Enemy* enemy_actor = SCENE_MGR->GetActor<Enemy>(actor_id_);
+	GeneralZombie* enemy_actor = SCENE_MGR->GetActor<GeneralZombie>(actor_id_);
 	Player* player_actor = SCENE_MGR->GetPlayer<Player>(0);
 	if (enemy_actor == nullptr || player_actor == nullptr)
 		return;

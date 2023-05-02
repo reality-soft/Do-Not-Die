@@ -1,4 +1,4 @@
-#include "Enemy.h"
+#include "GeneralZombie.h"
 #include "AttackEvent.h"
 #include "AnimationStateMachine.h"
 #include "Player.h"
@@ -7,7 +7,7 @@
 
 using namespace reality;
 
-void Enemy::OnInit(entt::registry& registry)
+void GeneralZombie::OnInit(entt::registry& registry)
 {
 	Character::OnInit(registry);
 	tag = "enemy";
@@ -32,7 +32,7 @@ void Enemy::OnInit(entt::registry& registry)
 	registry.emplace_or_replace<reality::C_SkeletalMesh>(entity_id_, skm);
 
 	reality::C_CapsuleCollision capsule;
-	capsule.tag = "Enemy";
+	capsule.tag = "enemy";
 	capsule.SetCapsuleData(XMFLOAT3(0, 0, 0), 50, 10);
 	registry.emplace<reality::C_CapsuleCollision>(entity_id_, capsule);
 
@@ -52,14 +52,14 @@ void Enemy::OnInit(entt::registry& registry)
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 }
 
-void Enemy::OnUpdate()
+void GeneralZombie::OnUpdate()
 {
 	ChasePlayer();
 	behavior_tree_.Update();
 	Character::OnUpdate();
 }
 
-void Enemy::SetCharacterAnimation(string anim_id) const
+void GeneralZombie::SetCharacterAnimation(string anim_id) const
 {
 	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
 	int base_index = animation_component_ptr->name_to_anim_slot_index["Base"];
@@ -67,15 +67,15 @@ void Enemy::SetCharacterAnimation(string anim_id) const
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
 }
 
-void Enemy::Jump()
+void GeneralZombie::Jump()
 {
 }
 
-void Enemy::Idle()
+void GeneralZombie::Idle()
 {
 }
 
-void Enemy::Attack()
+void GeneralZombie::Attack()
 {
 	if (is_attacking_ == true)
 		return;
@@ -90,22 +90,22 @@ void Enemy::Attack()
 	EVENT->PushEvent<AttackEvent_SingleRay>(attack_ray, entity_id_);
 }
 
-float Enemy::GetMaxHp() const
+float GeneralZombie::GetMaxHp() const
 {
 	return max_hp_;
 }
 
-void Enemy::SetCurHp(int hp)
+void GeneralZombie::SetCurHp(int hp)
 {
 }
 
-void Enemy::TakeDamage(int damage)
+void GeneralZombie::TakeDamage(int damage)
 {
 	is_hit_ = true;
 	cur_hp_ -= damage;
 }
 
-void Enemy::AddImpulse(XMVECTOR direction, float strength)
+void GeneralZombie::AddImpulse(XMVECTOR direction, float strength)
 {
 	CancelMovement();
 	auto c_capsule = GetCapsuleComponent();
@@ -117,7 +117,7 @@ void Enemy::AddImpulse(XMVECTOR direction, float strength)
 	}
 }
 
-void Enemy::SetMovement(const XMVECTOR& direction)
+void GeneralZombie::SetMovement(const XMVECTOR& direction)
 {
 	if (XMVector3Length(direction).m128_f32[0] <= 0.00001f) {
 		return;
@@ -140,7 +140,7 @@ void Enemy::SetMovement(const XMVECTOR& direction)
 	movement_component_->accelaration_vector[2] = 1;
 }
 
-void Enemy::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
+void GeneralZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 {
 	SetPos(target_poses[0] + XMVECTOR{ 0, 50.0f, 0, 0 });
 
@@ -165,13 +165,13 @@ void Enemy::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 	behavior_tree_.SetRootNode<IfElseIfNode>(children_, move_to_combat_zone);
 }
 
-void Enemy::SetMeshId(const string& mesh_id)
+void GeneralZombie::SetMeshId(const string& mesh_id)
 {
 	C_SkeletalMesh* skm = reg_scene_->try_get< reality::C_SkeletalMesh>(entity_id_);
 	skm->skeletal_mesh_id = mesh_id;
 }
 
-void Enemy::ChasePlayer()
+void GeneralZombie::ChasePlayer()
 {
 	if (in_defense_bound_ == false)
 		return;
@@ -199,7 +199,7 @@ void Enemy::ChasePlayer()
 		player_in_sight_ = true;
 }
 
-float Enemy::GetCurHp() const
+float GeneralZombie::GetCurHp() const
 {
 	return cur_hp_;
 }
