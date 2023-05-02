@@ -32,8 +32,8 @@ float4 PS(PS_OUT input) : SV_Target
     albedo = ApplyHemisphericAmbient(input.n, albedo);
     
     final_color = ApplyCookTorrance(albedo, roughness.r, specular_strength, input.n, input.view_dir);
-    final_color += ApplyPointLight(WhiteColor(), input.n, input.origin, input.view_dir);
-    final_color += ApplySpotLight(WhiteColor(), input.n, input.origin, input.view_dir);    
+    final_color += ApplyPointLight(albedo, input.n, input.origin, input.view_dir);
+    final_color += ApplySpotLight(albedo, input.n, input.origin, input.view_dir);
     final_color = ApplyDistanceFog(final_color, input.origin);
 
     return final_color;

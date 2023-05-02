@@ -31,7 +31,7 @@ VS_OUT VS(VS_IN input)
     float4 project = mul(local, ViewProjection());
 
     output.p = project;
-    output.n = input.n;
+    output.n = normalize(input.n);
     output.t = input.t;
     
     output.lod = GetLod(input.p);
