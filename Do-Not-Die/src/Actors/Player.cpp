@@ -120,6 +120,8 @@ void Player::OnInit(entt::registry& registry)
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
 	animation_component.GetAnimSlotByName("Base")->SetAnimation("Biker_Idle_Unreal Take.anim", 0.5);
 	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
+	auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_component.GetAnimSlotByName("UpperBody");
+	sm->SetPlayer(this);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
 	// FlashLight
@@ -138,26 +140,26 @@ void Player::SetCharacterMovementAnimation()
 	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
 	AnimationBase* anim_slot = animation_component_ptr->GetAnimSlotByName("Base");
 
-	string anim_id = "A_TP_CH_Breathing_Retargeted_Unreal Take.anim";
+	string anim_id = "player_idle.anim";
 
 	if (movement_component_->speed >= 0.1f) {
 		if (angle_ >= 330.0f || angle_ < 30.0f) {
-			anim_id = "A_TP_CH_Jog_F_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_f.anim";
 		}
 		else if (30.0f <= angle_ && angle_ < 110.0f) {
-			anim_id = "A_TP_CH_Jog_RF_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_rf.anim";
 		}
 		else if (110.0f <= angle_ && angle_ < 160.0f) {
-			anim_id = "A_TP_CH_Jog_RB_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_rb.anim";
 		}
 		else if (160.0f <= angle_ && angle_ < 200.0f) {
-			anim_id = "A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_b.anim";
 		}
 		else if (200.0f <= angle_ && angle_ < 250.0f) {
-			anim_id = "A_TP_CH_Jog_LB_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_lb.anim";
 		}
 		else if (250.0f <= angle_ && angle_ < 330.0f) {
-			anim_id = "A_TP_CH_Jog_LF_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_lf.anim";
 		}
 	}
 
@@ -380,6 +382,20 @@ void Player::SetPos(const XMVECTOR& position)
 {
 	cur_position_ = position;
 	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
+}
+
+void Player::AddSoundQueue(SoundType type, string sound_name, float volume, bool is_looping)
+{
+	SoundQueue sound_queue;
+	sound_queue.sound_type = type;
+	sound_queue.sound_filename = sound_name;
+	sound_queue.sound_volume = volume;
+	sound_queue.is_looping = is_looping;
+
+	auto generator = reg_scene_->try_get<C_SoundGenerator>(GetEntityId());
+
+	if(generator)
+		generator->sound_queue_list.push(sound_queue);
 }
 
 float Player::GetMaxHp() const

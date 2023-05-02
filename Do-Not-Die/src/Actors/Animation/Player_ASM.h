@@ -356,6 +356,17 @@ public:
 						}
 					})
 					});
+				transitions_.insert({ RELOAD_HG, Transition(IDLE_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (IsAnimationEnded() && !player->IsAiming()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
 			}
 
 			// Attack
@@ -457,7 +468,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ AIM_POSE_MELEE, Transition(AIM_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_MELEE, Transition(IDLE_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
@@ -649,13 +660,20 @@ public:
 		AnimationStateMachine::OnUpdate();
 	}
 
+	private:
+		Player* player_;
+	public:
+		Player* GetPlayer() { return player_; }
+		void SetPlayer(Player* player) { player_ = player; }
+
+	public:
 	class IdlePoseAR : public AnimationState {
 	public:
 		IdlePoseAR() : AnimationState(IDLE_POSE_AR) {}
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_AR_01_Idle_Pose_Retargeted_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("player_idle.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -671,7 +689,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.5f);
+			animation_base->SetAnimation("", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -687,7 +705,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_AR_01_Aim_Pose_Retargeted_Unreal Take.anim", 0.3f);
+			animation_base->SetAnimation("player_ar_aim_pose.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -703,7 +721,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_Handgun_Aim_Pose_Retargeted_Unreal Take.anim", 0.3f);
+			animation_base->SetAnimation("player_hg_aim_pose.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -751,7 +769,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_AR_Fire_Retargeted_Unreal Take.anim", 0.0f);
+			animation_base->SetAnimation("player_ar_fire.anim", 0.0f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -769,7 +787,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_Handgun_Fire_Retargeted_Unreal Take.anim", 0.0f);
+			animation_base->SetAnimation("player_hg_fire.anim", 0.0f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -787,7 +805,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Meele_Attack_2_Anim_mixamo_com_Unreal Take.anim", 0.0f);
+			animation_base->SetAnimation("player_melee_attack.anim", 0.1f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -807,7 +825,7 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 			executed = false;
-			animation_base->SetAnimation("Biker_Throw_Unreal Take.anim", 0.2f);
+			animation_base->SetAnimation("player_gr_throw.anim", 0.2f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -842,7 +860,9 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_AR_01_Reload_Retargeted_Unreal Take.anim", 0.3f);
+			animation_base->SetAnimation("player_ar_reload.anim", 0.3f);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_AR_01_Reload.wav", 0.5f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -873,7 +893,9 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("A_TP_CH_Handgun_Reload_Retargeted_Unreal Take.anim", 0.3f);
+			animation_base->SetAnimation("player_hg_reload.anim", 0.3f);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Handgun_Reload.wav", 0.5f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -980,7 +1002,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_Death_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("player_die.anim", 0.5f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{

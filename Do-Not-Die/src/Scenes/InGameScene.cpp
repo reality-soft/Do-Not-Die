@@ -11,7 +11,6 @@ void InGameScene::OnInit()
 	// LOADING : MANAGER_LOADING
 	loading_progress = LOADING_MANAGER;
 
-	WRITER->Init();
 	reality::ComponentSystem::GetInst()->OnInit(reg_scene_);
 
 	// LOADING : LOADING_SYSTEM
