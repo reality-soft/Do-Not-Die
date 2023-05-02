@@ -138,26 +138,26 @@ void Player::SetCharacterMovementAnimation()
 	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
 	AnimationBase* anim_slot = animation_component_ptr->GetAnimSlotByName("Base");
 
-	string anim_id = "A_TP_CH_Breathing_Retargeted_Unreal Take.anim";
+	string anim_id = "player_idle.anim";
 
 	if (movement_component_->speed >= 0.1f) {
 		if (angle_ >= 330.0f || angle_ < 30.0f) {
-			anim_id = "A_TP_CH_Jog_F_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_f.anim";
 		}
 		else if (30.0f <= angle_ && angle_ < 110.0f) {
-			anim_id = "A_TP_CH_Jog_RF_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_rf.anim";
 		}
 		else if (110.0f <= angle_ && angle_ < 160.0f) {
-			anim_id = "A_TP_CH_Jog_RB_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_rb.anim";
 		}
 		else if (160.0f <= angle_ && angle_ < 200.0f) {
-			anim_id = "A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_b.anim";
 		}
 		else if (200.0f <= angle_ && angle_ < 250.0f) {
-			anim_id = "A_TP_CH_Jog_LB_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_lb.anim";
 		}
 		else if (250.0f <= angle_ && angle_ < 330.0f) {
-			anim_id = "A_TP_CH_Jog_LF_Retargeted_Unreal Take.anim";
+			anim_id = "player_jog_lf.anim";
 		}
 	}
 
