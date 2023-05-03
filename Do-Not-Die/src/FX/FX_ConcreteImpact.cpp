@@ -13,5 +13,6 @@ void FX_ConcreteImpact::OnInit(entt::registry& registry)
 
 	AddSoundGeneratorComponent();
 
+	AddSoundQueue("S_WEP_Impact_Bullet_03.wav", SFX, false, 1.0f);
 }
 
