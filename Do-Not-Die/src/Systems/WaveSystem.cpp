@@ -248,6 +248,8 @@ void reality::WaveSystem::SpawnZombies(float interval)
 	int guidline_index = rand() % zomebie_tracks_->size();
 	int mesh_index = rand() % enemy_meshes.size();
 
+	guidline_index = 4;
+
 	vector<XMVECTOR> target_poses;
 	for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
 		target_poses.push_back(target_pos.second);
@@ -294,7 +296,7 @@ XMVECTOR reality::WaveSystem::GetCarPosition()
 
 void reality::WaveSystem::WaveStart()
 {
-	zombie_spawn_count_ += 30;
+	zombie_spawn_count_ += 2;
 }
 
 void reality::WaveSystem::WaveFinish()
