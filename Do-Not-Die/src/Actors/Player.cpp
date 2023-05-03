@@ -313,8 +313,6 @@ void Player::Reload()
 
 void Player::ThrowGrenade()
 {
-	
-
 	cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE]--;
 
 	auto grenade_entity = SCENE_MGR->AddActor<Grenade>();
@@ -322,23 +320,28 @@ void Player::ThrowGrenade()
 	XMVECTOR pos = cur_position_;
 	pos += right_ * 5.0f;
 	//pos += front_;
-	pos += XMVectorSet(0.0f, 5.0f, 0.0f, 0.0f);
+	pos += XMVectorSet(0.0f, 40.0f, 0.0f, 0.0f);
 	grenade_actor->SetPos(pos);
 	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 	XMVECTOR dir = ingame_scene->GetCameraSystem().GetCamera()->look;
-	//XMVECTOR dir = XMVectorAdd(front_, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
-	grenade_actor->SetDir(dir, 10.0f);
+	grenade_actor->SetDir(dir, 15.0f);
 }
 
 void Player::MeeleAttack()
 {
 	is_attacking_ = true;
-	C_CapsuleCollision* capsule_collision = reg_scene_->try_get<reality::C_CapsuleCollision>(entity_id_);
-	RayShape ray;
-	XMVECTOR ray_start_pos = GetTipBaseAB(capsule_collision->capsule).at(0);
-	XMStoreFloat3(&ray.start, ray_start_pos);
-	XMStoreFloat3(&ray.end, (ray_start_pos + front_ * 40.0f));
-	EVENT->PushEvent<AttackEvent_SingleRay>(ray, entity_id_);
+	C_CapsuleCollision* capsule_collision = GetCapsuleComponent();
+	if (capsule_collision == nullptr)
+		return;
+	
+	SphereShape attack_sphere;
+
+	auto capsule_info = GetTipBaseAB(capsule_collision->capsule);
+	XMVECTOR shepre_center = capsule_info[3] +(front_ * capsule_collision->capsule.radius * 2);
+	attack_sphere.center = _XMFLOAT3(shepre_center);
+	attack_sphere.radius = capsule_collision->capsule.radius;
+
+	EVENT->PushEvent<AttackEvent_BoundSphere>(50, attack_sphere, entity_id_);
 }
 
 bool Player::IsAiming()
