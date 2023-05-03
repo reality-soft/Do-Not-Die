@@ -36,13 +36,13 @@ void UI_Actor_Ending::OnUpdate()
 	ShowCursor(true);
 
 	static float timer = 0;
+	//if (FadeOutBg() == true)
+	FadeOutBg();
+	timer += TM_DELTATIME;
 
-	if (FadeOutBg() == true)
-		timer += TM_DELTATIME;
+	ScrollCredit(timer, 30.0f);
 
-	ScrollCredit(timer, 15.0f);
-
-	if (timer > 15.0f)
+	if (timer > 20.0f)
 		ending_finished = true;
 }
 
