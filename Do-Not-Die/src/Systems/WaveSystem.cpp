@@ -24,7 +24,7 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 
 void reality::WaveSystem::OnUpdate(entt::registry& reg)
 {
-	float counting_time = world_env_->GetCountingTime();
+	float counting_time = world_env_->GetCountingTime(); 
 	if (world_env_->IsDayChanged())
 	{
 		switch (world_env_->GetCurrentDay())
@@ -46,7 +46,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	SpawnZombies(1.f, 1);
 	SpawnCarSmokes();
 
-	if (wave_count_ > 4 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0)
+	if (wave_count_ > 4 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0 && SCENE_MGR->GetNumOfActor("enemy") == 0)
 	{
 		EVENT->PushEvent<GameResultEvent>(GameResultType::eGameCleared);
 	}
@@ -227,19 +227,18 @@ void reality::WaveSystem::DeleteExtractPoint(entt::entity ent)
 
 void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 {
-	if (zombie_spawn_ == false)
-		return;
-
 	static float cur_time = 0.0f;
-
 	cur_time += TM_DELTATIME;
 
-	if (zombie_spawn_count_ >= count)
+	if (zombie_spawn_count_ <= 0)
+	{
+		cur_time = 0.0f;
 		return;
-	
+	}
 
 	if (cur_time < interval)
 		return;
+
 
 	auto enemy_entity = SCENE_MGR->AddActor<GeneralZombie>();
 	// setting a character into quad tree
@@ -265,7 +264,7 @@ void reality::WaveSystem::SpawnZombies(float interval, UINT count)
 		enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
 
 		cur_time = 0.0f;
-		zombie_spawn_count_ += 1;
+		zombie_spawn_count_ -= 1;
 	}
 	
 }
@@ -305,12 +304,11 @@ XMVECTOR reality::WaveSystem::GetCarPosition()
 
 void reality::WaveSystem::WaveStart()
 {
-	zombie_spawn_ = true;
+	zombie_spawn_count_ += 1;
 }
 
 void reality::WaveSystem::WaveFinish()
 {
 	wave_count_++;
-	zombie_spawn_count_ = 0;
 	RandomSpawnItem(30);
 }
