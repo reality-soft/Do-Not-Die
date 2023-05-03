@@ -22,6 +22,11 @@ void Grenade::OnInit(entt::registry& registry)
 	stm.vertex_shader_id = "StaticMeshVS.cso";
 	registry.emplace_or_replace<reality::C_StaticMesh>(entity_id_, stm);
 
+	reality::C_SoundGenerator sound_gen;
+	sound_gen.local = XMMatrixIdentity();
+	sound_gen.world = XMMatrixIdentity();
+	registry.emplace_or_replace<reality::C_SoundGenerator>(entity_id_, sound_gen);
+
 	QUADTREE->RegistDynamicSphere(GetEntityId());
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_SphereCollision));
@@ -72,9 +77,23 @@ void Grenade::OnUpdate()
 			XMVECTOR dir = XMLoadFloat3(&dir_);
 			XMVECTOR normal = XMVector3Normalize(XMLoadFloat3(&sphere_comp.tri_normal));
 			XMVECTOR reflect = (dir - 2.0 * XMVector3Dot(dir, normal) * normal) * 0.7f;
+			bounce_count_++;
 			float dot = XMVectorGetX(XMVector3Dot(dir, normal));
 			if (dot < 0)
+			{
 				XMStoreFloat3(&dir_, reflect);
+				if (bounce_count_ <= bounce_max_)
+				{
+					auto& sound_gen = reg_scene_->get<C_SoundGenerator>(GetEntityId());
+					SoundQueue queue;
+					queue.sound_type = SFX;
+					queue.sound_filename = "Grenade_Bounce.mp3";
+					queue.sound_volume = 1.0f;
+					queue.is_looping = false;
+					sound_gen.sound_queue_list.push(queue);
+				}
+			}
+				
 		}
 	}
 	
