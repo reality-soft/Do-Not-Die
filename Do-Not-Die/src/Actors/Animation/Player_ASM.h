@@ -214,18 +214,18 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ ATTACK_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
-						entt::entity owner_id = animation_state_machine->GetOwnerId();
-						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
-						if (player->is_hit_ == true) {
-							player->is_attacking_ = false;
-							return true;
-						}
-						else {
-							return false;
-						}
-					})
-					});
+				//transitions_.insert({ ATTACK_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
+				//		entt::entity owner_id = animation_state_machine->GetOwnerId();
+				//		Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+				//		if (player->is_hit_ == true) {
+				//			player->is_attacking_ = false;
+				//			return true;
+				//		}
+				//		else {
+				//			return false;
+				//		}
+				//	})
+				//	});
 				transitions_.insert({ RELOAD_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
@@ -425,18 +425,18 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ ATTACK_HG, Transition(HIT_HG,[this](const AnimationStateMachine* animation_state_machine) {
-						entt::entity owner_id = animation_state_machine->GetOwnerId();
-						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
-						if (player->is_hit_ == true) {
-							player->is_attacking_ = false;
-							return true;
-						}
-						else {
-							return false;
-						}
-					})
-					});
+				//transitions_.insert({ ATTACK_HG, Transition(HIT_HG,[this](const AnimationStateMachine* animation_state_machine) {
+				//		entt::entity owner_id = animation_state_machine->GetOwnerId();
+				//		Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+				//		if (player->is_hit_ == true) {
+				//			player->is_attacking_ = false;
+				//			return true;
+				//		}
+				//		else {
+				//			return false;
+				//		}
+				//	})
+				//	});
 				transitions_.insert({ RELOAD_HG, Transition(HIT_HG,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
@@ -540,18 +540,18 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ ATTACK_MELEE, Transition(HIT_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
-						entt::entity owner_id = animation_state_machine->GetOwnerId();
-						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
-						if (player->is_hit_ == true) {
-							player->is_attacking_ = false;
-							return true;
-						}
-						else {
-							return false;
-						}
-					})
-					});
+				//transitions_.insert({ ATTACK_MELEE, Transition(HIT_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
+				//		entt::entity owner_id = animation_state_machine->GetOwnerId();
+				//		Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+				//		if (player->is_hit_ == true) {
+				//			player->is_attacking_ = false;
+				//			return true;
+				//		}
+				//		else {
+				//			return false;
+				//		}
+				//	})
+				//	});
 				transitions_.insert({ HIT_MELEE, Transition(AIM_POSE_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
 						if (IsAnimationEnded()) {
 							return true;
@@ -669,18 +669,18 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ ATTACK_GR, Transition(HIT_GR,[this](const AnimationStateMachine* animation_state_machine) {
-						entt::entity owner_id = animation_state_machine->GetOwnerId();
-						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
-						if (player->is_hit_ == true) {
-							player->is_attacking_ = false;
-							return true;
-						}
-						else {
-							return false;
-						}
-					})
-					});
+				//transitions_.insert({ ATTACK_GR, Transition(HIT_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				//		entt::entity owner_id = animation_state_machine->GetOwnerId();
+				//		Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+				//		if (player->is_hit_ == true) {
+				//			player->is_attacking_ = false;
+				//			return true;
+				//		}
+				//		else {
+				//			return false;
+				//		}
+				//	})
+				//	});
 				transitions_.insert({ HIT_GR, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
 						if (IsAnimationEnded()) {
 							return true;
@@ -859,8 +859,10 @@ public:
 	public:
 		AttackMelee() : AnimationState(ATTACK_MELEE) {}
 	public:
+		bool executed;
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
+			executed = false;
 			animation_base->SetAnimation("player_melee_attack.anim", 0.1f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
@@ -870,6 +872,15 @@ public:
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
+			if (animation_base->GetCurAnimation().cur_frame_ > 24.0f && !executed)
+			{
+				Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+				if (player)
+				{
+					player->MeeleAttack();
+					executed = true;
+				}				
+			}
 		}
 	};
 
