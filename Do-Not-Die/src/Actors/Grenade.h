@@ -16,6 +16,8 @@ private:
 	float		explosion_time_;
 	float		range_;
 	float		damage_;
+	int			bounce_count_ = 0;
+	int			bounce_max_ = 6;
 public:
 	float GetRange() { return range_; }
 	float GetDamage() { return damage_; }

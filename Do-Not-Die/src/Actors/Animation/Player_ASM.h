@@ -58,7 +58,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -70,7 +70,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -82,7 +82,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -258,7 +258,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -270,7 +270,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -282,7 +282,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -469,7 +469,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -481,7 +481,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -493,7 +493,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -572,7 +572,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -584,7 +584,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -596,7 +596,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
-							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 0.5f, false);
+							player->AddSoundQueue(SFX, "S_WEP_Holster.wav", 1.0f, false);
 							return true;
 						}
 						else {
@@ -761,7 +761,9 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_ar_aim_pose.anim", 0.3f);
+			animation_base->SetAnimation("player_ar_aim_pose.anim", 0.3f); 
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Aim_In.wav", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -778,6 +780,8 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 			animation_base->SetAnimation("player_hg_aim_pose.anim", 0.3f);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Aim_In.wav", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -864,6 +868,8 @@ public:
 		{
 			executed = false;
 			animation_base->SetAnimation("player_melee_attack.anim", 0.1f);
+			//auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			//sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Axe_Attack.mp3", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -878,6 +884,7 @@ public:
 				if (player)
 				{
 					player->MeeleAttack();
+					player->AddSoundQueue(SFX, "S_WEP_Axe_Attack.mp3", 1.0f, false);
 					executed = true;
 				}				
 			}
@@ -893,6 +900,8 @@ public:
 		{
 			executed = false;
 			animation_base->SetAnimation("player_gr_throw.anim", 0.2f);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			sm->GetPlayer()->AddSoundQueue(SFX, "S_CH_Grenade_Throw.wav", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -911,10 +920,10 @@ public:
 		{
 			if (animation_base->GetCurAnimation().cur_frame_ > 30.0f && !executed)
 			{
-				Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+				auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 				auto entity = animation_base->GetOwnerId();
-				player->ThrowGrenade();
-				auto static_mesh = player->reg_scene_->try_get<C_StaticMesh>(entity);
+				sm->GetPlayer()->ThrowGrenade();
+				auto static_mesh = sm->GetPlayer()->reg_scene_->try_get<C_StaticMesh>(entity);
 				static_mesh->static_mesh_id = "";
 				executed = true;
 			}
@@ -929,7 +938,7 @@ public:
 		{
 			animation_base->SetAnimation("player_ar_reload.anim", 0.3f);
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
-			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_AR_01_Reload.wav", 0.5f, false);
+			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_AR_01_Reload.wav", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -962,7 +971,7 @@ public:
 		{
 			animation_base->SetAnimation("player_hg_reload.anim", 0.3f);
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
-			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Handgun_Reload.wav", 0.5f, false);
+			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Handgun_Reload.wav", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{

@@ -228,6 +228,7 @@ void Player::Jump()
 
 	if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
 		GetMovementComponent()->jump_pulse = 150.0f;
+		AddSoundQueue(SFX, "S_CH_Jump_Start.wav", 1.0f, false);
 	}
 }
 
@@ -453,7 +454,10 @@ void Player::UpdateFlashLight()
 	static bool flash_onoff = false;
 
 	if (DINPUT->GetKeyState(DIK_F) == KEY_PUSH)
+	{
 		flash_onoff = !flash_onoff;
+		AddSoundQueue(SFX, "S_WEP_Flashlight_Click.wav", 1.0f, false);
+	}
 
 	auto& spot_light_comp = reg_scene_->get<C_SpotLight>(entity_id_);
 

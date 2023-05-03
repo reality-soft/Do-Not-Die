@@ -109,13 +109,17 @@ void reality::UI_Actor_Title::FadeInUI()
 {
 	static float timer = 0.0f;
 	static float alpha = 0.0f;
-
+	static bool executed = false;
 	if (alpha >= 1.0f)
 	{
-		newgame_button_->On();
-		loadinggame_button->On();
-		option_button_->On();
-		exit_button_->On();
+		if (!executed)
+		{
+			newgame_button_->On();
+			loadinggame_button->On();
+			option_button_->On();
+			exit_button_->On();
+			executed = true;
+		}
 		return;
 	}
 
@@ -160,7 +164,6 @@ void reality::UI_Actor_Title::DisappearUI()
 void UI_Actor_Title::UpdateUI()
 {
 	FadeInUI();
-
 
 	// When NewGame Button Selected
 	if (newgame_button_->GetCurrentState() == E_UIState::UI_SELECT)

@@ -13,4 +13,6 @@ void FX_BloodImpact::OnInit(entt::registry& registry)
 
 	AddSoundGeneratorComponent();
 
+	AddSoundQueue("S_WEP_Impact_Bullet_01.wav", SFX, false, 1.0f);
+
 }
