@@ -313,8 +313,6 @@ void Player::Reload()
 
 void Player::ThrowGrenade()
 {
-	
-
 	cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE]--;
 
 	auto grenade_entity = SCENE_MGR->AddActor<Grenade>();
@@ -322,12 +320,11 @@ void Player::ThrowGrenade()
 	XMVECTOR pos = cur_position_;
 	pos += right_ * 5.0f;
 	//pos += front_;
-	pos += XMVectorSet(0.0f, 5.0f, 0.0f, 0.0f);
+	pos += XMVectorSet(0.0f, 40.0f, 0.0f, 0.0f);
 	grenade_actor->SetPos(pos);
 	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 	XMVECTOR dir = ingame_scene->GetCameraSystem().GetCamera()->look;
-	//XMVECTOR dir = XMVectorAdd(front_, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
-	grenade_actor->SetDir(dir, 10.0f);
+	grenade_actor->SetDir(dir, 15.0f);
 }
 
 void Player::MeeleAttack()
