@@ -98,10 +98,6 @@ void reality::TriggerSystem::AddTriggerAtActor(entt::entity ent, float radius)
 
 bool reality::TriggerSystem::IsActorInTrigger(entt::entity ent, const C_TriggerVolume& trigger)
 {
-	//XMVECTOR actor_position = SCENE_MGR->GetActor<Actor>(ent)->GetCurPosition();
-	//if (Distance(actor_position, _XMVECTOR3(trigger.sphere_volume.center)) <= trigger.sphere_volume.radius)
-	//	return true;
-
 	auto c_capsule = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_CapsuleCollision>(ent);
 	if (c_capsule)
 	{		

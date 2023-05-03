@@ -30,7 +30,7 @@ VS_OUT VS(VS_IN input)
     VS_OUT output = (VS_OUT)0;
 
     output.normal_transform = mul(world_matrix, socket_matrix);
-
+    
     float4 local = float4(input.p, 1.0f);
     float4 world = mul(local, output.normal_transform);
     float4 projection = mul(world, ViewProjection());
