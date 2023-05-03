@@ -22,7 +22,7 @@ void Grenade::OnInit(entt::registry& registry)
 	stm.vertex_shader_id = "StaticMeshVS.cso";
 	registry.emplace_or_replace<reality::C_StaticMesh>(entity_id_, stm);
 
-	QUADTREE->RegistDynamicSphere(GetEntityId());
+	//QUADTREE->RegistDynamicSphere(GetEntityId());
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_SphereCollision));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_SphereCollision), TYPE_ID(C_StaticMesh));

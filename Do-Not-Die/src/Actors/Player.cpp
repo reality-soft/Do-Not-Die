@@ -18,9 +18,9 @@ void Player::OnInit(entt::registry& registry)
 	Character::OnInit(registry);
 	tag = "player";
 
-	movement_component_->speed = 0;
-	movement_component_->acceleration = 300;
-	movement_component_->max_speed = 150;
+	GetMovementComponent()->speed = 0;
+	GetMovementComponent()->acceleration = 300;
+	GetMovementComponent()->max_speed = 150;
 	max_hp_ = cur_hp_ = 100;
 	damage_ = 30.0f;
 
@@ -131,7 +131,6 @@ void Player::OnInit(entt::registry& registry)
 	inventory_.resize(INVENTORY_MAX);
 	inventory_timer_.resize(INVENTORY_MAX);
 
-	cur_hp_ = 100;
 	tag = "player";
 }
 
@@ -142,7 +141,7 @@ void Player::SetCharacterMovementAnimation()
 
 	string anim_id = "player_idle.anim";
 
-	if (movement_component_->speed >= 0.1f) {
+	if (GetMovementComponent()->speed >= 0.1f) {
 		if (angle_ >= 330.0f || angle_ < 30.0f) {
 			anim_id = "player_jog_f.anim";
 		}
@@ -195,7 +194,7 @@ void Player::MoveRight()
 	if (controller_enable_ == false)
 		return;
 
-	movement_component_->accelaration_vector[0] += 1;
+	GetMovementComponent()->accelaration_vector[0] += 1;
 }
 
 void Player::MoveLeft()
@@ -203,7 +202,7 @@ void Player::MoveLeft()
 	if (controller_enable_ == false)
 		return;
 
-	movement_component_->accelaration_vector[0] -= 1;
+	GetMovementComponent()->accelaration_vector[0] -= 1;
 }
 
 void Player::MoveForward()
@@ -211,7 +210,7 @@ void Player::MoveForward()
 	if (controller_enable_ == false)
 		return;
 
-	movement_component_->accelaration_vector[2] += 1;
+	GetMovementComponent()->accelaration_vector[2] += 1;
 }
 
 void Player::MoveBack()
@@ -219,7 +218,7 @@ void Player::MoveBack()
 	if (controller_enable_ == false)
 		return;
 
-	movement_component_->accelaration_vector[2] -= 1;
+	GetMovementComponent()->accelaration_vector[2] -= 1;
 }
 
 void Player::Jump()
@@ -227,8 +226,8 @@ void Player::Jump()
 	if (controller_enable_ == false)
 		return;
 
-	if (movement_component_->jump_pulse <= 0 && movement_component_->gravity_pulse <= 0) {
-		movement_component_->jump_pulse = 150.0f;
+	if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
+		GetMovementComponent()->jump_pulse = 150.0f;
 	}
 }
 
@@ -488,7 +487,7 @@ void Player::UpdateFlashLight()
 
 void Player::CalculateMovementAngle()
 {
-	XMVECTOR velocity = movement_component_->velocity;
+	XMVECTOR velocity = GetMovementComponent()->velocity;
 	velocity.m128_f32[1] = 0;
 	direction_ = XMVector3Transform(XMVector3Normalize(velocity), rotation_);
 	float dot_product = XMVectorGetX(XMVector3Dot(front_, direction_));

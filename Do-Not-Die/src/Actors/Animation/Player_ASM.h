@@ -909,7 +909,7 @@ public:
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
-			if (animation_base->GetCurAnimation().cur_frame_ > 36.0f && !executed)
+			if (animation_base->GetCurAnimation().cur_frame_ > 30.0f && !executed)
 			{
 				Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
 				auto entity = animation_base->GetOwnerId();
