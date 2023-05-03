@@ -250,7 +250,8 @@ void Player::Attack()
 
 	if (cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON)
 	{
-		MeeleAttack();
+		is_attacking_ = true;
+		//MeeleAttack();
 		return;
 	}
 		
@@ -338,9 +339,9 @@ void Player::MeeleAttack()
 	SphereShape attack_sphere;
 
 	auto capsule_info = GetTipBaseAB(capsule_collision->capsule);
-	XMVECTOR shepre_center = capsule_info[3] +(front_ * capsule_collision->capsule.radius * 2);
+	XMVECTOR shepre_center = capsule_info[3] +(front_ * capsule_collision->capsule.radius * 3);
 	attack_sphere.center = _XMFLOAT3(shepre_center);
-	attack_sphere.radius = capsule_collision->capsule.radius;
+	attack_sphere.radius = capsule_collision->capsule.radius * 2;
 
 	EVENT->PushEvent<AttackEvent_BoundSphere>(50, attack_sphere, entity_id_);
 }
