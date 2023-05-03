@@ -236,7 +236,7 @@ void Player::Attack()
 {
 	if (cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE)
 	{
-		if (is_attacking_)
+		if (is_attacking_ || is_aiming_ == false)
 			return;
 
 		if (cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] <= 0)

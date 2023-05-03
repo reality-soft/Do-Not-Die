@@ -10,6 +10,7 @@ public:
 	enum States {
 		IDLE_POSE_AR,
 		IDLE_POSE_HG,
+		IDLE_POSE_GR,
 		AIM_POSE_AR,
 		AIM_POSE_HG,
 		AIM_POSE_MELEE,
@@ -32,6 +33,7 @@ public:
 	virtual void OnInit() override {
 		states_.insert({ IDLE_POSE_AR, make_shared<IdlePoseAR>() });
 		states_.insert({ IDLE_POSE_HG, make_shared<IdlePoseHG>() });
+		states_.insert({ IDLE_POSE_GR, make_shared<IdlePoseGR>() });
 		states_.insert({ AIM_POSE_AR, make_shared<AimPoseAR>() });
 		states_.insert({ AIM_POSE_HG, make_shared<AimPoseHG>() });
 		states_.insert({ AIM_POSE_MELEE, make_shared<AimPoseMelee>() });
@@ -74,7 +76,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ IDLE_POSE_AR, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ IDLE_POSE_AR, Transition(IDLE_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
@@ -271,7 +273,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ IDLE_POSE_HG, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ IDLE_POSE_HG, Transition(IDLE_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
@@ -479,7 +481,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ AIM_POSE_MELEE, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_MELEE, Transition(IDLE_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
@@ -557,7 +559,7 @@ public:
 		{
 			// Pose Switch
 			{
-				transitions_.insert({ AIM_POSE_GR, Transition(IDLE_POSE_AR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ IDLE_POSE_GR, Transition(IDLE_POSE_AR,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE) {
@@ -568,7 +570,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ AIM_POSE_GR, Transition(AIM_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ IDLE_POSE_GR, Transition(IDLE_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
@@ -579,7 +581,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ AIM_POSE_GR, Transition(AIM_POSE_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ IDLE_POSE_GR, Transition(AIM_POSE_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
@@ -605,8 +607,34 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ ATTACK_GR, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ ATTACK_GR, Transition(IDLE_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
 						if (IsAnimationEnded()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+			}
+
+			// Aim
+			{
+				transitions_.insert({ IDLE_POSE_GR, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->IsAiming() == true) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ AIM_POSE_GR, Transition(IDLE_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->IsAiming() == false) {
 							return true;
 						}
 						else {
@@ -673,7 +701,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_idle.anim", 0.3f);
+			animation_base->SetAnimation("player_ar_idle_pose.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -686,6 +714,22 @@ public:
 	class IdlePoseHG : public AnimationState {
 	public:
 		IdlePoseHG() : AnimationState(IDLE_POSE_HG) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_base) override
+		{
+			animation_base->SetAnimation("", 0.3f);
+		}
+		virtual void Exit(AnimationStateMachine* animation_base) override
+		{
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		{
+		}
+	};
+
+	class IdlePoseGR : public AnimationState {
+	public:
+		IdlePoseGR() : AnimationState(IDLE_POSE_GR) {}
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
@@ -753,7 +797,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.3f);
+			animation_base->SetAnimation("player_gr_aim_pose.anim", 0.3f);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
