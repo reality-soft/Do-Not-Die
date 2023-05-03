@@ -45,7 +45,7 @@ void AttackEvent_SingleRay::Process()
 
 				GeneralZombie* enemy_actor = SCENE_MGR->GetActor<GeneralZombie>(actor_hit);
 				if (enemy_actor)
-					enemy_actor->AddImpulse(GetRayDirection(ray), 500.0f);
+					enemy_actor->AddImpulse(GetRayDirection(ray), 300.0f);
 
 				EVENT->PushEvent<TakeDamageEvent>(damage, actor_hit);
 				EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_total.point, callback_total.normal);
@@ -80,7 +80,9 @@ void AttackEvent_BoundSphere::Process()
 
 		auto general_zombie = SCENE_MGR->GetActor<GeneralZombie>(hit);
 		if (general_zombie)
-			general_zombie->AddImpulse(-hit_normal, damage_ * 20);
+		{
+			general_zombie->AddImpulse(-hit_normal + XMVectorSet(0, 0.3, 0, 0), damage_ * 30);
+		}
 	}
 
 	return;
