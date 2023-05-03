@@ -330,12 +330,18 @@ void Player::ThrowGrenade()
 void Player::MeeleAttack()
 {
 	is_attacking_ = true;
-	C_CapsuleCollision* capsule_collision = reg_scene_->try_get<reality::C_CapsuleCollision>(entity_id_);
-	RayShape ray;
-	XMVECTOR ray_start_pos = GetTipBaseAB(capsule_collision->capsule).at(0);
-	XMStoreFloat3(&ray.start, ray_start_pos);
-	XMStoreFloat3(&ray.end, (ray_start_pos + front_ * 40.0f));
-	EVENT->PushEvent<AttackEvent_SingleRay>(ray, entity_id_);
+	C_CapsuleCollision* capsule_collision = GetCapsuleComponent();
+	if (capsule_collision == nullptr)
+		return;
+	
+	SphereShape attack_sphere;
+
+	auto capsule_info = GetTipBaseAB(capsule_collision->capsule);
+	XMVECTOR shepre_center = capsule_info[3] +(front_ * capsule_collision->capsule.radius * 2);
+	attack_sphere.center = _XMFLOAT3(shepre_center);
+	attack_sphere.radius = capsule_collision->capsule.radius;
+
+	EVENT->PushEvent<AttackEvent_BoundSphere>(50, attack_sphere, entity_id_);
 }
 
 bool Player::IsAiming()
