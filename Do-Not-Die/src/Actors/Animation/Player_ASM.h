@@ -868,8 +868,8 @@ public:
 		{
 			executed = false;
 			animation_base->SetAnimation("player_melee_attack.anim", 0.1f);
-			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
-			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Axe_Attack.mp3", 1.0f, false);
+			//auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			//sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Axe_Attack.mp3", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -884,6 +884,7 @@ public:
 				if (player)
 				{
 					player->MeeleAttack();
+					player->AddSoundQueue(SFX, "S_WEP_Axe_Attack.mp3", 1.0f, false);
 					executed = true;
 				}				
 			}
