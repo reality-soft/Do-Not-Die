@@ -803,8 +803,8 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_ar_aim_pose.anim", 0.3f, true); 
-			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			animation_state_machine->SetAnimation("player_ar_aim_pose.anim", 0.3f, true);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_state_machine;
 			EVENT->PushEvent<SoundGenerateEvent>(sm->GetPlayer()->entity_id_, SFX, "S_WEP_Aim_In.wav", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
@@ -821,8 +821,8 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_hg_aim_pose.anim", 0.3f, true);
-			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			animation_state_machine->SetAnimation("player_hg_aim_pose.anim", 0.3f, true);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_state_machine;
 			EVENT->PushEvent<SoundGenerateEvent>(sm->GetPlayer()->entity_id_, SFX, "S_WEP_Aim_In.wav", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
@@ -909,9 +909,9 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			executed = false;
-			animation_base->SetAnimation("player_melee_attack.anim", 0.1f, true);
+			animation_state_machine->SetAnimation("player_melee_attack.anim", 0.1f, true);
 
-			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+			Player* player = SCENE_MGR->GetActor<Player>(animation_state_machine->GetOwnerId());
 			EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Axe_Swing.wav", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
@@ -941,8 +941,8 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			executed = false;
-			animation_base->SetAnimation("player_gr_throw.anim", 0.2f, true);
-			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			animation_state_machine->SetAnimation("player_gr_throw.anim", 0.2f, true);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_state_machine;
 			EVENT->PushEvent<SoundGenerateEvent>(sm->GetPlayer()->entity_id_, SFX, "S_CH_Grenade_Throw.wav", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
@@ -978,8 +978,8 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_ar_reload.anim", 0.3f, true);
-			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			animation_state_machine->SetAnimation("player_ar_reload.anim", 0.3f, true);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_state_machine;
 			EVENT->PushEvent<SoundGenerateEvent>(sm->GetPlayer()->entity_id_, SFX, "S_WEP_AR_01_Reload.wav", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
@@ -1011,8 +1011,8 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_hg_reload.anim", 0.3f, true);
-			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			animation_state_machine->SetAnimation("player_hg_reload.anim", 0.3f, true);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_state_machine;
 			EVENT->PushEvent<SoundGenerateEvent>(sm->GetPlayer()->entity_id_, SFX, "S_WEP_Handgun_Reload.wav", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
