@@ -3,6 +3,7 @@
 #include "SceneMgr.h"
 #include "ResourceMgr.h"
 #include "EffectMgr.h"
+#include "GameEvents.h"
 
 using namespace reality;
 
@@ -16,7 +17,7 @@ void FX_Explosion::OnInit(entt::registry& registry)
 
 	AddSoundGeneratorComponent();
 
-	AddSoundQueue("S_Explosion_01.wav", SFX, false, 0.5f);
+	EVENT->PushEvent<SoundGenerateEvent>(entity_id_, SFX, "S_Explosion_01.wav", 0.5f, false);
 }
 
 void FX_Explosion::OnUpdate()

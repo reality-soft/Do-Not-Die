@@ -49,7 +49,7 @@ public:
 	void SetPos(const XMVECTOR& position = { 0.f, 100.f, 0.f, 0.f });
 	int  GetKillScore() { return kill_score_; }
 	void AddKillScore() { kill_score_++; }
-	void AddSoundQueue(SoundType type, string sound_name, float volume, bool is_looping);
+
 public:
 	virtual float GetMaxHp() const override;
 	virtual void SetCurHp(int hp) override;
