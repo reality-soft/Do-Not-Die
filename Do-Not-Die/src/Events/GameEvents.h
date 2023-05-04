@@ -93,6 +93,40 @@ private:
 	float damage_;
 };
 
+class SoundGenerateEvent : public Event
+{
+public:
+	SoundGenerateEvent(entt::entity ent, SoundType sound_type, string sound_filename, float volume, bool is_looping)
+		: ent_(ent), 
+		sound_type_(sound_type),
+		sound_filename_(sound_filename),
+		volume_(volume),
+		is_looping_(is_looping)
+	{};
+
+	virtual void Process() override{
+
+		auto c_sound_gen = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_SoundGenerator>(ent_);
+		if (c_sound_gen == nullptr)
+			return;
+
+		SoundQueue sound_queue;
+		sound_queue.sound_type = sound_type_;
+		sound_queue.sound_filename = sound_filename_;
+		sound_queue.sound_volume = volume_;
+		sound_queue.is_looping = is_looping_;
+
+		c_sound_gen->sound_queue_list.push(sound_queue);
+	}
+
+private:
+	entt::entity ent_;
+	SoundType sound_type_;
+	string sound_filename_;
+	float volume_;
+	bool is_looping_;
+};
+
 class WalkEvent : public Event
 {
 public:
@@ -100,6 +134,7 @@ public:
 	virtual void Process() override {
 		static int count = 0;
 		auto player = SCENE_MGR->GetPlayer<Player>(0);
-		player->AddSoundQueue(SFX, "S_CH_Footstep_001.wav", 1.0f, false);
+    EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_CH_Footstep_001.wav", 1.0f, false);
 	};
 };
+

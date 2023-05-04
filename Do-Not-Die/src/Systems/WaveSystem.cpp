@@ -77,7 +77,7 @@ void reality::WaveSystem::RandomSpawnItem(float trigger_radius)
 
 	for (UINT index : empty_item_index)
 	{
-		ItemType item_type = (ItemType)(rand() % 7);
+		ItemType item_type = (ItemType)RandomIntInRange(0, 6);
 
 		const auto& spawn = item_spawns_.line_nodes[index];
 		SCENE_MGR->GetScene(INGAME)->AddActor<Item>(item_type, _XMFLOAT3(spawn), trigger_radius);
@@ -107,7 +107,7 @@ void reality::WaveSystem::CreateStaticEffects()
 {
 	for (const auto& node : fx_corpse_fire_.line_nodes)
 	{
-		int random_scale = rand() % 5 + 5;
+		float random_scale = RandomFloatInRange(5.0f, 10.0f);
 		entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Flame>(INGAME, node.second, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
 	}
 }
@@ -244,9 +244,9 @@ void reality::WaveSystem::SpawnZombies(float interval)
 		return;
 
 	enemy_actor->targeting_car_health = &car_health;
-
-	int guidline_index = rand() % zomebie_tracks_->size();
-	int mesh_index = rand() % enemy_meshes.size();
+	
+	int guidline_index = RandomIntInRange(0, zomebie_tracks_->size());
+	int mesh_index = RandomIntInRange(0, enemy_meshes.size());
 
 	guidline_index = 4;
 
@@ -273,7 +273,7 @@ void reality::WaveSystem::SpawnCarSmokes()
 				continue;
 
 			auto node = fx_car_fire_.line_nodes.at(index);
-			int random_scale = rand() % 5 + 5;
+			float random_scale = RandomFloatInRange(5.0f, 10.0f);
 			entt::entity ent = EFFECT_MGR->SpawnEffect<reality::FX_Smoke>(INGAME, node, XMQuaternionIdentity(), XMVectorReplicate(random_scale));
 			spawned_car_fired_.insert(make_pair(index, ent));
 		}

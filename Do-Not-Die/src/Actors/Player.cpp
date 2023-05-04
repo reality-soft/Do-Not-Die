@@ -246,7 +246,7 @@ void Player::Jump()
 
 	if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
 		GetMovementComponent()->jump_pulse = 150.0f;
-		AddSoundQueue(SFX, "S_CH_Jump_Start.wav", 1.0f, false);
+		EVENT->PushEvent<SoundGenerateEvent>(entity_id_, SFX, "S_CH_Jump_Start.wav", 1.0f, false);
 	}
 }
 
@@ -400,20 +400,6 @@ void Player::SetPos(const XMVECTOR& position)
 	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
-void Player::AddSoundQueue(SoundType type, string sound_name, float volume, bool is_looping)
-{
-	SoundQueue sound_queue;
-	sound_queue.sound_type = type;
-	sound_queue.sound_filename = sound_name;
-	sound_queue.sound_volume = volume;
-	sound_queue.is_looping = is_looping;
-
-	auto generator = reg_scene_->try_get<C_SoundGenerator>(GetEntityId());
-
-	if(generator)
-		generator->sound_queue_list.push(sound_queue);
-}
-
 float Player::GetMaxHp() const
 {
 	return max_hp_;
@@ -474,7 +460,7 @@ void Player::UpdateFlashLight()
 	if (DINPUT->GetKeyState(DIK_F) == KEY_PUSH)
 	{
 		flash_onoff = !flash_onoff;
-		AddSoundQueue(SFX, "S_WEP_Flashlight_Click.wav", 1.0f, false);
+		EVENT->PushEvent<SoundGenerateEvent>(entity_id_, SFX, "S_WEP_Flashlight_Click.wav", 1.0f, false);
 	}
 
 	auto& spot_light_comp = reg_scene_->get<C_SpotLight>(entity_id_);
