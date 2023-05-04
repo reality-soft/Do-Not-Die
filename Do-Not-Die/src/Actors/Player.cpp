@@ -56,7 +56,7 @@ void Player::OnInit(entt::registry& registry)
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
 	int skeleton_id = skeletal_mesh->skeleton.bone_name_id_map["Hand_R"];
 	XMMATRIX socket_offset = XMMatrixRotationZ(XMConvertToRadians(180))
-		* XMMatrixRotationY(XMConvertToRadians(110))
+		* XMMatrixRotationY(XMConvertToRadians(100))
 		* XMMatrixTranslationFromVector({-15, -3, 5, 0 });
 	socket_component.AddSocket("Rifle", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 
