@@ -1,11 +1,12 @@
 #pragma once
 #include "Engine_Include.h"
-#include "UI_Actor_LoadingScene.h"
+#include "UI_Actor_PopScene.h"
+#include "StartScene.h"
 #include "InGameScene.h"
 
 using namespace reality;
 
-class LoadingScene : public reality::Scene
+class PopScene : public reality::Scene
 {
 public:
 	virtual void OnInit();
@@ -13,12 +14,13 @@ public:
 	virtual void OnRender();
 	virtual void OnRelease();
 private:
-	reality::RenderSystem	sys_render;
-	reality::SoundSystem	sys_sound;
+	void LoadingScenes();
+private:
 	reality::UISystem		sys_ui;
 private:
-	InGameScene* ingame_scene;
+	StartScene*		start_scene;
+	InGameScene*	ingame_scene;
 private:
-	UI_Actor_LoadingScene loading_scene_ui;
+	UI_Actor_PopScene pop_scene_ui;
 };
 

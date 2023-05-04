@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UI_Minimap.h"
 #include "Player.h"
-#include "Enemy.h"
+#include "NormalZombie.h"
 
 #define MINIMAP_OFFSET 0.1
 #define MINIMAP_LENGTH 15800.0f
@@ -44,14 +44,17 @@ void UI_Minimap::UpdateThisUI()
 		// if player, continue;
 		if (entity == player->GetEntityId())
 		{
-			XMMATRIX player_world = player->GetTransformMatrix();
+			XMMATRIX player_world = player->GetRotation() * XMMatrixTranslationFromVector(player->GetCurPosition());
 			RenderPlayerIcon(player_world);
 		}
 		else
 		{
-			auto zombie = SCENE_MGR->GetActor<Enemy>(entity);
-			XMMATRIX zombie_world = zombie->GetTransformMatrix();
-			RenderZombieIcon(zombie_world);
+			auto zombie = SCENE_MGR->GetActor<NormalZombie>(entity);
+			if (zombie)
+			{
+				XMMATRIX zombie_world = XMMatrixTranslationFromVector(zombie->GetCurPosition());
+				RenderZombieIcon(zombie_world);
+			}
 		}
 	}
 

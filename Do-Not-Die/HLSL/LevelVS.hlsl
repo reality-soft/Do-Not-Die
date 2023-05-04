@@ -13,11 +13,14 @@ struct VS_OUT
     float3 n : NORMAL0;
     float2 t : TEXCOORD0;
     
-    float3 origin : NORMAL1;
-    float4 projection : NORMAL2;
-    
+    float3 origin : NORMAL1;    
     float lod : TEXCOORD1;
     float3 view_dir : TEXCOORD2;
+};
+
+cbuffer CbShadowMatrix : register(b1)
+{
+    matrix shadow_view_proj;
 };
 
 VS_OUT VS(VS_IN input)
@@ -28,13 +31,12 @@ VS_OUT VS(VS_IN input)
     float4 project = mul(local, ViewProjection());
 
     output.p = project;
-    output.n = input.n;
+    output.n = normalize(input.n);
     output.t = input.t;
     
     output.lod = GetLod(input.p);
     output.view_dir = normalize(camera_world - local).xyz;
     output.origin = local;
-    output.projection = project;
     
     return output;
 }

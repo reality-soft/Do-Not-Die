@@ -5,7 +5,17 @@
 #include "UI_Actor_Ingame.h"
 #include "TriggerSystem.h"
 #include "WaveSystem.h"
+
 using namespace reality;
+
+enum class GameResultType
+{
+	ePlayerDead,
+	eCarCrashed,
+	ePlayerInfected,
+	eGameCleared,
+	eNone
+};
 
 enum E_IngameLoading
 {
@@ -27,19 +37,8 @@ public:
 	virtual void OnRelease();
 
 private:
-	vector<std::string> enemy_meshes = {
-		"Zombie_Businessman_Male_01.skmesh",
-		"Zombie_Cheerleader_Female_01.skmesh",
-		"Zombie_Daughter_Female_01.skmesh",
-		"Zombie_Police_Male_01.skmesh",
-		"Zombie_RiotCop_Male_01.skmesh",
-		"Zombie_SchoolGirl_Female_01.skmesh",
-		"Zombie_Bellboy_Male_01.skmesh",
-	};
-
 	Environment environment_;
 	StaticMeshLevel level;
-	//SingleShadow single_shadow;
 
 	reality::LightingSystem sys_light;
 	reality::AnimationSystem sys_animation;
@@ -52,23 +51,36 @@ private:
 
 	TriggerSystem sys_trigger_;
 	WaveSystem sys_wave_;
+	
+#ifdef _DEBUG
+	PropertyWidget* prop_widget_ = nullptr;
+#endif
 
 public:
 	reality::CameraSystem GetCameraSystem() { return sys_camera; }
+	reality::WaveSystem& GetWaveSystem() { return sys_wave_; }
+	UI_Actor_Ingame& GetUIActor() { return ingame_ui; }
+	Environment& GetEnviroment() { return environment_; }
+
+	GameResultType game_result_type = GameResultType::eNone;
 private:
+#ifdef _DEBUG
 	TestWidget	test_window_;
 	PropertyWidget gw_property_;
+#endif
 	UI_Actor_Ingame ingame_ui;
-	void CreateExplosionEffectFromRay();
 	void CursorStateUpdate();
-
-private:
-	int cur_zombie_created = 0;
-private:
-	bool b_show_cursor = false;
+	
 public:
+	int cur_zombie_created = 0;
+	bool b_show_cursor = false;
 	void SetCursorVisible();
 	void SetCursorInvisible();
+
+private:
+	void ShowCarCrashing();
+	void GameResultProcess();
+
 private:
 	E_IngameLoading loading_progress = LOADING_START;
 public:

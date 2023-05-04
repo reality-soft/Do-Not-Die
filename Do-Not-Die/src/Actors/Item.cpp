@@ -11,6 +11,8 @@ Item::Item(ItemType item_type, XMFLOAT3 spawn_point, float trigger_radius)
 void Item::OnInit(entt::registry& registry)
 {
 	Actor::OnInit(registry);
+	visible = true;
+	tag = "item";
 
 	reality::C_StaticMesh stm;
 	stm.local = XMMatrixIdentity();
@@ -40,17 +42,23 @@ void Item::OnInit(entt::registry& registry)
 	case ItemType::eGrenade:
 		stm.static_mesh_id = "Grenade.stmesh";
 		break;
+	case ItemType::eRepairPart:
+		stm.static_mesh_id = "RepairPart.stmesh";
+		break;
 	}
 
 	registry.emplace_or_replace<reality::C_StaticMesh>(entity_id_, stm);
 
 	reality::C_TriggerVolume item_trigger;
 	item_trigger.sphere_volume = trigger_sphere_;
+	item_trigger.tag = "item";
 	registry.emplace_or_replace<reality::C_TriggerVolume>(entity_id_, item_trigger);
 
 	transform_tree_.root_node = make_shared<reality::TransformTreeNode>(TYPE_ID(reality::C_StaticMesh));
-	transform_matrix_ = TransformT(trigger_sphere_.center);
-	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
+	cur_position_.m128_f32[0] = trigger_sphere_.center.x;
+	cur_position_.m128_f32[1] = trigger_sphere_.center.y;
+	cur_position_.m128_f32[2] = trigger_sphere_.center.z;
+	transform_tree_.root_node->OnUpdate(registry, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
 void Item::OnUpdate()

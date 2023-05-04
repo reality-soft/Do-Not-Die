@@ -48,16 +48,19 @@ project "Do-Not-Die"
 		"../Game-Engine/Engine/src",
 		"../Game-Engine/Engine/vendor/spdlog/include",
 		"Do-Not-Die/src/Actors",
-		"Do-Not-Die/src/Game",
+		"Do-Not-Die/src/Actors/AI",
+		"Do-Not-Die/src/Actors/Animation",
+		"Do-Not-Die/src/Systems",
 		"Do-Not-Die/src/Events",
 		"Do-Not-Die/src/FX",
 		"Do-Not-Die/src/GUI",
 		"Do-Not-Die/src/Scenes",
 		"Do-Not-Die/src/UI",
 		"Do-Not-Die/src/Item",
+		"Do-Not-Die/src/UI/EndingScene",
 		"Do-Not-Die/src/UI/InGameScene",
-		"Do-Not-Die/src/UI/LoadingScene",
 		"Do-Not-Die/src/UI/StartScene",
+		"Do-Not-Die/src/UI/PopScene",
 		"../SDK/DirectXTK/include",
 		"../SDK/FBXSDK/include",
 		"../SDK/FMOD/include",
@@ -76,12 +79,8 @@ project "Do-Not-Die"
 	links
 	{
 		"Engine",
-		"libfbxsdk-md",
-		"libxml2-md",
-		"zlib-md",
 		"fmod_vc",
 		"fmodL_vc",
-		"ImGui_Win32_Dx11_D"
 	}
 
 	filter "files:**VS.hlsl"
@@ -124,6 +123,15 @@ project "Do-Not-Die"
 			"../SDK/FBXSDK/lib/debug",
 			"../SDK/FMOD/lib/debug",
 			"../output/bin/Debug-windows-x86_64/Engine/",
+		}
+
+		links
+		{
+			"Engine",
+			"libfbxsdk-md",
+			"libxml2-md",
+			"zlib-md",
+			"ImGui_Win32_Dx11_D"
 		}
 
 		prebuildcommands

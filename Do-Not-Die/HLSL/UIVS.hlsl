@@ -12,12 +12,14 @@ cbuffer cb_data : register(b1)
 struct VS_IN
 {
     float2 p : F2_POSITION;
+    float4 c : F4_COLOR;
     float2 t : F2_TEXTURE;
 };
 
 struct VS_OUT
 {
     float4 p : SV_POSITION;
+    float4 c : COLOR0;
     float2 t : TEXCOORD0;
 };
 
@@ -37,6 +39,7 @@ VS_OUT VS(VS_IN input)
     //world.y = -(world.y * 2 - 1);
 
     output.p = world;
+    output.c = input.c;
     output.t = input.t;
 
     return output;

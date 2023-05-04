@@ -240,20 +240,20 @@ bool SphereToTriangle(float3 center, float radius, TriangleShape tri)
     if (result.is_intersect) // step 3-1 : return intersect point
         return true;
     
-    else // step 3-2 : check edge_center segment
-    {
-        float3 edge1_segment = PointLineSegment(center, tri.vertex0, tri.vertex1);
-        if (length(edge1_segment - center) <= radius)
-            return true;
+    //else // step 3-2 : check edge_center segment
+    //{
+    //    float3 edge1_segment = PointLineSegment(center, tri.vertex0, tri.vertex1);
+    //    if (length(edge1_segment - center) <= radius)
+    //        return true;
         
-        float3 edge2_segment = PointLineSegment(center, tri.vertex0, tri.vertex2);
-        if (length(edge2_segment - center) <= radius)
-            return true;
+    //    float3 edge2_segment = PointLineSegment(center, tri.vertex0, tri.vertex2);
+    //    if (length(edge2_segment - center) <= radius)
+    //        return true;
         
-        float3 edge3_segment = PointLineSegment(center, tri.vertex2, tri.vertex1);
-        if (length(edge3_segment - center) <= radius)
-            return true;
-    }
+    //    float3 edge3_segment = PointLineSegment(center, tri.vertex2, tri.vertex1);
+    //    if (length(edge3_segment - center) <= radius)
+    //        return true;
+    //}
     return false;
 }
 
@@ -351,11 +351,11 @@ CapsuleCallback CapsuleToTriangle(CapsuleShape cap, TriangleShape tri)
 }
 
 StructuredBuffer<TriangleShape> level_triangles : register(t0);
-StructuredBuffer<CapsuleShape> character_capsules : register(t1); // capsule_pool_64
-StructuredBuffer<SphereShape> spheres : register(t2); // sphere_pool_64
-RWStructuredBuffer<CollisionResult> collision_result : register(u0); // capsule_pool_64
+StructuredBuffer<CapsuleShape> character_capsules : register(t1); // capsule_pool_32
+StructuredBuffer<SphereShape> spheres : register(t2); // sphere_pool_32
+RWStructuredBuffer<CollisionResult> collision_result : register(u0); // capsule_pool_32
 
-[numthreads(64, 1, 1)]
+[numthreads(32, 1, 1)]
 void CS(
 uint3 Gid : SV_GroupID,
 uint3 DTid : SV_DispatchThreadID,
@@ -370,7 +370,7 @@ uint GI : SV_GroupIndex)
     // Capsule Collision Check
     CapsuleShape capsule = character_capsules[GTid.x];
 
-    if (capsule.radius > 1.0f)
+    if (capsule.radius > 0.999f)
     {
         CapsuleResult capsule_result;
 
@@ -434,7 +434,7 @@ uint GI : SV_GroupIndex)
     // Sphere Triangle Check
     SphereShape sphere = spheres[GTid.x];
 
-    if (sphere.radius > 1.0f)
+    if (sphere.radius > 0.999f)
     {
         SphereResult sphere_result;
 

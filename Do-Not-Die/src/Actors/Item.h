@@ -10,6 +10,7 @@ enum class ItemType
 	eAR_Ammo,		// rifle ammo (30)
 	ePistol_Ammo,	// pistol ammo (8)
 	eGrenade,
+	eRepairPart,
 };
 
 class Item : public reality::Actor

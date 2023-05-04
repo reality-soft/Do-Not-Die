@@ -2,10 +2,25 @@
 #include "stdafx.h"
 #include "Engine_include.h"
 #include "Shape.h"
-#include "GameCharacter.h"
+#include "NormalZombie.h"
 #include "FX_BloodImpact.h"
+#include "FX_MeleeImpact.h"
 #include "FX_ConcreteImpact.h"
+#include "InGameScene.h"
+
 using namespace reality;
+
+class GameResultEvent : public Event
+{
+public:
+	GameResultEvent(GameResultType result_type) : result(result_type) {};
+	virtual void Process() override {
+		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		if (ingame_scene)
+			ingame_scene->game_result_type = result;
+	}
+	GameResultType result;
+};
 
 class TakeDamageEvent : public reality::Event
 {
@@ -21,37 +36,105 @@ private:
 	entt::entity actor_hit_;
 };
 
-class AttackEvent : public Event
+class MakeTextEvent : public Event
 {
 public:
-	AttackEvent(vector<RayShape> rays, entt::entity actor_id) : rays_(rays), actor_id_(actor_id) {};
-
+	MakeTextEvent(string text) : text_(text) {};
 	virtual void Process() override {
-		set<entt::entity> actors_hit;
-		GameCharacter* character = SCENE_MGR->GetActor<GameCharacter>(actor_id_);
-		float damage = character->GetCharacterDamage();
+		auto ingamescene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		auto& ui_actor = ingamescene->GetUIActor();
+		ui_actor.SetEventMsg(text_);
+	};
+private:
+	string text_;
+};
 
-		for (const auto& cur_ray : rays_) {
-			RayCallback raycallback = QUADTREE->Raycast(cur_ray);
+class GrenadeEvent : public Event
+{
+public:
+	GrenadeEvent(XMVECTOR pos, float range, float damage) : pos_(pos), range_(range), damage_(damage) {};
+	virtual void Process() override {
+		auto ingamescene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		for (auto& pair : ingamescene->GetActors())
+		{
 			
-			if (raycallback.is_actor) {
-				actors_hit.insert(raycallback.ent);
-			}
+			auto enemy = SCENE_MGR->GetActor<NormalZombie>(pair.first);
 
-			if (raycallback.success && raycallback.is_actor)
-				EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(raycallback.point, raycallback.normal);
+			if (enemy == nullptr)
+				continue;
 
-			else if (raycallback.success && !raycallback.is_actor)
-				EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(raycallback.point, raycallback.normal);
-		}
-		
-		for (const auto& actor_hit : actors_hit) {
-			EVENT->PushEvent<TakeDamageEvent>(damage, actor_hit);	
+			float distance = XMVectorGetX(XMVector3Length(pos_ - enemy->GetCurPosition()));
+
+			if (distance > range_)
+				continue;
+
+			float weight = distance / range_;
+
+			enemy->TakeDamage(damage_ * weight);
 		}
 	};
 private:
+	XMVECTOR pos_;
+	float range_;
+	float damage_;
+};
 
-	vector<RayShape> rays_;
-	entt::entity actor_id_;
+class KillEvent : public Event
+{
+public:
+	KillEvent() {};
+	virtual void Process() override {
+		auto player = SCENE_MGR->GetPlayer<Player>(0);
+		player->AddKillScore();
+	};
+private:
+	XMVECTOR pos_;
+	float range_;
+	float damage_;
+};
+
+class SoundGenerateEvent : public Event
+{
+public:
+	SoundGenerateEvent(entt::entity ent, SoundType sound_type, string sound_filename, float volume, bool is_looping)
+		: ent_(ent), 
+		sound_type_(sound_type),
+		sound_filename_(sound_filename),
+		volume_(volume),
+		is_looping_(is_looping)
+	{};
+
+	virtual void Process() override{
+
+		auto c_sound_gen = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_SoundGenerator>(ent_);
+		if (c_sound_gen == nullptr)
+			return;
+
+		SoundQueue sound_queue;
+		sound_queue.sound_type = sound_type_;
+		sound_queue.sound_filename = sound_filename_;
+		sound_queue.sound_volume = volume_;
+		sound_queue.is_looping = is_looping_;
+
+		c_sound_gen->sound_queue_list.push(sound_queue);
+	}
+
+private:
+	entt::entity ent_;
+	SoundType sound_type_;
+	string sound_filename_;
+	float volume_;
+	bool is_looping_;
+};
+
+class WalkEvent : public Event
+{
+public:
+	WalkEvent() {};
+	virtual void Process() override {
+		static int count = 0;
+		auto player = SCENE_MGR->GetPlayer<Player>(0);
+    EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_CH_Footstep_001.wav", 1.0f, false);
+	};
 };
 

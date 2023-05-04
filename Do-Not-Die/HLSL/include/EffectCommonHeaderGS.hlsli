@@ -11,6 +11,7 @@ struct GS_OUT
 	float4 c	: COLOR0;
 	float2 t	: TEXCOORD0;
 	float2 uv	: TEXCOORD1;
+	float3 world_pos : TEXCOORD2;
 };
 
 cbuffer cb_billboard : register(b0)

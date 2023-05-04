@@ -8,19 +8,31 @@
 #include "FX_Flame.h"
 #include "FX_Muzzle.h"
 #include "FX_Explosion.h"
-#include "GameEvents.h"
+#include "AttackEvent.h"
+#include "Player_ASM.h"
 
 using namespace reality;
 
 void Player::OnInit(entt::registry& registry)
 {
 	Character::OnInit(registry);
+	tag = "player";
 
-	movement_component_->speed = 150;
+	GetMovementComponent()->speed = 0;
+	GetMovementComponent()->acceleration = 300;
+	GetMovementComponent()->max_speed = 150;
 	max_hp_ = cur_hp_ = 100;
-	
+	damage_ = 30.0f;
+
+	C_TriggerSensor trigger_sensor;
+	trigger_sensor.can_sense_tags.insert("item");
+	trigger_sensor.can_sense_tags.insert("extract");
+	trigger_sensor.can_sense_tags.insert("repair");
+	trigger_sensor.can_sense_tags.insert("defense");
+	registry.emplace<reality::C_TriggerSensor>(entity_id_, trigger_sensor);
+
 	reality::C_SkeletalMesh skm;
-	skm.skeletal_mesh_id = "SM_Chr_Biker_Male_01.skmesh";
+	skm.skeletal_mesh_id = "SM_Chr_Biker_Male.skmesh";
 	skm.vertex_shader_id = "SkinningVS.cso";
 	registry.emplace_or_replace<reality::C_SkeletalMesh>(entity_id_, skm);
 
@@ -32,6 +44,10 @@ void Player::OnInit(entt::registry& registry)
 	camera.SetLocalFrom(capsule, 50);
 	registry.emplace<C_Camera>(entity_id_, camera);
 
+	C_SoundGenerator sound_generator;
+	sound_generator.local;
+	registry.emplace<C_SoundGenerator>(entity_id_, sound_generator);
+
 	C_SoundListener sound_listener;
 	sound_listener.local = camera.local;
 	registry.emplace<C_SoundListener>(entity_id_, sound_listener);
@@ -39,39 +55,74 @@ void Player::OnInit(entt::registry& registry)
 	C_Socket socket_component;
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
 	int skeleton_id = skeletal_mesh->skeleton.bone_name_id_map["Hand_R"];
-	XMMATRIX socket_offset = XMMatrixRotationY(XMConvertToRadians(90))
-		* XMMatrixRotationX(XMConvertToRadians(180))
-		* XMMatrixTranslationFromVector({ -20, -4, 4, 0 });
-	socket_component.AddSocket("RightHand", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+	XMMATRIX socket_offset = XMMatrixRotationZ(XMConvertToRadians(180))
+		* XMMatrixRotationY(XMConvertToRadians(100))
+		* XMMatrixTranslationFromVector({-15, -3, 5, 0 });
+	socket_component.AddSocket("Rifle", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+
+	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90)) 
+		* XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(90))
+		* XMMatrixTranslationFromVector({ -10, 0, 4, 0 });
+	socket_component.AddSocket("Pistol", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+
+	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90))
+		* XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(90))
+		* XMMatrixTranslationFromVector({ -10, 0, 4, 0 });
+	socket_component.AddSocket("Axe", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+
+	socket_offset = XMMatrixRotationZ(XMConvertToRadians(90))
+		* XMMatrixRotationY(XMConvertToRadians(90))
+		* XMMatrixRotationX(XMConvertToRadians(90))
+		* XMMatrixTranslationFromVector({ -10, 0, 4, 0 });
+	socket_component.AddSocket("Grenade", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
+
 	registry.emplace<C_Socket>(entity_id_, socket_component);
 
+	socket_ids_[0] = "Rifle";
+	socket_ids_[1] = "Pistol";
+	socket_ids_[2] = "Axe";
+	socket_ids_[3] = "Grenade";
+
+	stm_ids_[0] = "WEP_AK47.stmesh";
+	stm_ids_[1] = "WEP_Pistol.stmesh";
+	stm_ids_[2] = "WEP_Axe.stmesh";
+	stm_ids_[3] = "Grenade.stmesh";
+
+	stm_local_[0] = XMMatrixScalingFromVector({ 0.8f, 0.8f, 0.8f, 0.8f });
+	stm_local_[1] = XMMatrixScalingFromVector({ 0.8f, 0.8f, 0.8f, 0.8f });
+	stm_local_[2] = XMMatrixIdentity();
+	stm_local_[3] = XMMatrixIdentity();
+
 	C_StaticMesh static_mesh_component;
-	static_mesh_component.local = XMMatrixScalingFromVector({ 1.4f, 1.4f, 1.4f, 0.0f });
-	static_mesh_component.world = XMMatrixIdentity();
-	static_mesh_component.static_mesh_id = "SK_Handgun_01.stmesh";
+	static_mesh_component.local = TransformR(XMFLOAT3(0, 180, 0));
+	static_mesh_component.world = XMMatrixIdentity() * static_mesh_component.local;
+	static_mesh_component.static_mesh_id = stm_ids_[static_cast<int>(cur_equipped_weapon_)];
 	static_mesh_component.vertex_shader_id = "StaticMeshVS.cso";
-	static_mesh_component.socket_name = "RightHand";
+	static_mesh_component.socket_name = socket_ids_[static_cast<int>(cur_equipped_weapon_)];
 	registry.emplace<C_StaticMesh>(entity_id_, static_mesh_component);
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_CapsuleCollision));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SkeletalMesh));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_Camera));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SoundListener));
+	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SoundGenerator));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_SkeletalMesh), TYPE_ID(C_Socket));
 
-	transform_matrix_ = XMMatrixTranslation(0, 100, 0);
-	transform_tree_.root_node->OnUpdate(registry, entity_id_, transform_matrix_);
-
 	C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
-	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
+	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 1.0 }) * XMMatrixRotationY(XMConvertToRadians(180));
 
-	// create anim slot
-	C_Animation animation_component;
-	animation_component.SetBaseAnimObject<AnimationBase>();
-	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", skm.skeletal_mesh_id, "Spine_02", 6, entity_id_);
+	cur_position_ = { 0.0f, 100.0f, 0.0f, 0.0f };
+	transform_tree_.root_node->OnUpdate(registry, entity_id_, XMMatrixTranslationFromVector(cur_position_));
+	
+	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
+	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 4, "Spine_01");
+	animation_component.AddNewAnimSlot<PlayerFullBodyAnimationStateMachine>("FullBody", entity_id_, skm.skeletal_mesh_id, 1, "Root");
+	auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_component.GetAnimSlotByName("UpperBody");
+	sm->SetPlayer(this);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
-
-	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
 
 	// FlashLight
 	AddFlashLight();
@@ -80,149 +131,259 @@ void Player::OnInit(entt::registry& registry)
 	inventory_.resize(INVENTORY_MAX);
 	inventory_timer_.resize(INVENTORY_MAX);
 
-	cur_hp_ = 0;
-
-	// true means : this actor causes trigger event when overlaped at trigger 
-	trigger_sensor = true;
+	tag = "player";
 }
 
-void Player::OnUpdate()
-{
-	C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-	XMVECTOR scale, rotation, translation;
-	XMMatrixDecompose(&scale, &rotation, &translation, transform_matrix_);
-	XMMATRIX rotation_matrix = XMMatrixRotationY(camera->pitch_yaw.y);
-	transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, translation, rotation_matrix);
-	front_ = XMVector3Transform({ 0, 0, 1, 0 }, rotation_matrix);
-	right_ = XMVector3Transform({ 1, 0, 0, 0 }, rotation_matrix);
-
-	// FlashLight Update
-	UpdateFlashLight();
-
-	UpdateTimer();
-}
-
-void Player::SetCharacterAnimation(string anim_id, string anim_slot_id)
+void Player::SetCharacterMovementAnimation()
 {
 	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
-	int slot_index = animation_component_ptr->name_to_anim_slot_index[anim_slot_id];
-	if (animation_component_ptr->anim_slots[slot_index].second.anim_object_->GetCurAnimationId() != anim_id) {
-		animation_component_ptr->anim_slots[slot_index].second.anim_object_->SetAnimation(anim_id, 0.2);
+	AnimationBase* anim_slot = animation_component_ptr->GetAnimSlotByName("Base");
+
+	string anim_id = "player_idle.anim";
+
+	vector<AnimNotify> notifies;
+	
+	if (GetMovementComponent()->speed >= 0.1f) {
+
+		notifies.resize(2);
+		notifies[0].event = make_shared<WalkEvent>();
+		notifies[1].event = make_shared<WalkEvent>();
+
+		if (angle_ >= 330.0f || angle_ < 30.0f) {
+			anim_id = "player_jog_f.anim";
+			notifies[0].frame = 8 * 2;
+			notifies[1].frame = 18 * 2;
+		}
+		else if (30.0f <= angle_ && angle_ < 110.0f) {
+			anim_id = "player_jog_rf.anim";
+			notifies[0].frame = 8 * 2;
+			notifies[1].frame = 18 * 2;
+		}
+		else if (110.0f <= angle_ && angle_ < 160.0f) {
+			anim_id = "player_jog_rb.anim";
+			notifies[0].frame = 6 * 2;
+			notifies[1].frame = 17 * 2;
+		}
+		else if (160.0f <= angle_ && angle_ < 200.0f) {
+			anim_id = "player_jog_b.anim";
+			notifies[0].frame = 9 * 2;
+			notifies[1].frame = 19 * 2;
+		}
+		else if (200.0f <= angle_ && angle_ < 250.0f) {
+			anim_id = "player_jog_lb.anim";
+			notifies[0].frame = 6 * 2;
+			notifies[1].frame = 17 * 2;
+		}
+		else if (250.0f <= angle_ && angle_ < 330.0f) {
+			anim_id = "player_jog_lf.anim";
+			notifies[0].frame = 6 * 2;
+			notifies[1].frame = 18 * 2;
+		}
+	}
+
+	if (anim_slot->GetCurAnimationId() != anim_id) {
+		anim_slot->SetAnimation(anim_id, 1.0, true, notifies);
 	}
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
 }
 
+void Player::OnUpdate()
+{
+	if (cur_hp_ <= 0) {
+		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
+		is_dead_ = true;
+	}
+
+
+	if (controller_enable_)
+	{
+		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
+		rotation_ = XMMatrixRotationY(camera->pitch_yaw.y);
+	}
+
+	Character::OnUpdate();
+	CalculateMovementAngle();
+	SetCharacterMovementAnimation();
+	ChangeWeapon();
+
+	// FlashLight Update
+	UpdateFlashLight();
+	UpdateTimer();
+}
+
 void Player::MoveRight()
 {
-	SetCharacterAnimation("A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += right_;
-}
+	if (controller_enable_ == false || is_rolling_ == true)
+		return;
 
-void Player::MoveRightForward()
-{
-	SetCharacterAnimation("A_TP_CH_Jog_RF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += front_;
-	movement_component_->direction += right_;
-}
-
-void Player::MoveRightBack()
-{
-	SetCharacterAnimation("A_TP_CH_Jog_RB_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= front_;
-	movement_component_->direction += right_;
+	GetMovementComponent()->accelaration_vector[0] += 1;
 }
 
 void Player::MoveLeft()
 {
-	SetCharacterAnimation("A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= right_;
-}
+	if (controller_enable_ == false || is_rolling_ == true)
+		return;
 
-void Player::MoveLeftForward()
-{
-	SetCharacterAnimation("A_TP_CH_Jog_LF_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += front_;
-	movement_component_->direction -= right_;
-}
-
-void Player::MoveLeftBack()
-{
-	SetCharacterAnimation("A_TP_CH_Jog_LB_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= front_;
-	movement_component_->direction -= right_;
+	GetMovementComponent()->accelaration_vector[0] -= 1;
 }
 
 void Player::MoveForward()
 {
-	SetCharacterAnimation("A_TP_CH_Jog_F_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction += front_;
+	if (controller_enable_ == false || is_rolling_ == true)
+		return;
+
+	GetMovementComponent()->accelaration_vector[2] += 1;
 }
 
 void Player::MoveBack()
 {
-	SetCharacterAnimation("A_TP_CH_Jog_B_Anim_Retargeted_Unreal Take.anim");
-	movement_component_->direction -= front_;
+	if (controller_enable_ == false || is_rolling_ == true)
+		return;
+
+	GetMovementComponent()->accelaration_vector[2] -= 1;
+}
+
+void Player::Roll()
+{
+	if (controller_enable_ == false || is_rolling_ == true)
+		return;
+	if (GetMovementComponent()->jump_pulse > 1.0f || GetMovementComponent()->gravity_pulse > 1.0f) {
+		return;
+	}
+
+	wchar_t output[32]; 
+	swprintf(output, 32, L"jump_pulse: %f\n", GetMovementComponent()->jump_pulse);
+
+	OutputDebugStringW(output);
+
+	swprintf(output, 32, L"gravity_pulse: %f\n", GetMovementComponent()->gravity_pulse);
+	OutputDebugStringW(output);
+
+	roll_ = true;
 }
 
 void Player::Jump()
 {
-	movement_component_->jump_pulse = 500.0f;
+	if (controller_enable_ == false || is_rolling_ == true)
+		return;
+
+	if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
+		GetMovementComponent()->jump_pulse = 150.0f;
+		EVENT->PushEvent<SoundGenerateEvent>(entity_id_, SFX, "S_CH_Jump_Start.wav", 1.0f, false);
+	}
 }
 
-void Player::Idle()
+void Player::Attack()
 {
-	SetCharacterAnimation("A_TP_CH_Breathing_Anim_Retargeted_Unreal Take.anim");
-}
+	if (cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE)
+	{
+		if (is_attacking_ || is_aiming_ == false)
+			return;
 
-void Player::Fire()
-{
-	if (is_aiming_ && !is_firing_) {
+		if (cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE] <= 0)
+			return;
 
-		is_firing_ = true;
+		is_attacking_ = true;
+
+		return;
+	}
+
+	if (cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON)
+	{
+		is_attacking_ = true;
+		//MeeleAttack();
+		return;
+	}
+		
+	if (is_aiming_ && !is_attacking_ && cur_weapon_using_remained_[static_cast<int>(cur_equipped_weapon_)] > 0) {
+		cur_weapon_using_remained_[static_cast<int>(cur_equipped_weapon_)]--;
+		is_attacking_ = true;
 
 		// Make Muzzle when Shot
-		auto player_transform = GetTransformMatrix();
-		XMVECTOR s, r, t;
-		XMMatrixDecompose(&s, &r, &t, player_transform);
-		EFFECT_MGR->SpawnEffect<FX_Muzzle>(t);
+		XMVECTOR player_position = GetCurPosition();
+		if (cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE)
+		{
+			player_position += front_ * 40.0f;
+			player_position += right_ * -3.0f;
+			player_position += XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) * 40.0f;
+		}
+		else if (cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN)
+		{
+			player_position += front_ * 35.0f;
+			player_position += right_ * 6.0f;
+			player_position += XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) * 45.0f;
+		}
+		
+		EFFECT_MGR->SpawnEffect<FX_Muzzle>(player_position);
+
+		// Make Shot Sound when Shot
+		auto& generator = reg_scene_->get<C_SoundGenerator>(GetEntityId());
+		SoundQueue queue;
+		queue.sound_filename = "S_WEP_Fire_001.wav";
+		queue.sound_type = SoundType::SFX;
+		queue.sound_volume = 0.5f;
+		queue.is_looping = false;
+		generator.sound_queue_list.push(queue);
 
 		// Make Shot Impact Effect
 		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
  		RayShape ray = ingame_scene->GetCameraSystem().CreateFrontRay();
-		EVENT->PushEvent<AttackEvent>(vector<RayShape>{ray}, entity_id_);
+		EVENT->PushEvent<AttackEvent_SingleRay>(ray, entity_id_);
 	}
 }
 
-void Player::Aim()
+void Player::Aim(bool active)
 {
 	C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-	if (is_aiming_ == false) {
-		is_aiming_ = true;
+	if (camera == nullptr)
+		return;
+
+	if (active)
 		camera->target_rotation = 20;
-		reg_scene_->emplace_or_replace<C_Camera>(entity_id_, *camera);
-	}
-	else {
-		is_aiming_ = false;
+	else
 		camera->target_rotation = 0;
-		reg_scene_->emplace_or_replace<C_Camera>(entity_id_, *camera);
+
+	is_aiming_ = active;
+}
+
+void Player::Reload()
+{
+	if (is_reloading_ == false && cur_weapon_total_remained_[static_cast<int>(cur_equipped_weapon_)] > 0) {
+		is_reloading_ = true;
 	}
 }
 
 void Player::ThrowGrenade()
 {
-	if (grenade_timer_ < grenade_cooltime_)
-		return;
-
-	grenade_timer_ -= grenade_cooltime_;
+	cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::GRENADE]--;
 
 	auto grenade_entity = SCENE_MGR->AddActor<Grenade>();
 	auto grenade_actor = SCENE_MGR->GetActor<Grenade>(grenade_entity); 
-	XMVECTOR s, r, t;
-	XMMatrixDecompose(&s, &r, &t, transform_matrix_);
-	XMVECTOR pos = XMVectorAdd(t, XMVectorSet(0.0f, 50.0f, 0.0f, 0.0f));
+	XMVECTOR pos = cur_position_;
+	pos += right_ * 5.0f;
+	//pos += front_;
+	pos += XMVectorSet(0.0f, 40.0f, 0.0f, 0.0f);
 	grenade_actor->SetPos(pos);
-	XMVECTOR dir = XMVectorAdd(front_, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
-	grenade_actor->SetDir(dir, 4.0f);
+	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+	XMVECTOR dir = ingame_scene->GetCameraSystem().GetCamera()->look;
+	grenade_actor->SetDir(dir, 15.0f);
+}
+
+void Player::MeeleAttack()
+{
+	is_attacking_ = true;
+	C_CapsuleCollision* capsule_collision = GetCapsuleComponent();
+	if (capsule_collision == nullptr)
+		return;
+	
+	SphereShape attack_sphere;
+
+	auto capsule_info = GetTipBaseAB(capsule_collision->capsule);
+	XMVECTOR shepre_center = capsule_info[3] +(front_ * capsule_collision->capsule.radius * 3);
+	attack_sphere.center = _XMFLOAT3(shepre_center);
+	attack_sphere.radius = capsule_collision->capsule.radius * 2;
+
+	EVENT->PushEvent<AttackEvent_BoundSphere>(50, attack_sphere, entity_id_);
 }
 
 bool Player::IsAiming()
@@ -230,16 +391,36 @@ bool Player::IsAiming()
 	return is_aiming_;
 }
 
+bool Player::IsReloading()
+{
+	return is_reloading_;
+}
+
+void Player::InteractionRotate(XMVECTOR interaction_pos)
+{
+	controller_enable_ = false;
+	
+	XMVECTOR player_pos = GetCurPosition();
+	XMVECTOR direction = XMVector3Normalize(interaction_pos - player_pos);
+	float angle = XMVector3AngleBetweenVectors(XMVectorSet(0, 0, 1, 0), direction).m128_f32[0];
+	if (XMVectorGetX(XMVector3Dot(XMVectorSet(1, 0, 0, 0), direction)) < 0)
+		angle *= -1.0f;
+
+	XMMATRIX rotation_matrix = XMMatrixRotationY(angle);
+	transform_tree_.root_node->Rotate(*reg_scene_, entity_id_, player_pos, rotation_matrix);
+}
+
 void Player::ResetPos()
 {
-	transform_matrix_ = XMMatrixTranslationFromVector({ 0.f, 100.f, 0.f, 0.f });
-	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, transform_matrix_);
+	spawn_point.m128_f32[1] += 100.f;
+	cur_position_ = spawn_point;
+	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
 void Player::SetPos(const XMVECTOR& position)
 {
-	transform_matrix_ = XMMatrixTranslationFromVector(position);
-	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, transform_matrix_);
+	cur_position_ = position;
+	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
 float Player::GetMaxHp() const
@@ -254,7 +435,12 @@ void Player::SetCurHp(int hp)
 
 void Player::TakeDamage(int damage)
 {
-	cur_hp_ -= damage;
+	if (is_hit_ == true || is_rolling_) {
+		return;
+	}
+
+	is_hit_ = true;
+	cur_hp_ -= damage;	
 }
 
 float Player::GetCurHp() const
@@ -288,8 +474,6 @@ void Player::AddFlashLight()
 	//XMStoreFloat3(&spot_light_comp.direction, camera.look);
 
 	transform_tree_.AddNodeToNode(TYPE_ID(C_Camera), TYPE_ID(C_SpotLight));
-
-	transform_tree_.root_node->OnUpdate(*reg_scene_, entity_id_, transform_matrix_);
 }
 
 void Player::UpdateFlashLight()
@@ -297,7 +481,10 @@ void Player::UpdateFlashLight()
 	static bool flash_onoff = false;
 
 	if (DINPUT->GetKeyState(DIK_F) == KEY_PUSH)
+	{
 		flash_onoff = !flash_onoff;
+		EVENT->PushEvent<SoundGenerateEvent>(entity_id_, SFX, "S_WEP_Flashlight_Click.wav", 1.0f, false);
+	}
 
 	auto& spot_light_comp = reg_scene_->get<C_SpotLight>(entity_id_);
 
@@ -329,9 +516,49 @@ void Player::UpdateFlashLight()
 	
 }
 
+void Player::CalculateMovementAngle()
+{
+	XMVECTOR velocity = GetMovementComponent()->velocity;
+	velocity.m128_f32[1] = 0;
+	direction_ = XMVector3Transform(XMVector3Normalize(velocity), rotation_);
+	float dot_product = XMVectorGetX(XMVector3Dot(front_, direction_));
+
+	angle_ = XMVectorGetX(XMVector3AngleBetweenNormals(front_, direction_));
+
+	if (XMVectorGetX(XMVector3Dot(right_, direction_)) < 0)
+		angle_ = XM_2PI - angle_;
+	
+	angle_ = XMConvertToDegrees(angle_);
+	angle_ += 0.2f;
+}
+
+void Player::ChangeWeapon()
+{
+	if (is_aiming_ == true || is_reloading_ || is_rolling_ == true) {
+		return;
+	}
+	int cur_equipped_weapon = static_cast<int>(cur_equipped_weapon_);
+	cur_equipped_weapon += DINPUT->GetMouseWheel() / 120 * -1;
+
+	int num_of_weapon_type = static_cast<int>(EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE);
+	if (cur_equipped_weapon >= num_of_weapon_type) {
+		cur_equipped_weapon %= num_of_weapon_type;
+	}
+	if (cur_equipped_weapon < 0) {
+		cur_equipped_weapon = num_of_weapon_type - 1;
+	}
+
+	C_StaticMesh* stm_ptr = reg_scene_->try_get<C_StaticMesh>(entity_id_);
+	stm_ptr->socket_name = socket_ids_[cur_equipped_weapon];
+	stm_ptr->static_mesh_id = stm_ids_[cur_equipped_weapon];
+	stm_ptr->local = stm_local_[cur_equipped_weapon];
+
+	cur_equipped_weapon_ = static_cast<EQUIPPED_WEAPON>(cur_equipped_weapon);
+}
+
 void Player::UpdateTimer()
 {
-	// Grenade Timer
+	// Grenade Timerdd
 	if (grenade_timer_ < grenade_cooltime_)
 		grenade_timer_ += TIMER->GetDeltaTime();
 
@@ -382,24 +609,84 @@ bool Player::AcquireItem(shared_ptr<ItemBase> item)
 	return false;
 }
 
-void Player::UseItem(int slot)
+void Player::SelectSlot(int slot)
 {
-	if (INVENTORY_MAX <= slot)
+	selected_slot = slot;
+}
+
+void Player::DropItem()
+{
+	if (INVENTORY_MAX <= selected_slot)
 		return;
 
-	if (inventory_[slot] == NULL)
+	ItemBase* item_base = inventory_[selected_slot].get();
+	if (item_base == nullptr)
 		return;
 
-	if (inventory_timer_[slot] < inventory_[slot]->GetCooltime())
-		return;
-
-	inventory_[slot]->Use();
-
-	inventory_timer_[slot] = 0;
-
-	if (inventory_[slot]->GetCount() == 0)
+	SCENE_MGR->AddActor<Item>(item_base->item_type_, _XMFLOAT3(GetCurPosition()), 30);
+	item_base->Drop();
+	inventory_timer_[selected_slot] = 0;
+	if (item_base->GetCount() == 0)
 	{
-		inventory_[slot] = NULL;
+		inventory_[selected_slot] = NULL;
+	}	
+}
+
+void Player::UseItem()
+{
+	if (INVENTORY_MAX <= selected_slot)
+		return;
+
+	ItemBase* item_base = inventory_[selected_slot].get();
+	if (item_base == nullptr)
+		return;
+
+	if (item_base->item_type_ == ItemType::eRepairPart)
+		return;
+
+	if (inventory_timer_[selected_slot] < item_base->GetCooltime())
+		return;
+
+	item_base->Use();
+
+	inventory_timer_[selected_slot] = 0;
+
+	if (item_base->GetCount() == 0)
+	{
+		inventory_[selected_slot] = NULL;
+	}
+
+}
+
+bool Player::HasRepairPart()
+{
+	for (int i = 0; i < 4; ++i)
+	{
+		if (inventory_[i] == nullptr)
+			continue;
+
+		if (inventory_[i]->item_type_ == ItemType::eRepairPart)
+			return true;
+	}
+	return false;
+}
+
+void Player::UseRepairPart()
+{
+	for (auto& item : inventory_)
+	{
+		if (item == nullptr)
+			continue;
+
+		if (item.get()->item_type_ == ItemType::eRepairPart)
+		{
+			item->Use();
+			if (item->GetCount() == 0)
+			{
+				item = nullptr;
+			}
+			break;
+		}
 	}
 }
 
@@ -408,9 +695,92 @@ void Player::PickClosestItem()
 	if (selectable_items_.empty())
 		return;
 
+	bool getting_item_success = false;;
+
 	auto closest_item = selectable_items_.begin();
-	EVENT->PushEvent<DeleteActorEvent>(closest_item->second->entity_id_);
-	selectable_items_.erase(closest_item);
+	switch (closest_item->second->item_type_)
+	{
+	case ItemType::eMedicalBox:
+	{
+		shared_ptr<MedicalBoxItem> medical_box = make_shared<MedicalBoxItem>();
+		medical_box->OnCreate();
+		medical_box->AddCount(1);
+		medical_box->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(medical_box);
+		break;
+	}
+	case ItemType::eHealKit:
+	{
+		shared_ptr<HealKitItem> heal_kit = make_shared<HealKitItem>();
+		heal_kit->OnCreate();
+		heal_kit->AddCount(1);
+		heal_kit->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(heal_kit);
+		break;
+	}
+	case ItemType::eEnergyDrink:
+	{
+		shared_ptr<EnergyDrinkItem> energy_drink = make_shared<EnergyDrinkItem>();
+		energy_drink->OnCreate();
+		energy_drink->AddCount(1);
+		energy_drink->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(energy_drink);
+		break;
+	}
+	case ItemType::eDrug:
+	{
+		shared_ptr<DrugItem> drug = make_shared<DrugItem>();
+		drug->OnCreate();
+		drug->AddCount(1);
+		drug->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(drug);
+		break;
+	}
+	case ItemType::eAR_Ammo:
+	{
+		shared_ptr<ARAmmoItem> ar_ammo = make_shared<ARAmmoItem>();
+		ar_ammo->OnCreate();
+		ar_ammo->AddCount(1);
+		ar_ammo->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(ar_ammo);
+		break;
+	}
+	case ItemType::ePistol_Ammo:
+	{
+		shared_ptr<PistolAmmoItem> pistol_ammo = make_shared<PistolAmmoItem>();
+		pistol_ammo->OnCreate();
+		pistol_ammo->AddCount(1);
+		pistol_ammo->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(pistol_ammo);
+		break;
+	}
+	case ItemType::eGrenade:
+	{
+		shared_ptr<GrenadeItem> grenade = make_shared<GrenadeItem>();
+		grenade->OnCreate();
+		grenade->AddCount(1);
+		grenade->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(grenade);
+		break;
+	}
+	case ItemType::eRepairPart:
+	{
+		shared_ptr<RepairPartItem> repair_part = make_shared<RepairPartItem>();
+		repair_part->OnCreate();
+		repair_part->AddCount(1);
+		repair_part->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(repair_part);
+		break;
+	}
+	}
+
+	if (getting_item_success)
+	{
+		EVENT->PushEvent<DeleteActorEvent>(closest_item->second->entity_id_);
+		selectable_items_.erase(closest_item);
+		selectable_counts_--;
+	}
+	
 }
 
 vector<shared_ptr<ItemBase>>& Player::GetInventory()
@@ -421,4 +791,10 @@ vector<shared_ptr<ItemBase>>& Player::GetInventory()
 vector<float>& Player::GetInventoryTimer()
 {
 	return inventory_timer_;
+}
+
+void Player::SetSpawnPoint(XMVECTOR point)
+{
+	spawn_point = point;
+	ResetPos();
 }

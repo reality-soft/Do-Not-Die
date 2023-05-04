@@ -1,5 +1,6 @@
 #include "TestWidget.h"
 
+#ifdef _DEBUG
 void reality::TestWidget::Update()
 {
 	ImGui::SetCurrentContext(GUI->GetContext());
@@ -91,3 +92,4 @@ void reality::PropertyWidget::Render()
 
 	ImGui::End();
 }
+#endif
