@@ -76,6 +76,7 @@ void InGameScene::OnInit()
 	QUADTREE->CreatePhysicsCS();
 	QUADTREE->InitCollisionMeshes();
 	QUADTREE->SetBlockingFields("DND_Blocking_1");
+	QUADTREE->view_collisions_ = true;
 
 	XMVECTOR plyer_spawn = QUADTREE->GetGuideLines("DND_PlayerStart_1")->begin()->line_nodes.begin()->second;
 	player_actor->SetSpawnPoint(plyer_spawn);

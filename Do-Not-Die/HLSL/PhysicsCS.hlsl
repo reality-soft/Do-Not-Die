@@ -370,7 +370,7 @@ uint GI : SV_GroupIndex)
     // Capsule Collision Check
     CapsuleShape capsule = character_capsules[GTid.x];
 
-    if (capsule.radius > 1.0f)
+    if (capsule.radius > 0.999f)
     {
         CapsuleResult capsule_result;
 
@@ -434,7 +434,7 @@ uint GI : SV_GroupIndex)
     // Sphere Triangle Check
     SphereShape sphere = spheres[GTid.x];
 
-    if (sphere.radius > 1.0f)
+    if (sphere.radius > 0.999f)
     {
         SphereResult sphere_result;
 

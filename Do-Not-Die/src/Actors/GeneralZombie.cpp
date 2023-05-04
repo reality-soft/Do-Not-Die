@@ -107,6 +107,9 @@ void GeneralZombie::TakeDamage(int damage)
 
 void GeneralZombie::AddImpulse(XMVECTOR direction, float strength)
 {
+	if (cur_hp_ <= 0)
+		return;
+
 	CancelMovement();
 	auto c_capsule = GetCapsuleComponent();
 	if (c_capsule)

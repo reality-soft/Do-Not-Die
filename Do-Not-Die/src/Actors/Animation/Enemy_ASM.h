@@ -199,6 +199,9 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
+			GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(animation_state_machine->GetOwnerId());
+			enemy->GetCapsuleComponent()->capsule.height = 3.f;
+			enemy->GetCapsuleComponent()->capsule.radius = 3.f;
 			animation_state_machine->SetAnimation("Zombie_Death_Back_Mid_1_IPC_Anim_Unreal Take.anim", 0.5f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
