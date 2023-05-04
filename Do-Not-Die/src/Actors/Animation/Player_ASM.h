@@ -755,7 +755,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_ar_idle_pose.anim", 0.3f);
+			animation_base->SetAnimation("player_ar_idle_pose.anim", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -771,7 +771,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.3f);
+			animation_base->SetAnimation("", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -787,7 +787,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.3f);
+			animation_base->SetAnimation("", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -803,7 +803,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_ar_aim_pose.anim", 0.3f); 
+			animation_base->SetAnimation("player_ar_aim_pose.anim", 0.3f, true); 
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Aim_In.wav", 1.0f, false);
 		}
@@ -821,7 +821,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_hg_aim_pose.anim", 0.3f);
+			animation_base->SetAnimation("player_hg_aim_pose.anim", 0.3f, true);
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Aim_In.wav", 1.0f, false);
 		}
@@ -839,7 +839,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.3f);
+			animation_base->SetAnimation("", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -855,7 +855,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_gr_aim_pose.anim", 0.3f);
+			animation_base->SetAnimation("player_gr_aim_pose.anim", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -871,7 +871,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_ar_fire.anim", 0.0f);
+			animation_base->SetAnimation("player_ar_fire.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -889,7 +889,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_hg_fire.anim", 0.0f);
+			animation_base->SetAnimation("player_hg_fire.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -909,7 +909,7 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 			executed = false;
-			animation_base->SetAnimation("player_melee_attack.anim", 0.1f);
+			animation_base->SetAnimation("player_melee_attack.anim", 0.1f, true);
 			//auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			//sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Axe_Attack.mp3", 1.0f, false);
 		}
@@ -941,7 +941,7 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 			executed = false;
-			animation_base->SetAnimation("player_gr_throw.anim", 0.2f);
+			animation_base->SetAnimation("player_gr_throw.anim", 0.2f, true);
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			sm->GetPlayer()->AddSoundQueue(SFX, "S_CH_Grenade_Throw.wav", 1.0f, false);
 		}
@@ -978,7 +978,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_ar_reload.anim", 0.3f);
+			animation_base->SetAnimation("player_ar_reload.anim", 0.3f, true);
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_AR_01_Reload.wav", 1.0f, false);
 		}
@@ -1011,7 +1011,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_hg_reload.anim", 0.3f);
+			animation_base->SetAnimation("player_hg_reload.anim", 0.3f, true);
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Handgun_Reload.wav", 1.0f, false);
 		}
@@ -1043,7 +1043,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_ar_idle_pose_hit_react.anim", 0.0f);
+			animation_base->SetAnimation("player_ar_idle_pose_hit_react.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -1062,7 +1062,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_ar_aim_pose_hit_react.anim", 0.0f);
+			animation_base->SetAnimation("player_ar_aim_pose_hit_react.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -1081,7 +1081,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_idle_hit_react.anim", 0.5f);
+			animation_base->SetAnimation("player_idle_hit_react.anim", 0.5f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -1100,7 +1100,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_hg_aim_pose_hit_react.anim", 0.0f);
+			animation_base->SetAnimation("player_hg_aim_pose_hit_react.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -1120,7 +1120,7 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 
-			animation_base->SetAnimation("player_idle_hit_react.anim", 0.0f);
+			animation_base->SetAnimation("player_idle_hit_react.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -1139,7 +1139,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_idle_hit_react.anim", 0.0f);
+			animation_base->SetAnimation("player_idle_hit_react.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -1158,7 +1158,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_gr_aim_pose_hit_react.anim", 0.0f);
+			animation_base->SetAnimation("player_gr_aim_pose_hit_react.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{

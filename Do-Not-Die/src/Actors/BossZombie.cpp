@@ -44,7 +44,7 @@ void BossZombie::OnInit(entt::registry& registry)
 		//animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_Punch_R.anim", 0.0);
 		//animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_Run.anim", 0.0);
 		//animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_StrongPunch.anim", 0.0);
-		animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_Walk.anim", 0.0);
+		animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_Walk.anim", 0.0, false);
 		reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 	}
 

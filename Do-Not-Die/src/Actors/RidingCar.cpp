@@ -18,7 +18,7 @@ void RidingCar::OnInit(entt::registry& registry)
 
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_Car_Riding_Anim.anim", 0.0);
+	animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_Car_Riding_Anim.anim", 0.0, true);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_SkeletalMesh));
