@@ -160,10 +160,14 @@ public:
 	class Move_Base : public AnimationState {
 	public:
 		Move_Base() : AnimationState(MOVE_BASE) {}
+		
+		
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_state_machine->SetAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim", 0.8f, true);
+			vector<AnimNotify> notifies;
+			notifies.push_back({ 1, make_shared<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "Zombie_Move_1.mp3", 0.5f, false), true });
+			animation_state_machine->SetAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim", 0.8f, true, notifies);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -180,6 +184,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
+			EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieHit_1.wav", 0.5f, false);
 			animation_state_machine->SetAnimation("Zombie_Atk_KnockBack_1_IPC_Anim_Unreal Take.anim", 0.8f, true);
 			SCENE_MGR->GetActor<GeneralZombie>(animation_state_machine->GetOwnerId())->is_hit_ = false;
 		}
@@ -199,6 +204,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
+			EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieDie_1.wav", 0.5f, false);
 			GeneralZombie* enemy = SCENE_MGR->GetActor<GeneralZombie>(animation_state_machine->GetOwnerId());
 			enemy->GetCapsuleComponent()->capsule.height = 3.f;
 			enemy->GetCapsuleComponent()->capsule.radius = 3.f;
@@ -458,6 +464,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
+			EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieAttack_1.mp3", 0.5f, false);
 			animation_state_machine->SetAnimation("Zombie_Atk_Arms_3_SHORT_Loop_IPC_Retargeted_Unreal Take.anim", 0.5f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
