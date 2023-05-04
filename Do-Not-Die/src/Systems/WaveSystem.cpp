@@ -1,7 +1,7 @@
 #include "WaveSystem.h"
 #include "GameEvents.h"
 #include "Player.h"
-#include "GeneralZombie.h"
+#include "NormalZombie.h"
 #include "Item.h"
 #include "FX_Flame.h"
 #include "FX_Smoke.h"
@@ -239,7 +239,7 @@ void reality::WaveSystem::SpawnZombies(float interval)
 	if (cur_time < interval)
 		return;
 
-	auto enemy_actor = SCENE_MGR->GetActor<GeneralZombie>(SCENE_MGR->AddActor<GeneralZombie>());
+	auto enemy_actor = SCENE_MGR->GetActor<NormalZombie>(SCENE_MGR->AddActor<NormalZombie>());
 	if (enemy_actor == nullptr)
 		return;
 

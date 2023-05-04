@@ -118,7 +118,8 @@ void Player::OnInit(entt::registry& registry)
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 4, "Spine_01");
+	animation_component.AddNewAnimSlot<PlayerFullBodyAnimationStateMachine>("FullBody", entity_id_, skm.skeletal_mesh_id, 1, "Root");
 	auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_component.GetAnimSlotByName("UpperBody");
 	sm->SetPlayer(this);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
@@ -169,8 +170,11 @@ void Player::SetCharacterMovementAnimation()
 
 void Player::OnUpdate()
 {
-	if (cur_hp_ <= 0)
+	if (cur_hp_ <= 0) {
 		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
+		is_dead_ = true;
+	}
+
 
 	if (controller_enable_)
 	{
@@ -190,7 +194,7 @@ void Player::OnUpdate()
 
 void Player::MoveRight()
 {
-	if (controller_enable_ == false)
+	if (controller_enable_ == false || is_rolling_ == true)
 		return;
 
 	GetMovementComponent()->accelaration_vector[0] += 1;
@@ -198,7 +202,7 @@ void Player::MoveRight()
 
 void Player::MoveLeft()
 {
-	if (controller_enable_ == false)
+	if (controller_enable_ == false || is_rolling_ == true)
 		return;
 
 	GetMovementComponent()->accelaration_vector[0] -= 1;
@@ -206,7 +210,7 @@ void Player::MoveLeft()
 
 void Player::MoveForward()
 {
-	if (controller_enable_ == false)
+	if (controller_enable_ == false || is_rolling_ == true)
 		return;
 
 	GetMovementComponent()->accelaration_vector[2] += 1;
@@ -214,15 +218,34 @@ void Player::MoveForward()
 
 void Player::MoveBack()
 {
-	if (controller_enable_ == false)
+	if (controller_enable_ == false || is_rolling_ == true)
 		return;
 
 	GetMovementComponent()->accelaration_vector[2] -= 1;
 }
 
+void Player::Roll()
+{
+	if (controller_enable_ == false || is_rolling_ == true)
+		return;
+	if (GetMovementComponent()->jump_pulse > 1.0f || GetMovementComponent()->gravity_pulse > 1.0f) {
+		return;
+	}
+
+	wchar_t output[32]; 
+	swprintf(output, 32, L"jump_pulse: %f\n", GetMovementComponent()->jump_pulse);
+
+	OutputDebugStringW(output);
+
+	swprintf(output, 32, L"gravity_pulse: %f\n", GetMovementComponent()->gravity_pulse);
+	OutputDebugStringW(output);
+
+	roll_ = true;
+}
+
 void Player::Jump()
 {
-	if (controller_enable_ == false)
+	if (controller_enable_ == false || is_rolling_ == true)
 		return;
 
 	if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
@@ -407,7 +430,7 @@ void Player::SetCurHp(int hp)
 
 void Player::TakeDamage(int damage)
 {
-	if (is_hit_ == true) {
+	if (is_hit_ == true || is_rolling_) {
 		return;
 	}
 
@@ -506,7 +529,7 @@ void Player::CalculateMovementAngle()
 
 void Player::ChangeWeapon()
 {
-	if (is_aiming_ == true || is_reloading_) {
+	if (is_aiming_ == true || is_reloading_ || is_rolling_ == true) {
 		return;
 	}
 	int cur_equipped_weapon = static_cast<int>(cur_equipped_weapon_);
