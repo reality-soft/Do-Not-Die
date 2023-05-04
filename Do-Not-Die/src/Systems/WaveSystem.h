@@ -29,7 +29,7 @@ namespace reality
 		void PlayerRepairCar();
 		void SpawnRepairItem(XMFLOAT3 position);
 		void DeleteExtractPoint(entt::entity ent);
-		void SpawnZombies(float interval, UINT count);
+		void SpawnZombies(float interval);
 		void SpawnCarSmokes();
 
 		void WaveStart();

@@ -27,8 +27,6 @@ void Grenade::OnInit(entt::registry& registry)
 	sound_gen.world = XMMatrixIdentity();
 	registry.emplace_or_replace<reality::C_SoundGenerator>(entity_id_, sound_gen);
 
-	QUADTREE->RegistDynamicSphere(GetEntityId());
-
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(C_SphereCollision));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_SphereCollision), TYPE_ID(C_StaticMesh));
 

@@ -6,8 +6,8 @@ void BossZombie::OnInit(entt::registry& registry)
 	tag = "enemy";
 
 	// setting character data
-	movement_component_->max_speed = 100;
-	movement_component_->acceleration = 100;
+	GetMovementComponent()->max_speed = 100;
+	GetMovementComponent()->acceleration = 100;
 	max_hp_ = cur_hp_ = 100;
 	damage_ = 10.0f;
 

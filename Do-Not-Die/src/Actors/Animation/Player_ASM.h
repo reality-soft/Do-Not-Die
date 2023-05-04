@@ -918,7 +918,7 @@ public:
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{
-			if (animation_base->GetCurAnimation().cur_frame_ > 36.0f && !executed)
+			if (animation_base->GetCurAnimation().cur_frame_ > 30.0f && !executed)
 			{
 				auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 				auto entity = animation_base->GetOwnerId();
