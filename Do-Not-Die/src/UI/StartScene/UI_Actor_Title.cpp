@@ -64,24 +64,28 @@ void UI_Actor_Title::CreateUI()
 	// New Game Button
 	newgame_button_ = make_shared<UI_Button>();
 	newgame_button_->InitButton("T_Button_NewGame_Normal.png", "T_Button_NewGame_Hover.png", "T_Button_NewGame_Pushed.png");
+	newgame_button_->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
 	newgame_button_->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f }, 200.0f, 70.0f);
 	ui_comp_->ui_list.insert({ "1_New Game Button", newgame_button_ });
 
 	// Load Game Button
 	loadinggame_button = make_shared<UI_Button>();
 	loadinggame_button->InitButton("T_Button_LoadGame_Normal.png", "T_Button_LoadGame_Hover.png", "T_Button_LoadGame_Pushed.png");
+	loadinggame_button->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
 	loadinggame_button->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f + 70.0f * 1.0f }, 200.0f, 70.0f);
 	ui_comp_->ui_list.insert({ "1_Load Game Button", loadinggame_button });
 
 	// Option Button
 	option_button_ = make_shared<UI_Button>();
 	option_button_->InitButton("T_Button_Option_Normal.png", "T_Button_Option_Hover.png", "T_Button_Option_Pushed.png");
+	option_button_->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
 	option_button_->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f + 70.0f * 2.0f }, 200.0f, 70.0f);
 	ui_comp_->ui_list.insert({ "1_Option Button", option_button_ });
 
 	// Exit Button
 	exit_button_ = make_shared<UI_Button>();
 	exit_button_->InitButton("T_Button_Exit_Normal.png", "T_Button_Exit_Hover.png", "T_Button_Exit_Pushed.png");
+	exit_button_->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
 	exit_button_->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f + 70.0f * 3.0f }, 200.0f, 70.0f);
 	ui_comp_->ui_list.insert({ "1_Exit Button", exit_button_ });
 
@@ -109,13 +113,17 @@ void reality::UI_Actor_Title::FadeInUI()
 {
 	static float timer = 0.0f;
 	static float alpha = 0.0f;
-
+	static bool executed = false;
 	if (alpha >= 1.0f)
 	{
-		newgame_button_->On();
-		loadinggame_button->On();
-		option_button_->On();
-		exit_button_->On();
+		if (!executed)
+		{
+			newgame_button_->On();
+			loadinggame_button->On();
+			option_button_->On();
+			exit_button_->On();
+			executed = true;
+		}
 		return;
 	}
 
@@ -160,7 +168,6 @@ void reality::UI_Actor_Title::DisappearUI()
 void UI_Actor_Title::UpdateUI()
 {
 	FadeInUI();
-
 
 	// When NewGame Button Selected
 	if (newgame_button_->GetCurrentState() == E_UIState::UI_SELECT)

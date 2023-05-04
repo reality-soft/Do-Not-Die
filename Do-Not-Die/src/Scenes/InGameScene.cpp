@@ -76,6 +76,7 @@ void InGameScene::OnInit()
 	QUADTREE->CreatePhysicsCS();
 	QUADTREE->InitCollisionMeshes();
 	QUADTREE->SetBlockingFields("DND_Blocking_1");
+	QUADTREE->view_collisions_ = true;
 
 	XMVECTOR plyer_spawn = QUADTREE->GetGuideLines("DND_PlayerStart_1")->begin()->line_nodes.begin()->second;
 	player_actor->SetSpawnPoint(plyer_spawn);
@@ -84,7 +85,7 @@ void InGameScene::OnInit()
 	loading_progress = LOADING_ACTOR;
 	
 	environment_.CreateEnvironment();
-	environment_.SetWorldTime(10, 10);
+	environment_.SetWorldTime(10, 120);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.1f, 0.25f);
@@ -100,12 +101,11 @@ void InGameScene::OnInit()
 	sys_trigger_.OnCreate(reg_scene_);
 
 #ifdef _DEBUG
-	QUADTREE->view_collisions_ = true;
 	GUI->AddWidget<PropertyWidget>("property");
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("FPS", &TIMER->fps);
 #endif
 
-	// BossZombie Test
+	//BossZombie Test
 	BossZombie* boss = GetActor<BossZombie>(AddActor<BossZombie>());
 	if (boss)
 		boss->ApplyMovement(player_actor->GetCurPosition() + XMVectorSet(0, -100, 0, 0));

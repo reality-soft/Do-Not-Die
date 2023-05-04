@@ -13,8 +13,8 @@ void GeneralZombie::OnInit(entt::registry& registry)
 	tag = "enemy";
 
 	// setting character data
-	movement_component_->max_speed = 100;
-	movement_component_->acceleration = 100;
+	GetMovementComponent()->max_speed = 100;
+	GetMovementComponent()->acceleration = 100;
 	max_hp_ = cur_hp_ = 100;
 	damage_ = 10.0f;
 
@@ -22,7 +22,7 @@ void GeneralZombie::OnInit(entt::registry& registry)
 	C_TriggerSensor trigger_sensor;
 	trigger_sensor.can_sense_tags.insert("defense");
 	registry.emplace<reality::C_TriggerSensor>(entity_id_, trigger_sensor);
-
+	
 	// setting character objects
 	reality::C_SkeletalMesh skm;
 	skm.local = XMMatrixIdentity();
@@ -83,7 +83,7 @@ void GeneralZombie::Attack()
 	auto c_enemy_capsule = reg_scene_->try_get<C_CapsuleCollision>(entity_id_);
 	if (c_enemy_capsule == nullptr)
 		return;
-
+	 
 	RayShape attack_ray;
 	attack_ray.start = _XMFLOAT3(GetTipBaseAB(c_enemy_capsule->capsule)[3]);
 	attack_ray.end = _XMFLOAT3((_XMVECTOR3(attack_ray.start) + (front_ * attack_distance_)));
@@ -137,7 +137,7 @@ void GeneralZombie::SetMovement(const XMVECTOR& direction)
 
 	rotation_ = XMMatrixRotationY(angle);
 
-	movement_component_->accelaration_vector[2] = 1;
+	GetMovementComponent()->accelaration_vector[2] = 1;
 }
 
 void GeneralZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)

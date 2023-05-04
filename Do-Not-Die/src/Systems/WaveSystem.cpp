@@ -24,7 +24,7 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 
 void reality::WaveSystem::OnUpdate(entt::registry& reg)
 {
-	float counting_time = world_env_->GetCountingTime();
+	float counting_time = world_env_->GetCountingTime(); 
 	if (world_env_->IsDayChanged())
 	{
 		switch (world_env_->GetCurrentDay())
@@ -43,10 +43,10 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
-	SpawnZombies(1.f, 1);
+	SpawnZombies(1.f);
 	SpawnCarSmokes();
 
-	if (wave_count_ > 4 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0)
+	if (wave_count_ > 4 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0 && SCENE_MGR->GetNumOfActor("enemy") == 0)
 	{
 		EVENT->PushEvent<GameResultEvent>(GameResultType::eGameCleared);
 	}
@@ -225,49 +225,40 @@ void reality::WaveSystem::DeleteExtractPoint(entt::entity ent)
 	}
 }
 
-void reality::WaveSystem::SpawnZombies(float interval, UINT count)
+void reality::WaveSystem::SpawnZombies(float interval)
 {
-	if (zombie_spawn_ == false)
-		return;
-
 	static float cur_time = 0.0f;
-
 	cur_time += TM_DELTATIME;
 
-	if (zombie_spawn_count_ >= count)
+	if (zombie_spawn_count_ <= 0)
+	{
+		cur_time = 0.0f;
 		return;
-	
+	}
 
 	if (cur_time < interval)
 		return;
 
-	auto enemy_entity = SCENE_MGR->AddActor<GeneralZombie>();
-	// setting a character into quad tree
-	if (QUADTREE->RegistDynamicCapsule(enemy_entity) == false)
-	{
-		EVENT->PushEvent<DeleteActorEvent>(enemy_entity);
+	auto enemy_actor = SCENE_MGR->GetActor<GeneralZombie>(SCENE_MGR->AddActor<GeneralZombie>());
+	if (enemy_actor == nullptr)
+		return;
+
+	enemy_actor->targeting_car_health = &car_health;
+
+	int guidline_index = rand() % zomebie_tracks_->size();
+	int mesh_index = rand() % enemy_meshes.size();
+
+	guidline_index = 4;
+
+	vector<XMVECTOR> target_poses;
+	for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
+		target_poses.push_back(target_pos.second);
 	}
-	else
-	{
-		auto enemy_actor = SCENE_MGR->GetActor<GeneralZombie>(enemy_entity);
-		enemy_actor->targeting_car_health = &car_health;
+	enemy_actor->SetBehaviorTree(target_poses);
+	enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
 
-		int guidline_index = rand() % zomebie_tracks_->size();
-		int mesh_index = rand() % enemy_meshes.size();
-		
-		guidline_index = 4;
-
-		vector<XMVECTOR> target_poses;
-		for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
-			target_poses.push_back(target_pos.second);
-		}
-		enemy_actor->SetBehaviorTree(target_poses);
-		enemy_actor->SetMeshId(enemy_meshes[mesh_index]);
-
-		cur_time = 0.0f;
-		zombie_spawn_count_ += 1;
-	}
-	
+	cur_time = 0.0f;
+	zombie_spawn_count_ -= 1;	
 }
 
 void reality::WaveSystem::SpawnCarSmokes()
@@ -305,12 +296,11 @@ XMVECTOR reality::WaveSystem::GetCarPosition()
 
 void reality::WaveSystem::WaveStart()
 {
-	zombie_spawn_ = true;
+	zombie_spawn_count_ += 2;
 }
 
 void reality::WaveSystem::WaveFinish()
 {
 	wave_count_++;
-	zombie_spawn_count_ = 0;
 	RandomSpawnItem(30);
 }

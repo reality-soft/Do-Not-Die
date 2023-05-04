@@ -23,6 +23,7 @@ void UI_OptionWindow::InitOptionWindow()
 	// Option Close Button
 	option_close_button_ = make_shared<UI_Button>();
 	option_close_button_->InitButton("T_Button_Close_Normal.png", "T_Button_Close_Hover.png", "T_Button_Close_Normal.png");
+	option_close_button_->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
 	option_window_->AddChildUI("1_CloseButton", option_close_button_);
 	option_close_button_->SetLocalRectByCenter({ 450.0f, 42.0f }, 60.0f, 60.0f);
 
@@ -38,6 +39,8 @@ void UI_OptionWindow::InitOptionWindow()
 	option_resolution_list_box_->AddItem(E_Resolution_String[E_Resolution::R1920x1080]);
 	option_resolution_list_box_->AddItem(E_Resolution_String[E_Resolution::R1280x720]);
 	option_resolution_list_box_->SetItemSelected(E_Resolution_String[E_Resolution::R1920x1080]);
+	option_resolution_list_box_->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
+	option_resolution_list_box_->SetItemButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
 
 	resolution_value = option_resolution_list_box_->GetCurrentItem();
 
