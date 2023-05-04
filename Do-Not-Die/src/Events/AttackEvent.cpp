@@ -76,7 +76,7 @@ void AttackEvent_BoundSphere::Process()
 		
 		XMVECTOR hit_point = _XMVECTOR3(sphere_.center);
 		XMVECTOR hit_normal = -character_actor->GetFront();
-		EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(hit_point, hit_normal);
+		EFFECT_MGR->SpawnEffectFromNormal<FX_MeleeImpact>(hit_point, hit_normal);
 
 		auto general_zombie = SCENE_MGR->GetActor<GeneralZombie>(hit);
 		if (general_zombie)
