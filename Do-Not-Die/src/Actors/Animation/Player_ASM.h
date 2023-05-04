@@ -753,14 +753,14 @@ public:
 	public:
 		IdlePoseAR() : AnimationState(IDLE_POSE_AR) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_ar_idle_pose.anim", 0.3f, true);
+			animation_state_machine->SetAnimation("player_ar_idle_pose.anim", 0.3f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -769,14 +769,14 @@ public:
 	public:
 		IdlePoseHG() : AnimationState(IDLE_POSE_HG) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("", 0.3f, true);
+			animation_state_machine->SetAnimation("", 0.3f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -785,14 +785,14 @@ public:
 	public:
 		IdlePoseGR() : AnimationState(IDLE_POSE_GR) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("", 0.3f, true);
+			animation_state_machine->SetAnimation("", 0.3f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -801,16 +801,16 @@ public:
 	public:
 		AimPoseAR() : AnimationState(AIM_POSE_AR) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_ar_aim_pose.anim", 0.3f, true); 
-			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			animation_state_machine->SetAnimation("player_ar_aim_pose.anim", 0.3f, true);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_state_machine;
 			EVENT->PushEvent<SoundGenerateEvent>(sm->GetPlayer()->entity_id_, SFX, "S_WEP_Aim_In.wav", 1.0f, false);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -819,16 +819,16 @@ public:
 	public:
 		AimPoseHG() : AnimationState(AIM_POSE_HG) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_hg_aim_pose.anim", 0.3f, true);
-			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			animation_state_machine->SetAnimation("player_hg_aim_pose.anim", 0.3f, true);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_state_machine;
 			EVENT->PushEvent<SoundGenerateEvent>(sm->GetPlayer()->entity_id_, SFX, "S_WEP_Aim_In.wav", 1.0f, false);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -837,14 +837,14 @@ public:
 	public:
 		AimPoseMelee() : AnimationState(AIM_POSE_MELEE) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("", 0.3f, true);
+			animation_state_machine->SetAnimation("", 0.3f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -853,14 +853,14 @@ public:
 	public:
 		AimPoseGR() : AnimationState(AIM_POSE_GR) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_gr_aim_pose.anim", 0.3f, true);
+			animation_state_machine->SetAnimation("player_gr_aim_pose.anim", 0.3f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -869,16 +869,16 @@ public:
 	public:
 		AttackAR() : AnimationState(ATTACK_AR) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_ar_fire.anim", 0.0f, true);
+			animation_state_machine->SetAnimation("player_ar_fire.anim", 0.0f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+			Player* player = SCENE_MGR->GetActor<Player>(animation_state_machine->GetOwnerId());
 			player->is_attacking_ = false;
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -887,16 +887,16 @@ public:
 	public:
 		AttackHG() : AnimationState(ATTACK_HG) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_hg_fire.anim", 0.0f, true);
+			animation_state_machine->SetAnimation("player_hg_fire.anim", 0.0f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+			Player* player = SCENE_MGR->GetActor<Player>(animation_state_machine->GetOwnerId());
 			player->is_attacking_ = false;
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -906,24 +906,24 @@ public:
 		AttackMelee() : AnimationState(ATTACK_MELEE) {}
 	public:
 		bool executed;
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			executed = false;
-			animation_base->SetAnimation("player_melee_attack.anim", 0.1f, true);
+			animation_state_machine->SetAnimation("player_melee_attack.anim", 0.1f, true);
 
-			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
-			EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Axe_Swing.wav", 0.5f, false);
+			Player* player = SCENE_MGR->GetActor<Player>(animation_state_machine->GetOwnerId());
+			EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Axe_Swing.wav", 1.0f, false);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+			Player* player = SCENE_MGR->GetActor<Player>(animation_state_machine->GetOwnerId());
 			player->is_attacking_ = false;
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
-			if (animation_base->GetCurAnimation().cur_frame_ > 24.0f && !executed)
+			if (animation_state_machine->GetCurAnimation().cur_frame_ > 24.0f && !executed)
 			{
-				Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+				Player* player = SCENE_MGR->GetActor<Player>(animation_state_machine->GetOwnerId());
 				if (player)
 				{
 					player->MeeleAttack();
@@ -938,16 +938,16 @@ public:
 		AttackGR() : AnimationState(ATTACK_GR) {}
 	public:
 		bool executed;
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			executed = false;
-			animation_base->SetAnimation("player_gr_throw.anim", 0.2f, true);
-			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			animation_state_machine->SetAnimation("player_gr_throw.anim", 0.2f, true);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_state_machine;
 			EVENT->PushEvent<SoundGenerateEvent>(sm->GetPlayer()->entity_id_, SFX, "S_CH_Grenade_Throw.wav", 1.0f, false);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			auto entity = animation_base->GetOwnerId();
+			auto entity = animation_state_machine->GetOwnerId();
 			Player* player = SCENE_MGR->GetActor<Player>(entity);
 			
 			player->is_attacking_ = false;
@@ -958,12 +958,12 @@ public:
 			}
 			
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
-			if (animation_base->GetCurAnimation().cur_frame_ > 30.0f && !executed)
+			if (animation_state_machine->GetCurAnimation().cur_frame_ > 30.0f && !executed)
 			{
-				auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
-				auto entity = animation_base->GetOwnerId();
+				auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_state_machine;
+				auto entity = animation_state_machine->GetOwnerId();
 				sm->GetPlayer()->ThrowGrenade();
 				auto static_mesh = sm->GetPlayer()->reg_scene_->try_get<C_StaticMesh>(entity);
 				static_mesh->static_mesh_id = "";
@@ -976,15 +976,15 @@ public:
 	public:
 		ReloadAR() : AnimationState(RELOAD_AR) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_ar_reload.anim", 0.3f, true);
-			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			animation_state_machine->SetAnimation("player_ar_reload.anim", 0.3f, true);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_state_machine;
 			EVENT->PushEvent<SoundGenerateEvent>(sm->GetPlayer()->entity_id_, SFX, "S_WEP_AR_01_Reload.wav", 1.0f, false);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+			Player* player = SCENE_MGR->GetActor<Player>(animation_state_machine->GetOwnerId());
 			player->is_reloading_ = false;
 
 			int count_to_reload = AUTO_RIFLE_MAX - player->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::AUTO_RIFLE];
@@ -1000,7 +1000,7 @@ public:
 			}
 			
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -1009,15 +1009,15 @@ public:
 	public:
 		ReloadHG() : AnimationState(RELOAD_HG) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_hg_reload.anim", 0.3f, true);
-			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
+			animation_state_machine->SetAnimation("player_hg_reload.anim", 0.3f, true);
+			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_state_machine;
 			EVENT->PushEvent<SoundGenerateEvent>(sm->GetPlayer()->entity_id_, SFX, "S_WEP_Handgun_Reload.wav", 1.0f, false);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			Player* player = SCENE_MGR->GetActor<Player>(animation_base->GetOwnerId());
+			Player* player = SCENE_MGR->GetActor<Player>(animation_state_machine->GetOwnerId());
 			player->is_reloading_ = false;
 
 			int count_to_reload = HAND_GUN_MAX - player->cur_weapon_using_remained_[(int)EQUIPPED_WEAPON::HAND_GUN];
@@ -1032,7 +1032,7 @@ public:
 				player->cur_weapon_total_remained_[(int)EQUIPPED_WEAPON::HAND_GUN] -= count_to_reload;
 			}
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -1041,17 +1041,17 @@ public:
 	public:
 		HitARIdle() : AnimationState(HIT_AR_IDLE) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_ar_idle_pose_hit_react.anim", 0.0f, true);
+			animation_state_machine->SetAnimation("player_ar_idle_pose_hit_react.anim", 0.0f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			entt::entity owner_id = animation_base->GetOwnerId();
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			player->is_hit_ = false;
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -1060,17 +1060,17 @@ public:
 	public:
 		HitARAim() : AnimationState(HIT_AR_AIM) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_ar_aim_pose_hit_react.anim", 0.0f, true);
+			animation_state_machine->SetAnimation("player_ar_aim_pose_hit_react.anim", 0.0f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			entt::entity owner_id = animation_base->GetOwnerId();
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			player->is_hit_ = false;
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -1079,17 +1079,17 @@ public:
 	public:
 		HitHGIdle() : AnimationState(HIT_HG_IDLE) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_idle_hit_react.anim", 0.5f, true);
+			animation_state_machine->SetAnimation("player_idle_hit_react.anim", 0.5f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			entt::entity owner_id = animation_base->GetOwnerId();
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			player->is_hit_ = false;
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -1098,17 +1098,17 @@ public:
 	public:
 		HitHGAim() : AnimationState(HIT_HG_AIM) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_hg_aim_pose_hit_react.anim", 0.0f, true);
+			animation_state_machine->SetAnimation("player_hg_aim_pose_hit_react.anim", 0.0f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			entt::entity owner_id = animation_base->GetOwnerId();
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			player->is_hit_ = false;
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -1117,18 +1117,18 @@ public:
 	public:
 		HitMelee() : AnimationState(HIT_MELEE) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 
-			animation_base->SetAnimation("player_idle_hit_react.anim", 0.0f, true);
+			animation_state_machine->SetAnimation("player_idle_hit_react.anim", 0.0f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			entt::entity owner_id = animation_base->GetOwnerId();
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			player->is_hit_ = false;
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -1137,17 +1137,17 @@ public:
 	public:
 		HitGRIdle() : AnimationState(HIT_GR_IDLE) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_idle_hit_react.anim", 0.0f, true);
+			animation_state_machine->SetAnimation("player_idle_hit_react.anim", 0.0f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			entt::entity owner_id = animation_base->GetOwnerId();
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			player->is_hit_ = false;
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};
@@ -1156,17 +1156,223 @@ public:
 	public:
 		HitGRAim() : AnimationState(HIT_GR_AIM) {}
 	public:
-		virtual void Enter(AnimationStateMachine* animation_base) override
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_base->SetAnimation("player_gr_aim_pose_hit_react.anim", 0.0f, true);
+			animation_state_machine->SetAnimation("player_gr_aim_pose_hit_react.anim", 0.0f, true);
 		}
-		virtual void Exit(AnimationStateMachine* animation_base) override
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			entt::entity owner_id = animation_base->GetOwnerId();
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			player->is_hit_ = false;
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+	};
+};
+
+class PlayerFullBodyAnimationStateMachine : public AnimationStateMachine {
+public:
+	enum States {
+		NONE, 
+		DODGE_ROLL,
+		DIE,
+		DEAD
+	};
+
+	PlayerFullBodyAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
+
+	virtual void OnInit() override {
+		states_.insert({ NONE, make_shared<None>() });
+		states_.insert({ DODGE_ROLL, make_shared<DodgeRoll>() });
+		states_.insert({ DIE, make_shared<Die>() });
+		states_.insert({ DEAD, make_shared<Dead>() });
+
+		// Dodge Roll
+		{
+			transitions_.insert({ NONE, Transition(DODGE_ROLL,[this](const AnimationStateMachine* animation_state_machine) {
+				entt::entity owner_id = animation_state_machine->GetOwnerId();
+				Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+
+				C_Movement* movement_component = SCENE_MGR->GetActor<Player>(owner_id)->GetMovementComponent();
+				int* direction_vector = movement_component->accelaration_vector;
+
+				bool is_movement_ = false;
+				for (int i = 0;i < 3;i++) {
+					if (direction_vector[i] != 0) {
+						is_movement_ = true;
+					}
+				}
+
+				if (player->roll_ == true && is_movement_ == true) {
+					return true;
+				}
+				else {
+					player->roll_ = false;
+					return false;
+				}
+			})
+			});
+
+			transitions_.insert({ DODGE_ROLL, Transition(NONE,[this](const AnimationStateMachine* animation_state_machine) {
+				if (IsAnimationEnded()) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+		}
+
+		// Die
+		{
+			transitions_.insert({ NONE, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
+				entt::entity owner_id = animation_state_machine->GetOwnerId();
+				Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+				if (player->is_dead_) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+			transitions_.insert({ DIE, Transition(DEAD,[this](const AnimationStateMachine* animation_state_machine) {
+				if (IsAnimationEnded()) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+		}
+
+		cur_state_ = states_[NONE];
+	}
+
+	class None : public AnimationState {
+	public:
+		None() : AnimationState(NONE) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			animation_state_machine->SetAnimation("", 0.2f, true);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+	};
+
+	class DodgeRoll : public AnimationState {
+	private:
+		int roll_direction_[3];
+	public:
+		DodgeRoll() : AnimationState(DODGE_ROLL) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
+
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			player->is_rolling_ = true;
+
+			C_Movement* movement_component = player->GetMovementComponent();
+
+			movement_component->velocity.m128_f32[0] = 0.0f;
+			movement_component->velocity.m128_f32[2] = 0.0f;
+			movement_component->acceleration = 300.0f;
+
+			for (int i = 0;i < 3;i++) {
+				roll_direction_[i] = movement_component->accelaration_vector[i];
+			}
+
+			if (roll_direction_[0] == 1) {
+				if (roll_direction_[2] == 1) {
+					animation_state_machine->SetAnimation("player_dodge_roll_rf.anim", 0.2f, true);
+				}
+				else if (roll_direction_[2] == -1) {
+					animation_state_machine->SetAnimation("player_dodge_roll_rb.anim", 0.2f, true);
+				}
+				else {
+					animation_state_machine->SetAnimation("player_dodge_roll_r.anim", 0.2f, true);
+				}
+			}
+			else if (roll_direction_[0] == -1) {
+				if (roll_direction_[2] == 1) {
+					animation_state_machine->SetAnimation("player_dodge_roll_lf.anim", 0.2f, true);
+				}
+				else if (roll_direction_[2] == -1) {
+					animation_state_machine->SetAnimation("player_dodge_roll_lb.anim", 0.2f, true);
+				}
+				else {
+					animation_state_machine->SetAnimation("player_dodge_roll_l.anim", 0.2f, true);
+				}
+			}
+			else {
+				if (roll_direction_[2] == 1) {
+					animation_state_machine->SetAnimation("player_dodge_roll_f.anim", 0.2f, true);
+				}
+				else if(roll_direction_[2] == -1) {
+					animation_state_machine->SetAnimation("player_dodge_roll_b.anim", 0.2f, true);
+				}
+			}
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			player->is_rolling_ = false;
+			player->roll_ = false;
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			C_Movement* movement_component = player->GetMovementComponent();
+
+			movement_component->velocity = XMVectorZero();
+
+			for (int i = 0;i < 3;i++) {
+				movement_component->accelaration_vector[i] = roll_direction_[i];
+			}
+			movement_component->acceleration = 30000.0f;
+		}
+	};
+
+	class Die : public AnimationState {
+	public:
+		Die() : AnimationState(DIE) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			animation_state_machine->SetAnimation("player_die.anim", 0.2f, true);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+	};
+
+	class Dead : public AnimationState {
+	public:
+		Dead() : AnimationState(DEAD) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			animation_state_machine->SetAnimation("player_dead_pose.anim", 0.2f, true);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 	};

@@ -30,6 +30,7 @@ public:
 	void MoveLeft();
 	void MoveForward();
 	void MoveBack();
+	void Roll();
 	void Jump();
 	void Attack();
 	void Aim(bool active);
@@ -114,6 +115,8 @@ public:
 
 	bool is_reloading_ = false;
 	bool is_hit_ = false;
+	bool roll_ = false;
+	bool is_rolling_ = false;
 	bool is_dead_ = false;
 	
 	entt::entity repair_extract_trigger;
