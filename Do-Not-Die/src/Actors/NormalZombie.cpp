@@ -36,14 +36,21 @@ void NormalZombie::OnInit(entt::registry& registry)
 	capsule.SetCapsuleData(XMFLOAT3(0, 0, 0), 50, 10);
 	registry.emplace<reality::C_CapsuleCollision>(entity_id_, capsule);
 
+	C_SoundGenerator sound_generator;
+	sound_generator.local = XMMatrixIdentity();
+	sound_generator.world = XMMatrixIdentity();
+	registry.emplace<reality::C_SoundGenerator>(entity_id_, sound_generator);
+
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(reality::C_CapsuleCollision));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SkeletalMesh));
+	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SoundGenerator));
 
 	reality::C_SkeletalMesh* skm_ptr = registry.try_get<C_SkeletalMesh>(entity_id_);
 	skm_ptr->local = XMMatrixScalingFromVector({ 0.3, 0.3, 0.3, 0.0 }) * XMMatrixRotationY(XMConvertToRadians(180.f));
 
 	cur_position_ = { 0.f, 100.f, 0.f, 0.f };
 	transform_tree_.root_node->OnUpdate(registry, entity_id_, XMMatrixTranslationFromVector(cur_position_));
+
 
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
