@@ -337,12 +337,14 @@ void UI_Actor_Ingame::CreateMenuUI()
 	// Menu Resume Button
 	menu_resume_button_ = make_shared<UI_Button>();
 	menu_resume_button_->InitButton("T_Ingame_But_Resume_Normal.png", "T_Ingame_But_Resume_Hover.png");
+	menu_resume_button_->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
 	menu_window_->AddChildUI("1_ResumeButton", menu_resume_button_);
 	menu_resume_button_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f + height_step * 0.0f }, 269.0f, 54.0f);
 
 	// Menu Option Button
 	menu_option_button_ = make_shared<UI_Button>();
 	menu_option_button_->InitButton("T_Ingame_But_Option_Normal.png", "T_Ingame_But_Option_Hover.png");
+	menu_option_button_->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
 	menu_window_->AddChildUI("1_OptionButton", menu_option_button_);
 	menu_option_button_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f + height_step * 1.0f}, 269.0f, 54.0f);
 
@@ -353,6 +355,7 @@ void UI_Actor_Ingame::CreateMenuUI()
 	// Menu Exit Button
 	menu_exit_button_ = make_shared<UI_Button>();
 	menu_exit_button_->InitButton("T_Ingame_But_Exit_Normal.png", "T_Ingame_But_Exit_Hover.png");
+	menu_exit_button_->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
 	menu_window_->AddChildUI("1_ExitButton", menu_exit_button_);
 	menu_exit_button_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f + height_step * 2.0f }, 269.0f, 54.0f);
 }
