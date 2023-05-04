@@ -63,7 +63,7 @@ void GeneralZombie::SetCharacterAnimation(string anim_id) const
 {
 	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
 	int base_index = animation_component_ptr->name_to_anim_slot_index["Base"];
-	animation_component_ptr->anim_slots[base_index].second->SetAnimation(anim_id, 0.3);
+	animation_component_ptr->anim_slots[base_index].second->SetAnimation(anim_id, 0.3, true);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
 }
 

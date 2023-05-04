@@ -146,7 +146,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_state_machine->SetAnimation("Zombie_Idle_1_v2_IPC_Anim.anim", 0.3f);
+			animation_state_machine->SetAnimation("Zombie_Idle_1_v2_IPC_Anim.anim", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -163,7 +163,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_state_machine->SetAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim", 0.8f);
+			animation_state_machine->SetAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim", 0.8f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -180,7 +180,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_state_machine->SetAnimation("Zombie_Atk_KnockBack_1_IPC_Anim_Unreal Take.anim", 0.8f);
+			animation_state_machine->SetAnimation("Zombie_Atk_KnockBack_1_IPC_Anim_Unreal Take.anim", 0.8f, true);
 			SCENE_MGR->GetActor<GeneralZombie>(animation_state_machine->GetOwnerId())->is_hit_ = false;
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
@@ -199,7 +199,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_state_machine->SetAnimation("Zombie_Death_Back_Mid_1_IPC_Anim_Unreal Take.anim", 0.5f);
+			animation_state_machine->SetAnimation("Zombie_Death_Back_Mid_1_IPC_Anim_Unreal Take.anim", 0.5f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -390,7 +390,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_state_machine->SetAnimation("", 0.3f);
+			animation_state_machine->SetAnimation("", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -407,7 +407,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_state_machine->SetAnimation("", 0.8f);
+			animation_state_machine->SetAnimation("", 0.8f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -423,7 +423,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_state_machine->SetAnimation("", 0.8f);
+			animation_state_machine->SetAnimation("", 0.8f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -439,7 +439,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_state_machine->SetAnimation("", 0.5f);
+			animation_state_machine->SetAnimation("", 0.5f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -455,7 +455,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_state_machine->SetAnimation("Zombie_Atk_Arms_3_SHORT_Loop_IPC_Retargeted_Unreal Take.anim", 0.5f);
+			animation_state_machine->SetAnimation("Zombie_Atk_Arms_3_SHORT_Loop_IPC_Retargeted_Unreal Take.anim", 0.5f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{

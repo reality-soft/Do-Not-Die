@@ -21,11 +21,13 @@ public:
 		ATTACK_GR,
 		RELOAD_AR,
 		RELOAD_HG,
-		HIT_AR,
-		HIT_HG,
+		HIT_AR_IDLE,
+		HIT_AR_AIM,
+		HIT_HG_IDLE,
+		HIT_HG_AIM,
 		HIT_MELEE,
-		HIT_GR,
-		DIE
+		HIT_GR_IDLE,
+		HIT_GR_AIM,
 	};
 
 	PlayerUpperBodyAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
@@ -44,11 +46,13 @@ public:
 		states_.insert({ ATTACK_GR, make_shared<AttackGR>() });
 		states_.insert({ RELOAD_HG, make_shared<ReloadHG>() });
 		states_.insert({ RELOAD_AR, make_shared<ReloadAR>() });
-		states_.insert({ HIT_AR, make_shared<HitAR>() });
-		states_.insert({ HIT_HG, make_shared<HitHG>() });
+		states_.insert({ HIT_AR_IDLE, make_shared<HitARIdle>() });
+		states_.insert({ HIT_AR_AIM, make_shared<HitARAim>() });
+		states_.insert({ HIT_HG_IDLE, make_shared<HitHGIdle>() });
+		states_.insert({ HIT_HG_AIM, make_shared<HitHGAim>() });
 		states_.insert({ HIT_MELEE, make_shared<HitMelee>() });
-		states_.insert({ HIT_GR, make_shared<HitGR>() });
-		states_.insert({ DIE, make_shared<Die>() });
+		states_.insert({ HIT_GR_IDLE, make_shared<HitGRIdle>() });
+		states_.insert({ HIT_GR_AIM, make_shared<HitGRAim>() });
 
 		// Auto Rifle
 		{
@@ -192,7 +196,7 @@ public:
 
 			// Hit
 			{
-				transitions_.insert({ IDLE_POSE_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ IDLE_POSE_AR, Transition(HIT_AR_IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->is_hit_ == true) {
@@ -203,7 +207,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ AIM_POSE_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_AR, Transition(HIT_AR_AIM,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->is_hit_ == true) {
@@ -214,19 +218,19 @@ public:
 						}
 					})
 					});
-				//transitions_.insert({ ATTACK_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
-				//		entt::entity owner_id = animation_state_machine->GetOwnerId();
-				//		Player* player = SCENE_MGR->GetActor<Player>(owner_id);
-				//		if (player->is_hit_ == true) {
-				//			player->is_attacking_ = false;
-				//			return true;
-				//		}
-				//		else {
-				//			return false;
-				//		}
-				//	})
-				//	});
-				transitions_.insert({ RELOAD_AR, Transition(HIT_AR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ ATTACK_AR, Transition(HIT_AR_AIM,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							player->is_attacking_ = false;
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ RELOAD_AR, Transition(HIT_AR_AIM,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->is_hit_ == true) {
@@ -238,7 +242,16 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ HIT_AR, Transition(IDLE_POSE_AR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ HIT_AR_AIM, Transition(AIM_POSE_AR,[this](const AnimationStateMachine* animation_state_machine) {
+						if (IsAnimationEnded()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ HIT_AR_IDLE, Transition(IDLE_POSE_AR,[this](const AnimationStateMachine* animation_state_machine) {
 						if (IsAnimationEnded()) {
 							return true;
 						}
@@ -403,7 +416,7 @@ public:
 
 			// Hit
 			{
-				transitions_.insert({ IDLE_POSE_HG, Transition(HIT_HG,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ IDLE_POSE_HG, Transition(HIT_HG_IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->is_hit_ == true) {
@@ -414,7 +427,7 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ AIM_POSE_HG, Transition(HIT_HG,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_HG, Transition(HIT_HG_AIM,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->is_hit_ == true) {
@@ -425,19 +438,19 @@ public:
 						}
 					})
 					});
-				//transitions_.insert({ ATTACK_HG, Transition(HIT_HG,[this](const AnimationStateMachine* animation_state_machine) {
-				//		entt::entity owner_id = animation_state_machine->GetOwnerId();
-				//		Player* player = SCENE_MGR->GetActor<Player>(owner_id);
-				//		if (player->is_hit_ == true) {
-				//			player->is_attacking_ = false;
-				//			return true;
-				//		}
-				//		else {
-				//			return false;
-				//		}
-				//	})
-				//	});
-				transitions_.insert({ RELOAD_HG, Transition(HIT_HG,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ ATTACK_HG, Transition(HIT_HG_AIM,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							player->is_attacking_ = false;
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ RELOAD_HG, Transition(HIT_HG_AIM,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->is_hit_ == true) {
@@ -449,7 +462,16 @@ public:
 						}
 					})
 					});
-				transitions_.insert({ HIT_HG, Transition(IDLE_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ HIT_HG_AIM, Transition(AIM_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
+						if (IsAnimationEnded()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ HIT_HG_IDLE, Transition(IDLE_POSE_HG,[this](const AnimationStateMachine* animation_state_machine) {
 						if (IsAnimationEnded()) {
 							return true;
 						}
@@ -540,18 +562,18 @@ public:
 						}
 					})
 					});
-				//transitions_.insert({ ATTACK_MELEE, Transition(HIT_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
-				//		entt::entity owner_id = animation_state_machine->GetOwnerId();
-				//		Player* player = SCENE_MGR->GetActor<Player>(owner_id);
-				//		if (player->is_hit_ == true) {
-				//			player->is_attacking_ = false;
-				//			return true;
-				//		}
-				//		else {
-				//			return false;
-				//		}
-				//	})
-				//	});
+				transitions_.insert({ ATTACK_MELEE, Transition(HIT_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							player->is_attacking_ = false;
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
 				transitions_.insert({ HIT_MELEE, Transition(AIM_POSE_MELEE,[this](const AnimationStateMachine* animation_state_machine) {
 						if (IsAnimationEnded()) {
 							return true;
@@ -658,7 +680,7 @@ public:
 
 			// Hit
 			{
-				transitions_.insert({ AIM_POSE_GR, Transition(HIT_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ AIM_POSE_GR, Transition(HIT_GR_AIM,[this](const AnimationStateMachine* animation_state_machine) {
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->is_hit_ == true) {
@@ -669,19 +691,39 @@ public:
 						}
 					})
 					});
-				//transitions_.insert({ ATTACK_GR, Transition(HIT_GR,[this](const AnimationStateMachine* animation_state_machine) {
-				//		entt::entity owner_id = animation_state_machine->GetOwnerId();
-				//		Player* player = SCENE_MGR->GetActor<Player>(owner_id);
-				//		if (player->is_hit_ == true) {
-				//			player->is_attacking_ = false;
-				//			return true;
-				//		}
-				//		else {
-				//			return false;
-				//		}
-				//	})
-				//	});
-				transitions_.insert({ HIT_GR, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+				transitions_.insert({ IDLE_POSE_GR, Transition(HIT_GR_IDLE,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ ATTACK_GR, Transition(HIT_GR_AIM,[this](const AnimationStateMachine* animation_state_machine) {
+						entt::entity owner_id = animation_state_machine->GetOwnerId();
+						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+						if (player->is_hit_ == true) {
+							player->is_attacking_ = false;
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ HIT_GR_AIM, Transition(AIM_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
+						if (IsAnimationEnded()) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					})
+					});
+				transitions_.insert({ HIT_GR_IDLE, Transition(IDLE_POSE_GR,[this](const AnimationStateMachine* animation_state_machine) {
 						if (IsAnimationEnded()) {
 							return true;
 						}
@@ -713,7 +755,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_ar_idle_pose.anim", 0.3f);
+			animation_base->SetAnimation("player_ar_idle_pose.anim", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -729,7 +771,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.3f);
+			animation_base->SetAnimation("", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -745,7 +787,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.3f);
+			animation_base->SetAnimation("", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -761,7 +803,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_ar_aim_pose.anim", 0.3f); 
+			animation_base->SetAnimation("player_ar_aim_pose.anim", 0.3f, true); 
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Aim_In.wav", 1.0f, false);
 		}
@@ -779,7 +821,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_hg_aim_pose.anim", 0.3f);
+			animation_base->SetAnimation("player_hg_aim_pose.anim", 0.3f, true);
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Aim_In.wav", 1.0f, false);
 		}
@@ -797,7 +839,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("", 0.3f);
+			animation_base->SetAnimation("", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -813,7 +855,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_gr_aim_pose.anim", 0.3f);
+			animation_base->SetAnimation("player_gr_aim_pose.anim", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -829,7 +871,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_ar_fire.anim", 0.0f);
+			animation_base->SetAnimation("player_ar_fire.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -847,7 +889,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_hg_fire.anim", 0.0f);
+			animation_base->SetAnimation("player_hg_fire.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -867,7 +909,7 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 			executed = false;
-			animation_base->SetAnimation("player_melee_attack.anim", 0.1f);
+			animation_base->SetAnimation("player_melee_attack.anim", 0.1f, true);
 			//auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			//sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Axe_Attack.mp3", 1.0f, false);
 		}
@@ -899,7 +941,7 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 			executed = false;
-			animation_base->SetAnimation("player_gr_throw.anim", 0.2f);
+			animation_base->SetAnimation("player_gr_throw.anim", 0.2f, true);
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			sm->GetPlayer()->AddSoundQueue(SFX, "S_CH_Grenade_Throw.wav", 1.0f, false);
 		}
@@ -936,7 +978,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_ar_reload.anim", 0.3f);
+			animation_base->SetAnimation("player_ar_reload.anim", 0.3f, true);
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_AR_01_Reload.wav", 1.0f, false);
 		}
@@ -969,7 +1011,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_hg_reload.anim", 0.3f);
+			animation_base->SetAnimation("player_hg_reload.anim", 0.3f, true);
 			auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_base;
 			sm->GetPlayer()->AddSoundQueue(SFX, "S_WEP_Handgun_Reload.wav", 1.0f, false);
 		}
@@ -995,13 +1037,13 @@ public:
 		}
 	};
 
-	class HitAR : public AnimationState {
+	class HitARIdle : public AnimationState {
 	public:
-		HitAR() : AnimationState(HIT_AR) {}
+		HitARIdle() : AnimationState(HIT_AR_IDLE) {}
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_Idle_Hit_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("player_ar_idle_pose_hit_react.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -1014,13 +1056,51 @@ public:
 		}
 	};
 
-	class HitHG : public AnimationState {
+	class HitARAim : public AnimationState {
 	public:
-		HitHG() : AnimationState(HIT_HG) {}
+		HitARAim() : AnimationState(HIT_AR_AIM) {}
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_Idle_Hit_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("player_ar_aim_pose_hit_react.anim", 0.0f, true);
+		}
+		virtual void Exit(AnimationStateMachine* animation_base) override
+		{
+			entt::entity owner_id = animation_base->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			player->is_hit_ = false;
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		{
+		}
+	};
+
+	class HitHGIdle : public AnimationState {
+	public:
+		HitHGIdle() : AnimationState(HIT_HG_IDLE) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_base) override
+		{
+			animation_base->SetAnimation("player_idle_hit_react.anim", 0.5f, true);
+		}
+		virtual void Exit(AnimationStateMachine* animation_base) override
+		{
+			entt::entity owner_id = animation_base->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			player->is_hit_ = false;
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_base) override
+		{
+		}
+	};
+
+	class HitHGAim : public AnimationState {
+	public:
+		HitHGAim() : AnimationState(HIT_HG_AIM) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_base) override
+		{
+			animation_base->SetAnimation("player_hg_aim_pose_hit_react.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -1040,7 +1120,7 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
 
-			animation_base->SetAnimation("Biker_Idle_Hit_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("player_idle_hit_react.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -1053,13 +1133,13 @@ public:
 		}
 	};
 
-	class HitGR : public AnimationState {
+	class HitGRIdle : public AnimationState {
 	public:
-		HitGR() : AnimationState(HIT_GR) {}
+		HitGRIdle() : AnimationState(HIT_GR_IDLE) {}
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("Biker_Idle_Hit_Unreal Take.anim", 0.5f);
+			animation_base->SetAnimation("player_idle_hit_react.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
@@ -1072,16 +1152,19 @@ public:
 		}
 	};
 
-	class Die : public AnimationState {
+	class HitGRAim : public AnimationState {
 	public:
-		Die() : AnimationState(DIE) {}
+		HitGRAim() : AnimationState(HIT_GR_AIM) {}
 	public:
 		virtual void Enter(AnimationStateMachine* animation_base) override
 		{
-			animation_base->SetAnimation("player_die.anim", 0.5f);
+			animation_base->SetAnimation("player_gr_aim_pose_hit_react.anim", 0.0f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_base) override
 		{
+			entt::entity owner_id = animation_base->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			player->is_hit_ = false;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_base) override
 		{

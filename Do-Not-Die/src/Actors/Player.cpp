@@ -56,7 +56,7 @@ void Player::OnInit(entt::registry& registry)
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
 	int skeleton_id = skeletal_mesh->skeleton.bone_name_id_map["Hand_R"];
 	XMMATRIX socket_offset = XMMatrixRotationZ(XMConvertToRadians(180))
-		* XMMatrixRotationY(XMConvertToRadians(110))
+		* XMMatrixRotationY(XMConvertToRadians(100))
 		* XMMatrixTranslationFromVector({-15, -3, 5, 0 });
 	socket_component.AddSocket("Rifle", skeleton_id, XMMatrixRotationY(XMConvertToRadians(180)), socket_offset);
 
@@ -118,7 +118,6 @@ void Player::OnInit(entt::registry& registry)
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.GetAnimSlotByName("Base")->SetAnimation("Biker_Idle_Unreal Take.anim", 0.5);
 	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
 	auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_component.GetAnimSlotByName("UpperBody");
 	sm->SetPlayer(this);
@@ -163,7 +162,7 @@ void Player::SetCharacterMovementAnimation()
 	}
 
 	if (anim_slot->GetCurAnimationId() != anim_id) {
-		anim_slot->SetAnimation(anim_id, 1.0);
+		anim_slot->SetAnimation(anim_id, 1.0, true);
 	}
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
 }
