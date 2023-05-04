@@ -140,29 +140,48 @@ void Player::SetCharacterMovementAnimation()
 
 	string anim_id = "player_idle.anim";
 
+	vector<AnimNotify> notifies;
+	
 	if (GetMovementComponent()->speed >= 0.1f) {
+
+		notifies.resize(2);
+		notifies[0].event = make_shared<WalkEvent>();
+		notifies[1].event = make_shared<WalkEvent>();
+
 		if (angle_ >= 330.0f || angle_ < 30.0f) {
 			anim_id = "player_jog_f.anim";
+			notifies[0].frame = 8 * 2;
+			notifies[1].frame = 18 * 2;
 		}
 		else if (30.0f <= angle_ && angle_ < 110.0f) {
 			anim_id = "player_jog_rf.anim";
+			notifies[0].frame = 8 * 2;
+			notifies[1].frame = 18 * 2;
 		}
 		else if (110.0f <= angle_ && angle_ < 160.0f) {
 			anim_id = "player_jog_rb.anim";
+			notifies[0].frame = 6 * 2;
+			notifies[1].frame = 17 * 2;
 		}
 		else if (160.0f <= angle_ && angle_ < 200.0f) {
 			anim_id = "player_jog_b.anim";
+			notifies[0].frame = 9 * 2;
+			notifies[1].frame = 19 * 2;
 		}
 		else if (200.0f <= angle_ && angle_ < 250.0f) {
 			anim_id = "player_jog_lb.anim";
+			notifies[0].frame = 6 * 2;
+			notifies[1].frame = 17 * 2;
 		}
 		else if (250.0f <= angle_ && angle_ < 330.0f) {
 			anim_id = "player_jog_lf.anim";
+			notifies[0].frame = 6 * 2;
+			notifies[1].frame = 18 * 2;
 		}
 	}
 
 	if (anim_slot->GetCurAnimationId() != anim_id) {
-		anim_slot->SetAnimation(anim_id, 1.0, true);
+		anim_slot->SetAnimation(anim_id, 1.0, true, notifies);
 	}
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
 }

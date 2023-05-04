@@ -4,6 +4,7 @@
 #include "Shape.h"
 #include "GeneralZombie.h"
 #include "FX_BloodImpact.h"
+#include "FX_MeleeImpact.h"
 #include "FX_ConcreteImpact.h"
 #include "InGameScene.h"
 
@@ -125,3 +126,15 @@ private:
 	float volume_;
 	bool is_looping_;
 };
+
+class WalkEvent : public Event
+{
+public:
+	WalkEvent() {};
+	virtual void Process() override {
+		static int count = 0;
+		auto player = SCENE_MGR->GetPlayer<Player>(0);
+    EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_CH_Footstep_001.wav", 1.0f, false);
+	};
+};
+
