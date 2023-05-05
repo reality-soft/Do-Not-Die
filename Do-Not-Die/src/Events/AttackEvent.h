@@ -14,6 +14,7 @@ public:
 private:
 	RayShape ray;
 	entt::entity actor_id_;
+	entt::entity hit_actor_;
 };
 
 class AttackEvent_BoundSphere : public Event
