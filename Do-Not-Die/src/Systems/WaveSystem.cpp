@@ -245,8 +245,8 @@ void reality::WaveSystem::SpawnZombies(float interval)
 
 	enemy_actor->targeting_car_health = &car_health;
 	
-	int guidline_index = RandomIntInRange(0, zomebie_tracks_->size());
-	int mesh_index = RandomIntInRange(0, enemy_meshes.size());
+	int guidline_index = RandomIntInRange(0, zomebie_tracks_->size() - 1);
+	int mesh_index = RandomIntInRange(0, enemy_meshes.size() - 1);
 
 	guidline_index = 4;
 

@@ -2,6 +2,7 @@
 #include "FX_MeleeImpact.h"
 #include "SceneMgr.h"
 #include "ResourceMgr.h"
+#include "GameEvents.h"
 
 using namespace reality;
 
@@ -13,6 +14,5 @@ void FX_MeleeImpact::OnInit(entt::registry& registry)
 
 	AddSoundGeneratorComponent();
 
-	//AddSoundQueue("S_WEP_Impact_Bullet_01.wav", SFX, false, 1.0f);
-
+	EVENT->PushEvent<SoundGenerateEvent>(entity_id_, SFX, "S_WEP_Axe_Hit.wav", 0.5f, false);
 }
