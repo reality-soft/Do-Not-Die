@@ -189,11 +189,12 @@ void Player::SetCharacterMovementAnimation()
 
 void Player::OnUpdate()
 {
+	GetCapsuleComponent()->raycast_enable = !is_rolling_;
+
 	if (cur_hp_ <= 0) {
 		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
 		is_dead_ = true;
 	}
-
 
 	if (controller_enable_)
 	{
@@ -435,9 +436,8 @@ void Player::SetCurHp(int hp)
 
 void Player::TakeDamage(int damage)
 {
-	if (is_hit_ == true || is_rolling_) {
-		return;
-	}
+	if (is_hit_)
+		return;	
 
 	is_hit_ = true;
 	cur_hp_ -= damage;	
