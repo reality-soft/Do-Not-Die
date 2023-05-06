@@ -736,6 +736,15 @@ void Player::PickClosestItem()
 		getting_item_success = AcquireItem(drug);
 		break;
 	}
+	case ItemType::eVaccine:
+	{
+		shared_ptr<VaccineItem> vaccine = make_shared<VaccineItem>();
+		vaccine->OnCreate();
+		vaccine->AddCount(1);
+		vaccine->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(vaccine);
+		break;
+	}
 	case ItemType::eAR_Ammo:
 	{
 		shared_ptr<ARAmmoItem> ar_ammo = make_shared<ARAmmoItem>();
