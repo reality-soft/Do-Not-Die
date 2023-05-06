@@ -11,8 +11,9 @@ void MedicalBoxItem::OnCreate()
 
 void MedicalBoxItem::UseItem()
 {
-	float added_hp = min(100, owner_->GetCurHp() + heal_amount);
-	owner_->SetCurHp(added_hp);
+	owner_->GetStatus("hp")->PermanentVariation(heal_amount);
+	//float added_hp = min(100, owner_->GetCurHp() + heal_amount);
+	//owner_->SetCurHp(added_hp);
 }
 
 void HealKitItem::OnCreate()
@@ -26,8 +27,9 @@ void HealKitItem::OnCreate()
 
 void HealKitItem::UseItem()
 {
-	float added_hp = min(100, owner_->GetCurHp() + heal_amount);
-	owner_->SetCurHp(added_hp);
+	owner_->GetStatus("hp")->PermanentVariation(heal_amount);
+	//float added_hp = min(100, owner_->GetCurHp() + heal_amount);
+	//owner_->SetCurHp(added_hp);
 }
 
 void EnergyDrinkItem::OnCreate()
@@ -39,7 +41,7 @@ void EnergyDrinkItem::OnCreate()
 
 void EnergyDrinkItem::UseItem()
 {
-
+	owner_->GetStatus("max_speed")->TimeLimitedVariation(10, 150);
 }
 
 void DrugItem::OnCreate()
@@ -50,6 +52,19 @@ void DrugItem::OnCreate()
 }
 
 void DrugItem::UseItem()
+{
+	owner_->GetStatus("gunfire_damage")->TimeLimitedVariation(10, 30);
+	owner_->GetStatus("meele_damage")->TimeLimitedVariation(10, 30);
+}
+
+void VaccineItem::OnCreate()
+{
+	item_icon_ = "Vaccine.png";
+	item_count_ = 0;
+	item_cooltime_ = 20.0f;
+}
+
+void VaccineItem::UseItem()
 {
 }
 

@@ -46,7 +46,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	SpawnZombies(1.f);
 	SpawnCarSmokes();
 
-	if (wave_count_ > 4 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0 && SCENE_MGR->GetNumOfActor("enemy") == 0)
+	if (wave_count_ > 5 && SCENE_MGR->GetPlayer<Player>(0)->GetStatus("hp")->GetCurrentValue() > 0 && SCENE_MGR->GetNumOfActor("enemy") == 0)
 	{
 		EVENT->PushEvent<GameResultEvent>(GameResultType::eGameCleared);
 	}
@@ -77,7 +77,7 @@ void reality::WaveSystem::RandomSpawnItem(float trigger_radius)
 
 	for (UINT index : empty_item_index)
 	{
-		ItemType item_type = (ItemType)RandomIntInRange(0, 6);
+		ItemType item_type = (ItemType)RandomIntInRange(0, 7);
 
 		const auto& spawn = item_spawns_.line_nodes[index];
 		SCENE_MGR->GetScene(INGAME)->AddActor<Item>(item_type, _XMFLOAT3(spawn), trigger_radius);

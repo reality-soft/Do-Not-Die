@@ -52,10 +52,10 @@ public:
 	void AddKillScore() { kill_score_++; }
 
 public:
-	virtual float GetMaxHp() const override;
-	virtual void SetCurHp(int hp) override;
-	virtual void TakeDamage(int damage) override;
-	virtual float GetCurHp() const override;
+	//virtual float GetMaxHp() const override;
+	//virtual void SetCurHp(int hp) override;
+	//virtual void TakeDamage(int damage) override;
+	//virtual float GetCurHp() const override;
 
 private:
 	void AddFlashLight();
@@ -102,11 +102,9 @@ public:
 	vector<shared_ptr<ItemBase>>&	GetInventory();
 	vector<float>&					GetInventoryTimer();
 
-	float drop_during_time_ = 0.0f;
 	float extract_during_time_ = 0.0f;
 	float repair_during_time_ = 0.0f;
 
-	const float drop_time_takes_ = 0.5f;
 	const float extract_time_takes_ = 5.0f;
 	const float repair_time_takes_ = 5.0f;
 
@@ -114,7 +112,7 @@ public:
 	bool can_repair_car_ = false;
 
 	bool is_reloading_ = false;
-	bool is_hit_ = false;
+	//bool is_hit_ = false;
 	bool roll_ = false;
 	bool is_rolling_ = false;
 	bool is_dead_ = false;
