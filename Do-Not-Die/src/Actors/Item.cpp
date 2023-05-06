@@ -33,6 +33,9 @@ void Item::OnInit(entt::registry& registry)
 	case ItemType::eDrug:
 		stm.static_mesh_id = "Drug.stmesh";
 		break;
+	case ItemType::eVaccine:
+		stm.static_mesh_id = "DND_VaccineCase.stmesh";
+		break;
 	case ItemType::eAR_Ammo:
 		stm.static_mesh_id = "AR_Ammo.stmesh";
 		break;

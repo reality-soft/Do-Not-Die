@@ -53,6 +53,17 @@ void DrugItem::UseItem()
 {
 }
 
+void VaccineItem::OnCreate()
+{
+	item_icon_ = "Vaccine.png";
+	item_count_ = 0;
+	item_cooltime_ = 20.0f;
+}
+
+void VaccineItem::UseItem()
+{
+}
+
 void ARAmmoItem::OnCreate()
 {
 	item_icon_ = "AR_Ammo.png";

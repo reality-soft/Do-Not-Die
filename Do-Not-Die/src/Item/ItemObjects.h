@@ -37,6 +37,16 @@ public:
 	void UseItem() override;
 };
 
+class VaccineItem : public ItemBase
+{
+private:
+	float infection_reduce;
+
+public:
+	void OnCreate() override;
+	void UseItem() override;
+};
+
 class ARAmmoItem : public ItemBase
 {
 private:
