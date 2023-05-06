@@ -12,11 +12,20 @@ void NormalZombie::OnInit(entt::registry& registry)
 	Character::OnInit(registry);
 	tag = "enemy";
 
-	// setting character data
-	GetMovementComponent()->max_speed = 100;
+	//// setting character data
+	//GetMovementComponent()->max_speed = 100;
+	//GetMovementComponent()->acceleration = 100;
+	//max_hp_ = cur_hp_ = 100;
+	//damage_ = 10.0f;
+
+	AddStatus("hp", CharacterStatus(100, 100, 0, 100));
+	AddStatus("default_damage", CharacterStatus(10, 10, 10, 10));
+	AddStatus("max_speed", CharacterStatus(RandomIntInRange(100, 200), 0, 100, 200));
+
+	GetMovementComponent()->speed = 0;
 	GetMovementComponent()->acceleration = 100;
-	max_hp_ = cur_hp_ = 100;
-	damage_ = 10.0f;
+	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
+
 
 	// set trigger sensor
 	C_TriggerSensor trigger_sensor;
@@ -61,6 +70,9 @@ void NormalZombie::OnInit(entt::registry& registry)
 
 void NormalZombie::OnUpdate()
 {
+	UpdateStatus();
+	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
+
 	ChasePlayer();
 	behavior_tree_.Update();
 	Character::OnUpdate();
@@ -97,25 +109,25 @@ void NormalZombie::Attack()
 	EVENT->PushEvent<AttackEvent_SingleRay>(attack_ray, entity_id_);
 }
 
-float NormalZombie::GetMaxHp() const
-{
-	return max_hp_;
-}
+//float NormalZombie::GetMaxHp() const
+//{
+//	return max_hp_;
+//}
+//
+//void NormalZombie::SetCurHp(int hp)
+//{
+//}
 
-void NormalZombie::SetCurHp(int hp)
-{
-}
-
-void NormalZombie::TakeDamage(int damage)
-{
-	is_hit_ = true;
-	cur_hp_ -= damage;
-}
+//void NormalZombie::TakeDamage(int damage)
+//{
+//	is_hit_ = true;
+//	cur_hp_ -= damage;
+//}
 
 void NormalZombie::AddImpulse(XMVECTOR direction, float strength)
 {
-	if (cur_hp_ <= 0)
-		return;
+	if (GetStatus("hp")->GetCurrentValue() <= 0)
+		return;	
 
 	CancelMovement();
 	auto c_capsule = GetCapsuleComponent();
@@ -209,7 +221,7 @@ void NormalZombie::ChasePlayer()
 		player_in_sight_ = true;
 }
 
-float NormalZombie::GetCurHp() const
-{
-	return cur_hp_;
-}
+//float NormalZombie::GetCurHp() const
+//{
+//	return cur_hp_;
+//}

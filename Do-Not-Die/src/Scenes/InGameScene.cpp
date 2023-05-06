@@ -86,7 +86,8 @@ void InGameScene::OnInit()
 	loading_progress = LOADING_ACTOR;
 	
 	environment_.CreateEnvironment();
-	environment_.SetWorldTime(120, 240);
+	//environment_.SetWorldTime(120, 240);
+	environment_.SetWorldTime(120, 30);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.1f, 0.25f);
@@ -104,6 +105,8 @@ void InGameScene::OnInit()
 #ifdef _DEBUG
 	GUI->AddWidget<PropertyWidget>("property");
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("FPS", &TIMER->fps);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("speed buff timer", &player_actor->GetStatus("max_speed")->timer_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("damage buff timer", &player_actor->GetStatus("gunfire_damage")->timer_);
 #endif
 
 	//BossZombie Test

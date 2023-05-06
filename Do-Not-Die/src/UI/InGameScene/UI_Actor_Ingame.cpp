@@ -409,7 +409,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	// HP Update
 	{
 		player_ = SCENE_MGR->GetPlayer<Player>(0);
-		float hp_ratio = (float)player_->GetCurHp() / (float)player_->GetMaxHp();
+		float hp_ratio = (float)player_->GetStatus("hp")->GetCurrentValue() / (float)player_->GetStatus("hp")->GetMaxValue();
 		if (hp_ratio > 0.3f)
 			hp_img_->render_data_.tex_id = "T_HpBar.png";
 		else
@@ -581,6 +581,9 @@ void UI_Actor_Ingame::UpdateIngameUI()
 					break;
 				case ItemType::eDrug:
 					item = "Drug";
+					break;
+				case ItemType::eVaccine:
+					item = "Vaccine Case";
 					break;
 				case ItemType::eAR_Ammo:
 					item = "AR Ammo";

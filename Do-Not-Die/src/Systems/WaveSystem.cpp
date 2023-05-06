@@ -46,7 +46,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	SpawnZombies(1.f);
 	SpawnCarSmokes();
 
-	if (wave_count_ > 4 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0 && SCENE_MGR->GetNumOfActor("enemy") == 0)
+	if (wave_count_ > 5 && SCENE_MGR->GetPlayer<Player>(0)->GetStatus("hp")->GetCurrentValue() > 0 && SCENE_MGR->GetNumOfActor("enemy") == 0)
 	{
 		EVENT->PushEvent<GameResultEvent>(GameResultType::eGameCleared);
 	}
@@ -77,10 +77,7 @@ void reality::WaveSystem::RandomSpawnItem(float trigger_radius)
 
 	for (UINT index : empty_item_index)
 	{
-		//ItemType item_type = (ItemType)RandomIntInRange(0, 7);
-
-		// TEST
-		ItemType item_type = ItemType::eVaccine;
+		ItemType item_type = (ItemType)RandomIntInRange(0, 7);
 
 		const auto& spawn = item_spawns_.line_nodes[index];
 		SCENE_MGR->GetScene(INGAME)->AddActor<Item>(item_type, _XMFLOAT3(spawn), trigger_radius);
@@ -251,7 +248,7 @@ void reality::WaveSystem::SpawnZombies(float interval)
 	int guidline_index = RandomIntInRange(0, zomebie_tracks_->size() - 1);
 	int mesh_index = RandomIntInRange(0, enemy_meshes.size() - 1);
 
-	//guidline_index = 4;
+	guidline_index = 4;
 
 	vector<XMVECTOR> target_poses;
 	for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
@@ -299,7 +296,7 @@ XMVECTOR reality::WaveSystem::GetCarPosition()
 
 void reality::WaveSystem::WaveStart()
 {
-	zombie_spawn_count_ += 30;
+	zombie_spawn_count_ += 2;
 }
 
 void reality::WaveSystem::WaveFinish()

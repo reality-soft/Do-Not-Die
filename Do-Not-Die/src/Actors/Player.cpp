@@ -18,11 +18,18 @@ void Player::OnInit(entt::registry& registry)
 	Character::OnInit(registry);
 	tag = "player";
 
+	AddStatus("hp", CharacterStatus(100, 100, 0, 100));
+	AddStatus("gunfire_damage", CharacterStatus(30, 30, 30, 60));
+	AddStatus("meele_damage", CharacterStatus(50, 50, 50, 100));
+	AddStatus("max_speed", CharacterStatus(150, 150, 150, 300));
+	AddStatus("infection", CharacterStatus(0, 0, 0, 100));
+
 	GetMovementComponent()->speed = 0;
 	GetMovementComponent()->acceleration = 300;
-	GetMovementComponent()->max_speed = 150;
-	max_hp_ = cur_hp_ = 100;
-	damage_ = 30.0f;
+	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
+
+	//max_hp_ = cur_hp_ = 100;
+	//damage_ = 30.0f;
 
 	C_TriggerSensor trigger_sensor;
 	trigger_sensor.can_sense_tags.insert("item");
@@ -189,9 +196,12 @@ void Player::SetCharacterMovementAnimation()
 
 void Player::OnUpdate()
 {
+	UpdateStatus();
+	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
+
 	GetCapsuleComponent()->raycast_enable = !is_rolling_;
 
-	if (cur_hp_ <= 0) {
+	if (GetStatus("hp")->GetCurrentValue() <= 0) {
 		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
 		is_dead_ = true;
 	}
@@ -384,7 +394,7 @@ void Player::MeeleAttack()
 	attack_sphere.center = _XMFLOAT3(shepre_center);
 	attack_sphere.radius = capsule_collision->capsule.radius * 2;
 
-	EVENT->PushEvent<AttackEvent_BoundSphere>(50, attack_sphere, entity_id_);
+	EVENT->PushEvent<AttackEvent_BoundSphere>(GetStatus("meele_damage")->GetCurrentValue(), attack_sphere, entity_id_);
 }
 
 bool Player::IsAiming()
@@ -424,29 +434,29 @@ void Player::SetPos(const XMVECTOR& position)
 	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
-float Player::GetMaxHp() const
-{
-	return max_hp_;
-}
-
-void Player::SetCurHp(int hp)
-{
-	cur_hp_ = hp;
-}
-
-void Player::TakeDamage(int damage)
-{
-	if (is_hit_)
-		return;	
-
-	is_hit_ = true;
-	cur_hp_ -= damage;	
-}
-
-float Player::GetCurHp() const
-{
-	return cur_hp_;
-}
+//float Player::GetMaxHp() const
+//{
+//	return max_hp_;
+//}
+//
+//void Player::SetCurHp(int hp)
+//{
+//	cur_hp_ = hp;
+//}
+//
+//void Player::TakeDamage(int damage)
+//{
+//	if (is_hit_)
+//		return;	
+//
+//	is_hit_ = true;
+//	cur_hp_ -= damage;	
+//}
+//
+//float Player::GetCurHp() const
+//{
+//	return cur_hp_;
+//}
 
 void Player::AddFlashLight()
 {

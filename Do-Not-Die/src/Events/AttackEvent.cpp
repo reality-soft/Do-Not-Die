@@ -30,7 +30,7 @@ void AttackEvent_SingleRay::EnemyProcess()
 			if (SCENE_MGR->GetActor<GameCharacter>(callback_actor.ent)->tag == "player")
 			{
 				hit_actor_ = callback_actor.ent;
-				EVENT->PushEvent<TakeDamageEvent>(enemy_actor->GetCharacterDamage(), hit_actor_);
+				EVENT->PushEvent<TakeDamageEvent>(enemy_actor->GetStatus("default_damage")->GetCurrentValue(), hit_actor_);
 				EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_actor.point, callback_actor.normal);
 			}
 		}
@@ -49,7 +49,7 @@ void AttackEvent_SingleRay::PlayerProcess()
 			if (enemy_actor)
 				enemy_actor->AddImpulse(GetRayDirection(ray), 300.0f);
 
-			EVENT->PushEvent<TakeDamageEvent>(SCENE_MGR->GetPlayer<Player>(0)->GetCharacterDamage(), hit_actor_);
+			EVENT->PushEvent<TakeDamageEvent>(SCENE_MGR->GetPlayer<Player>(0)->GetStatus("gunfire_damage")->GetCurrentValue(), hit_actor_);
 			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_total.point, callback_total.normal);
 		}
 		else

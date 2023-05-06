@@ -15,10 +15,10 @@ public:
 	void Attack();
 
 public:
-	float	 GetMaxHp() const override;
-	float	 GetCurHp() const override;
-	void SetCurHp(int hp) override;
-	void TakeDamage(int damage) override;
+	//float	 GetMaxHp() const override;
+	//float	 GetCurHp() const override;
+	//void SetCurHp(int hp) override;
+	//void TakeDamage(int damage) override;
 	void AddImpulse(XMVECTOR direction, float strength);
 
 public:
@@ -35,7 +35,7 @@ private:
 	float attack_distance_ = 80.0f;
 
 public:
-	bool is_hit_ = false;
+	//bool is_hit_ = false;
 	bool in_defense_bound_ = false;
 	bool player_in_sight_ = true;
 	bool is_attacking_ = false;
