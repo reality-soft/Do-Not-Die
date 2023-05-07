@@ -61,6 +61,13 @@ CharacterStatus* GameCharacter::GetStatus(const string& name)
 	else
 		return nullptr;
 }
+
+void GameCharacter::TakeDamage(int damage)
+{
+	is_hit_ = true;
+	GetStatus("hp")->PermanentVariation(-damage);
+};
+
 bool GameCharacter::AddStatus(const string& name, const CharacterStatus& status)
 {
 	if (GetStatus(name) != nullptr)
