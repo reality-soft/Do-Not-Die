@@ -1,4 +1,9 @@
 #include "BossZombie.h"
+#include "AttackEvent.h"
+#include "AnimationStateMachine.h"
+#include "Player.h"
+#include "BossZombie_ASM.h"
+#include "Enemy_BTN.h"
 
 void BossZombie::OnInit(entt::registry& registry)
 {
@@ -26,7 +31,7 @@ void BossZombie::OnInit(entt::registry& registry)
 
 	reality::C_CapsuleCollision capsule;
 	capsule.tag = "enemy";
-	capsule.SetCapsuleData(XMFLOAT3(0, 0, 0), 50, 10);
+	capsule.SetCapsuleData(XMFLOAT3(0, 0, 0), 180, 40);
 	registry.emplace<reality::C_CapsuleCollision>(entity_id_, capsule);
 
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
@@ -53,8 +58,27 @@ void BossZombie::OnInit(entt::registry& registry)
 	transform_tree_.root_node->OnUpdate(registry, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
-
-void BossZombie::OnUpdate()
+void BossZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 {
+	SetPos(target_poses[0] + XMVECTOR{ 0, 50.0f, 0, 0 });
 
+	// setting behavior tree
+
+	// in combat zone
+	shared_ptr<SelectorNode> follow_player_or_car = make_shared<SelectorNode>();
+	follow_player_or_car->AddChild<EnemyFollowPlayer>(entity_id_, XMVectorZero());
+	follow_player_or_car->AddChild<EnemyFollowCar>(entity_id_, XMVectorZero());
+
+	shared_ptr<InfiniteRepeatNode> repeat_node = make_shared<InfiniteRepeatNode>(follow_player_or_car);
+
+	// to combat zone
+	shared_ptr<SequenceNode> move_to_combat_zone = make_shared<SequenceNode>();
+	for (auto target_pos : target_poses) {
+		move_to_combat_zone->AddChild<EnemyMoveToTarget>(entity_id_, target_pos);
+	}
+
+	// root node
+	vector<pair<std::function<bool()>, shared_ptr<BehaviorNode>>> children_;
+	children_.push_back(make_pair([this]() { return in_defense_bound_; }, repeat_node));
+	behavior_tree_.SetRootNode<IfElseIfNode>(children_, move_to_combat_zone);
 }

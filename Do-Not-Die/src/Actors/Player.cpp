@@ -118,7 +118,7 @@ void Player::OnInit(entt::registry& registry)
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 5, "Spine_01");
 	animation_component.AddNewAnimSlot<PlayerFullBodyAnimationStateMachine>("FullBody", entity_id_, skm.skeletal_mesh_id, 1, "Root");
 	auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_component.GetAnimSlotByName("UpperBody");
 	sm->SetPlayer(this);
@@ -268,10 +268,10 @@ void Player::Jump()
 	if (controller_enable_ == false || is_rolling_ == true)
 		return;
 
-	if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
+	//if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
 		GetMovementComponent()->jump_pulse = 150.0f;
 		EVENT->PushEvent<SoundGenerateEvent>(entity_id_, SFX, "S_CH_Jump_Start.wav", 1.0f, false);
-	}
+	//}
 }
 
 void Player::Attack()

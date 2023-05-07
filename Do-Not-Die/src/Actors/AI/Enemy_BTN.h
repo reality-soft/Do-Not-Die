@@ -11,7 +11,7 @@ public:
 
 	virtual reality::BehaviorStatus Action() override
 	{
-		NormalZombie* enemy = reality::SCENE_MGR->GetActor<NormalZombie>(owner_id_);
+		BaseEnemy* enemy = reality::SCENE_MGR->GetActor<BaseEnemy>(owner_id_);
 
 		XMVECTOR cur_pos = enemy->GetCurPosition();
 		XMVECTOR target_pos = target_position_;
@@ -47,7 +47,7 @@ public:
 		search_time += TM_DELTATIME;
 
 		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
-		NormalZombie* enemy = reality::SCENE_MGR->GetActor<NormalZombie>(owner_id_);
+		BaseEnemy* enemy = reality::SCENE_MGR->GetActor<BaseEnemy>(owner_id_);
 
 		XMVECTOR direction_to_player = XMVector3Normalize(player->GetCurPosition() - enemy->GetCurPosition());
 		target_position_ = player->GetCurPosition();
@@ -85,7 +85,7 @@ public:
 
 	virtual reality::BehaviorStatus Action() override
 	{
-  		NormalZombie* owner = reality::SCENE_MGR->GetActor<NormalZombie>(owner_id_);
+  		BaseEnemy* owner = reality::SCENE_MGR->GetActor<BaseEnemy>(owner_id_);
 		XMVECTOR owner_pos = owner->GetCurPosition();
 
 		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
