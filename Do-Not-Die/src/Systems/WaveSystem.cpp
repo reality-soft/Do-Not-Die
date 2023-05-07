@@ -60,28 +60,32 @@ void reality::WaveSystem::SetWorldEnv(Environment* env)
 {
 	world_env_ = shared_ptr<Environment>(env);
 	countdown_timer_ = fabs(world_env_->GetTimeLimits().x * 2);
-	for (const auto& node : item_spawns_.line_nodes)
-	{
-		item_table_.insert(make_pair(node.first, false));
-	}
 }
 
 void reality::WaveSystem::RandomSpawnItem(float trigger_radius)
 {
 	list<UINT> empty_item_index;
-	for (const auto& index : item_table_)
-	{
-		if (index.second == false)
-			empty_item_index.push_back(index.first);
-	}
 
-	for (UINT index : empty_item_index)
+	const auto& item_view = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().view<C_TriggerVolume>();
+	for (const auto& spawn : item_spawns_.line_nodes)
 	{
-		ItemType item_type = (ItemType)RandomIntInRange(0, 7);
+		bool is_item_stay = false;
 
-		const auto& spawn = item_spawns_.line_nodes[index];
-		SCENE_MGR->GetScene(INGAME)->AddActor<Item>(item_type, _XMFLOAT3(spawn), trigger_radius);
-		item_table_[index] = true;
+		for (const auto& ent : item_view)
+		{
+			const auto& trigger = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().get<C_TriggerVolume>(ent);
+			if (trigger.tag != "item")
+				continue;
+
+			if (Distance(spawn.second, _XMVECTOR3(trigger.sphere_volume.center)) < trigger_radius)
+				is_item_stay = true;
+		}
+
+		if (!is_item_stay)
+		{
+			ItemType item_type = (ItemType)RandomIntInRange(0, 7);
+			SCENE_MGR->GetScene(INGAME)->AddActor<Item>(item_type, _XMFLOAT3(spawn.second), trigger_radius);
+		}
 	}
 }
 

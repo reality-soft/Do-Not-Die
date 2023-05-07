@@ -66,6 +66,9 @@ void VaccineItem::OnCreate()
 
 void VaccineItem::UseItem()
 {
+	owner_->GetStatus("infection")->PermanentVariation(-100);
+	owner_->hit_count_ = 0;
+	owner_->infection_probability_ = 0;
 }
 
 void ARAmmoItem::OnCreate()

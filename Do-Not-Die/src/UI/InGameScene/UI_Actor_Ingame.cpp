@@ -307,13 +307,17 @@ void UI_Actor_Ingame::CreateIngameUI()
 	car_is_crashed_ui_->InitImage("T_CarIsCrashed.png");
 	car_is_crashed_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
 	
+	player_infected_ui_ = make_shared<UI_Image>();
+	player_infected_ui_->InitImage("T_YouAreInfected.png");
+	player_infected_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
 
 	game_over_exit_button_ = make_shared<UI_Button>();
 	game_over_exit_button_->InitButton("T_Gameover_ExitBtn_Normal.png", "T_Gameover_ExitBtn_Hover.png");
 	game_over_exit_button_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height * 3.0f / 4.0f }, 500.0f, 150.0f);
+
 	player_dead_ui_->AddChildUI("Exit Button", game_over_exit_button_);
 	car_is_crashed_ui_->AddChildUI("Exit Button", game_over_exit_button_);
-	
+	player_infected_ui_->AddChildUI("Exit Button", game_over_exit_button_);
 }
 
 void UI_Actor_Ingame::CreateMenuUI()
@@ -705,7 +709,9 @@ void UI_Actor_Ingame::ShowPlayerDead()
 
 void UI_Actor_Ingame::ShowPlayerInfected()
 {
-
+	ui_comp_->ui_list.clear();
+	ui_comp_->ui_list.insert({ "Player Infected UI", player_infected_ui_ });
+	while (ShowCursor(true) <= 0);
 }
 
 void UI_Actor_Ingame::ShowCarCrashed()

@@ -18,7 +18,7 @@ void Player::OnInit(entt::registry& registry)
 	Character::OnInit(registry);
 	tag = "player";
 
-	AddStatus("hp", CharacterStatus(100, 100, 0, 100));
+	AddStatus("hp", CharacterStatus(200, 200, 0, 200));
 	AddStatus("gunfire_damage", CharacterStatus(30, 30, 30, 60));
 	AddStatus("meele_damage", CharacterStatus(50, 50, 50, 100));
 	AddStatus("max_speed", CharacterStatus(150, 150, 150, 300));
@@ -141,6 +141,36 @@ void Player::OnInit(entt::registry& registry)
 	tag = "player";
 }
 
+void Player::OnUpdate()
+{
+	GetCapsuleComponent()->raycast_enable = !is_rolling_;
+
+	if (GetStatus("hp")->GetCurrentValue() <= 0) {
+		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
+		is_dead_ = true;
+	}
+
+	if (controller_enable_)
+	{
+		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
+		rotation_ = XMMatrixRotationY(camera->pitch_yaw.y);
+	}
+
+	Character::OnUpdate();
+	CalculateMovementAngle();
+	SetCharacterMovementAnimation();
+	ChangeWeapon();
+
+	// FlashLight Update
+	UpdateFlashLight();
+	UpdateTimer();
+
+	// Status
+	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
+	IncreaseInfection();
+	UpdateStatus();
+}
+
 void Player::SetCharacterMovementAnimation()
 {
 	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
@@ -192,34 +222,6 @@ void Player::SetCharacterMovementAnimation()
 		anim_slot->SetAnimation(anim_id, 1.0, true, notifies);
 	}
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
-}
-
-void Player::OnUpdate()
-{
-	UpdateStatus();
-	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
-
-	GetCapsuleComponent()->raycast_enable = !is_rolling_;
-
-	if (GetStatus("hp")->GetCurrentValue() <= 0) {
-		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
-		is_dead_ = true;
-	}
-
-	if (controller_enable_)
-	{
-		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-		rotation_ = XMMatrixRotationY(camera->pitch_yaw.y);
-	}
-
-	Character::OnUpdate();
-	CalculateMovementAngle();
-	SetCharacterMovementAnimation();
-	ChangeWeapon();
-
-	// FlashLight Update
-	UpdateFlashLight();
-	UpdateTimer();
 }
 
 void Player::MoveRight()
@@ -396,6 +398,40 @@ void Player::MeeleAttack()
 
 	EVENT->PushEvent<AttackEvent_BoundSphere>(GetStatus("meele_damage")->GetCurrentValue(), attack_sphere, entity_id_);
 }
+
+void Player::TakeDamage(int damage)
+{
+	is_hit_ = true;
+	GetStatus("hp")->PermanentVariation(-damage);
+
+	if (is_infected == true)
+		return;
+
+	++hit_count_;
+	infection_probability_ = pow(hit_count_, 2);
+	is_infected = Probability(infection_probability_);
+};
+
+void Player::IncreaseInfection()
+{
+	if (is_infected == false)
+		return;
+
+	if (GetStatus("infection")->GetCurrentValue() >= 100.f)
+	{
+		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerInfected);
+		return;
+	}
+
+	static float timer = 0;
+	timer += TM_DELTATIME;
+	if (timer >= 1.0f)
+	{
+		GetStatus("infection")->PermanentVariation(0.5f);
+		timer = 0.0f;
+	}
+}
+
 
 bool Player::IsAiming()
 {
@@ -705,7 +741,7 @@ void Player::PickClosestItem()
 	if (selectable_items_.empty())
 		return;
 
-	bool getting_item_success = false;;
+	bool getting_item_success = false;
 
 	auto closest_item = selectable_items_.begin();
 	switch (closest_item->second->item_type_)
