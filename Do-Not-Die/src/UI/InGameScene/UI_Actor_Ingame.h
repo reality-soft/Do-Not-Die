@@ -71,6 +71,7 @@ namespace reality
 		// Game Over UI
 		shared_ptr<UI_Image>	player_dead_ui_;
 		shared_ptr<UI_Image>	car_is_crashed_ui_;
+		shared_ptr<UI_Image>	player_infected_ui_;
 
 		shared_ptr<UI_Button> game_over_exit_button_;
 
