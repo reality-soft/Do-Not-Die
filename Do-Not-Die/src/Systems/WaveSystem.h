@@ -46,7 +46,6 @@ namespace reality
 		GuideLine repair_spawns_;
 		GuideLine car_event_;
 		GuideLine fx_corpse_fire_;
-		map<UINT, bool> item_table_;
 		set<entt::entity> repair_parts;
 
 		map<int, entt::entity> spawned_car_fired_;

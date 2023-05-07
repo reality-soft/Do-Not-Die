@@ -87,7 +87,7 @@ void InGameScene::OnInit()
 	
 	environment_.CreateEnvironment();
 	//environment_.SetWorldTime(120, 240);
-	environment_.SetWorldTime(120, 30);
+	environment_.SetWorldTime(30, 30);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.1f, 0.25f);
@@ -105,14 +105,10 @@ void InGameScene::OnInit()
 #ifdef _DEBUG
 	GUI->AddWidget<PropertyWidget>("property");
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("FPS", &TIMER->fps);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("speed buff timer", &player_actor->GetStatus("max_speed")->timer_);
-	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("damage buff timer", &player_actor->GetStatus("gunfire_damage")->timer_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("hit count", &player_actor->hit_count_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("infection prob", &player_actor->infection_probability_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("infection value", &player_actor->GetStatus("infection")->current_value_);
 #endif
-
-	//BossZombie Test
-	//BossZombie* boss = GetActor<BossZombie>(AddActor<BossZombie>());
-	//if (boss)
-	//	boss->ApplyMovement(player_actor->GetCurPosition() + XMVectorSet(0, -100, 0, 0));
 }
 
 void InGameScene::OnUpdate()
@@ -232,6 +228,8 @@ void InGameScene::ShowCarCrashing()
 
 void InGameScene::GameResultProcess()
 {
+	SCENE_MGR->GetPlayer<Player>(0)->controller_enable_ = false;
+
 	switch (game_result_type)
 	{
 	case GameResultType::ePlayerDead:
@@ -241,6 +239,7 @@ void InGameScene::GameResultProcess()
 		ShowCarCrashing();
 		break;
 	case GameResultType::ePlayerInfected:
+		ingame_ui.ShowPlayerInfected();
 		break;
 	case GameResultType::eGameCleared:
 		bool fade_out_finished = ingame_ui.FadeOut();
