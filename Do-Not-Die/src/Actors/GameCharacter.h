@@ -17,6 +17,7 @@ public:
 	int GetTimer();
 	void TimeLimitedVariation(float time, float variation);
 	void PermanentVariation(float variation);
+	void SetDefualtValue(float value);
 
 	float current_value_ = 0;
 private:

@@ -53,6 +53,11 @@ void CharacterStatus::PermanentVariation(float variation)
 	default_value_ += variation;
 }
 
+void CharacterStatus::SetDefualtValue(float value)
+{
+	default_value_ = current_value_ = value;
+}
+
 CharacterStatus* GameCharacter::GetStatus(const string& name)
 {
 	auto iter = status_map_.find(name);

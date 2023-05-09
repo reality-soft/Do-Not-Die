@@ -16,7 +16,8 @@ namespace reality
 
 		float countdown_timer_ = 0;
 		UINT wave_count_ = 0;
-		int car_health = 40;
+		int car_health = 100;
+		int car_health_max = 300;
 		int car_repair_count = 0;
 		GuideLine fx_car_fire_;
 

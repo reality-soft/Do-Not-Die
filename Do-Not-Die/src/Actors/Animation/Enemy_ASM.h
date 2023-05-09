@@ -10,6 +10,7 @@ public:
 	enum States {
 		IDLE_BASE,
 		MOVE_BASE,
+		ATTACK_BASE,
 		HIT_BASE,
 		DIE_BASE,
 	};
@@ -19,11 +20,33 @@ public:
 	virtual void OnInit() override {
 		states_.insert({ IDLE_BASE, make_shared<Idle_Base>() });
 		states_.insert({ MOVE_BASE, make_shared<Move_Base>() });
+		states_.insert({ ATTACK_BASE, make_shared<Attack_Base>() });
 		states_.insert({ HIT_BASE, make_shared<Hit_Base>() });
 		states_.insert({ DIE_BASE, make_shared<Die_Base>() });
+
 		transitions_.insert({ IDLE_BASE, Transition(MOVE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
 				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
 				if (enemy->IsMoving()) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+		transitions_.insert({ MOVE_BASE, Transition(ATTACK_BASE,[this](const AnimationStateMachine* animation_state_machine) {
+				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
+				if (enemy->is_attacking_) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+		transitions_.insert({ ATTACK_BASE, Transition(MOVE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
+				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
+				if (enemy->is_attacking_ == false) {
 					return true;
 				}
 				else {
@@ -161,19 +184,47 @@ public:
 	public:
 		Move_Base() : AnimationState(MOVE_BASE) {}
 		
-		
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			vector<AnimNotify> notifies;
 			notifies.push_back({ 1, make_shared<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "Zombie_Move_1.mp3", 0.5f, false), true });
-			animation_state_machine->SetAnimation("Zombie_Walk_F_6_Loop_IPC_Anim_Unreal Take.anim", 0.8f, true, notifies);
+			selected_chase_anim = RandomIntInRange(0, 4);
+			animation_state_machine->SetAnimation(chase_animations_[selected_chase_anim], 0.8f, true, notifies);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
+		}
+
+	private:
+		vector<string> chase_animations_ = { "DND_HyperChase1.anim",
+											 "DND_HyperChase2.anim",
+											 "DND_HyperChase3.anim",
+											 "DND_HyperChase4.anim",
+											 "DND_HyperChase5.anim" };
+											 
+		UINT selected_chase_anim = 0;
+	};
+
+	class Attack_Base : public AnimationState {
+	public:
+		Attack_Base() : AnimationState(ATTACK_BASE) {}
+
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			animation_state_machine->SetAnimation("DND_NormalChase.anim", 0.3f, true);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+
 		}
 	};
 
@@ -465,18 +516,19 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieAttack_1.mp3", 0.5f, false);
-			animation_state_machine->SetAnimation("Zombie_Atk_Arms_3_SHORT_Loop_IPC_Retargeted_Unreal Take.anim", 0.5f, true);
+			animation_state_machine->SetAnimation("Zombie_Atk_Arms_3_SHORT_Loop_IPC_Retargeted_Unreal Take.anim", 0.5f, true);						
+			SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId())->GetStatus("max_speed")->SetDefualtValue(50);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
 			enemy->is_attack_ended = true;
 			enemy->is_attacking_ = false;
+			SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId())->GetStatus("max_speed")->SetDefualtValue(RandomIntInRange(100, 200));
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
-			//enemy->CancelMovement();
 		}
 	};
 };
