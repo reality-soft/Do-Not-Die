@@ -10,7 +10,8 @@ CharacterStatus::CharacterStatus(float def, float cur, float min, float max)
 
 void CharacterStatus::Update()
 {
-	if (Tick() == true)
+	is_on_ = Tick();
+	if (is_on_)
 	{
 		current_value_ = default_value_ + variation_;
 	}
@@ -29,7 +30,9 @@ float CharacterStatus::GetMaxValue() { return max_value_; }
 float CharacterStatus::GetCurrentValue() { return current_value_; }
 float CharacterStatus::GetDefaultValue() { return default_value_; }
 float CharacterStatus::GetVariation() { return variation_; }
-int   CharacterStatus::GetTimer() { return timer_; }
+float CharacterStatus::GetTimer() { return timer_; }
+
+bool CharacterStatus::GetIsOn(){ return is_on_; }
 
 bool CharacterStatus::Tick()
 {
