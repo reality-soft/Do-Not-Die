@@ -16,9 +16,11 @@ public:
 	GameResultEvent(GameResultType result_type) : result(result_type) {};
 	virtual void Process() override {
 		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
-		if (ingame_scene)
+		if (ingame_scene && ingame_scene->game_result_type == GameResultType::eNone)
 			ingame_scene->game_result_type = result;
 	}
+	
+private:
 	GameResultType result;
 };
 

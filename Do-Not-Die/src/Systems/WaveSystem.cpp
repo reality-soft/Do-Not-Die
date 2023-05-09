@@ -205,7 +205,7 @@ void reality::WaveSystem::PlayerRepairCar()
 	{
 		player->controller_enable_ = true;
 		player->UseRepairPart();
-		car_health = min(100, car_health + 20);
+		car_health = min(car_health_max, car_health + 20);
 		player->repair_during_time_ = 0.0f; 
 		car_repair_count++;
 		EVENT->PushEvent<MakeTextEvent>("Repair Success!");
@@ -267,9 +267,9 @@ void reality::WaveSystem::SpawnZombies(float interval)
 
 void reality::WaveSystem::SpawnCarSmokes()
 {
-	for (int i = 0; i < 100; i += 20)
+	for (int i = 0; i < car_health_max; i += car_health_max / 5)
 	{
-		int index = i / 20;
+		int index = i / 60;
 
 		if (i >= car_health || car_health == 0)
 		{
