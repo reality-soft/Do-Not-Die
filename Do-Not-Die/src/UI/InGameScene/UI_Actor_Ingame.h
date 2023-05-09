@@ -38,6 +38,13 @@ namespace reality
 			shared_ptr<UI_Text>		inven_count_text_[4];
 			shared_ptr<UI_Image>	inven_cooltime_img_[4];
 			shared_ptr<UI_Image>	hp_img_;
+			shared_ptr<UI_Image>	infected_img_;
+			shared_ptr<UI_Text>		infected_text_;
+		// Buff
+		shared_ptr<UI_Image>	buff_slot1_;
+			shared_ptr<UI_Text>		buff_timer1_;
+		shared_ptr<UI_Image>	buff_slot2_;
+			shared_ptr<UI_Text>		buff_timer2_;
 		// Objective
 		shared_ptr<UI_Image>	objective_ui_;
 			shared_ptr<UI_Text>		wave_text_;

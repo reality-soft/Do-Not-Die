@@ -6,6 +6,10 @@
 
 using namespace reality;
 
+static float slot_width = 75.0f;
+static float slot_height = 75.0f;
+static float slot_width_step = 110.0f;
+
 void UI_Actor_Ingame::OnInit(entt::registry& registry)
 {
 	UIActor::OnInit(registry);
@@ -55,7 +59,7 @@ void UI_Actor_Ingame::CreateIngameUI()
 	// 무기 UI
 	{
 		float weapon_ui_height = win_size_1920_height - 500.0f;
-		
+
 		float width = 300.0f;
 		float height = 75.0f;
 
@@ -112,7 +116,7 @@ void UI_Actor_Ingame::CreateIngameUI()
 		ammo_ui_->AddChildUI("1_AmmoCurrent", ammo_cur_text_);
 
 		ammo_max_text_ = make_shared<UI_Text>();
-		ammo_max_text_->InitText("150", ROBOTO, { 130.0f, 15.0f }, 0.8f, {0.3f, 0.3f, 0.3f, 1.0f});
+		ammo_max_text_->InitText("150", ROBOTO, { 130.0f, 15.0f }, 0.8f, { 0.3f, 0.3f, 0.3f, 1.0f });
 		ammo_ui_->AddChildUI("1_AmmoMax", ammo_max_text_);
 
 		ui_comp_->ui_list.insert({ "Weapon_Ammo UI", ammo_ui_ });
@@ -144,7 +148,7 @@ void UI_Actor_Ingame::CreateIngameUI()
 		inven_[0]->InitImage("");
 		inven_[0]->SetLocalRectByCenter({ 101.5f, 76.5f }, 90.0f, 90.0f);
 		inven_count_text_[0] = make_shared<UI_Text>();
-		inven_count_text_[0]->InitText("", E_Font::BASIC, inven_count_min, inven_count_text_size, {0.0f, 0.0f, 0.0f, 1.0f});
+		inven_count_text_[0]->InitText("", E_Font::BASIC, inven_count_min, inven_count_text_size, { 0.0f, 0.0f, 0.0f, 1.0f });
 		inven_[0]->AddChildUI("2_InvenCountText", inven_count_text_[0]);
 		inven_slot_text_[0] = make_shared<UI_Text>();
 		inven_slot_text_[0]->InitText("1", E_Font::BASIC, inven_slot_min, 1.0f, { 0.0f, 0.0f, 0.0f, 1.0f });
@@ -199,8 +203,51 @@ void UI_Actor_Ingame::CreateIngameUI()
 		hp_img_ = make_shared<UI_Image>();
 		status_ui->AddChildUI("1_HpBar", hp_img_);
 		hp_img_->InitImage("T_HpBar.png");
-		hp_img_->SetLocalRectByMin({ status_ui->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f - 200.0f, 150.0f }, 400.0f, 30.0f);
+		hp_img_->SetLocalRectByMin({ status_ui->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f - 200.5f, 150.5f }, 400.0f, 30.0f);
+
+		infected_img_ = make_shared<UI_Image>();
+		status_ui->AddChildUI("1_InfectedBar", infected_img_);
+		infected_img_->InitImage("T_Infected_Bar.png");
+		infected_img_->SetLocalRectByMin({ status_ui->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f - 154.0f, 190.0f }, 352.0f, 8.0f);
+
+		infected_text_ = make_shared<UI_Text>();
+		status_ui->AddChildUI("1_InfectedText", infected_text_);
+		infected_text_->InitText("0%", E_Font::ROBOTO, { 61.0f, 185.0f }, 0.7f, { 0.1f, 0.44f, 0.0f, 1.0f });
+
 		ui_comp_->ui_list.insert({ "Status UI", status_ui });
+	}
+
+	// 버프 UI
+	{
+		buff_slot1_ = make_shared<UI_Image>();
+		buff_slot2_ = make_shared<UI_Image>();
+
+		buff_slot1_->InitImage("T_Buff_Damage.png");
+		buff_slot2_->InitImage("T_Buff_Damage.png");
+
+		float slot_x = 100.0f; // win_size_1920_width / 10.0f;
+		float slot_y = win_size_1920_height / 2.0f - 100.0f;
+		//float slot_width = 75.0f;
+		//float slot_height = 75.0f;
+		//float slot_width_step = 110.0f;
+
+		buff_slot1_->SetLocalRectByMin({ slot_x + slot_width_step * 0.0f, slot_y }, slot_width, slot_height);
+		buff_slot2_->SetLocalRectByMin({ slot_x + slot_width_step * 1.0f, slot_y }, slot_width, slot_height);
+
+		buff_timer1_ = make_shared<UI_Text>();
+		buff_timer2_ = make_shared<UI_Text>();
+
+		buff_slot1_->AddChildUI("1_Timer", buff_timer1_);
+		buff_slot2_->AddChildUI("1_Timer", buff_timer2_);
+
+		float timer_x = slot_width / 2.0f - 15.0f;
+		float timer_y = slot_height;// +slot_height / 2.0f;
+
+		buff_timer1_->InitText("10", E_Font::ROBOTO, { timer_x, timer_y }, 0.7f);
+		buff_timer2_->InitText("9", E_Font::ROBOTO, { timer_x + 5.0f, timer_y }, 0.7f);
+
+		ui_comp_->ui_list.insert({ "1_buff_slot1", buff_slot1_ });
+		ui_comp_->ui_list.insert({ "1_buff_slot2", buff_slot2_ });
 	}
 
 	// 미니맵 UI
@@ -261,10 +308,12 @@ void UI_Actor_Ingame::CreateIngameUI()
 	}
 
 	// CrossHair UI
-	crosshair_ui_ = make_shared<UI_Image>();
-	crosshair_ui_->InitImage("T_DotCrossHair.png");
-	crosshair_ui_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f }, 8.0f, 8.0f);
-	ui_comp_->ui_list.insert({ "CrossHair UI", crosshair_ui_ });
+	{
+		crosshair_ui_ = make_shared<UI_Image>();
+		crosshair_ui_->InitImage("T_DotCrossHair.png");
+		crosshair_ui_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f }, 8.0f, 8.0f);
+		ui_comp_->ui_list.insert({ "CrossHair UI", crosshair_ui_ });
+	}
 
 	// Interaction UI
 	{
@@ -295,29 +344,33 @@ void UI_Actor_Ingame::CreateIngameUI()
 	}
 
 	// Event Message UI
-	event_msg_text_ = make_shared<UI_Text>();
-	event_msg_text_->InitText("Event Test", E_Font::ROBOTO, { win_size_1920_width / 2.0f - 100.0f, win_size_1920_height - 300.0f });
+	{
+		event_msg_text_ = make_shared<UI_Text>();
+		event_msg_text_->InitText("Event Test", E_Font::ROBOTO, { win_size_1920_width / 2.0f - 100.0f, win_size_1920_height - 300.0f });
+	}
 
 	// Game Over UI
-	player_dead_ui_ = make_shared<UI_Image>();
-	player_dead_ui_->InitImage("T_YouAreDead.png");
-	player_dead_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
+	{
+		player_dead_ui_ = make_shared<UI_Image>();
+		player_dead_ui_->InitImage("T_YouAreDead.png");
+		player_dead_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
 
-	car_is_crashed_ui_ = make_shared<UI_Image>();
-	car_is_crashed_ui_->InitImage("T_CarIsCrashed.png");
-	car_is_crashed_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
-	
-	player_infected_ui_ = make_shared<UI_Image>();
-	player_infected_ui_->InitImage("T_YouAreInfected.png");
-	player_infected_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
+		car_is_crashed_ui_ = make_shared<UI_Image>();
+		car_is_crashed_ui_->InitImage("T_CarIsCrashed.png");
+		car_is_crashed_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
 
-	game_over_exit_button_ = make_shared<UI_Button>();
-	game_over_exit_button_->InitButton("T_Gameover_ExitBtn_Normal.png", "T_Gameover_ExitBtn_Hover.png");
-	game_over_exit_button_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height * 3.0f / 4.0f }, 500.0f, 150.0f);
+		player_infected_ui_ = make_shared<UI_Image>();
+		player_infected_ui_->InitImage("T_YouAreInfected.png");
+		player_infected_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
 
-	player_dead_ui_->AddChildUI("Exit Button", game_over_exit_button_);
-	car_is_crashed_ui_->AddChildUI("Exit Button", game_over_exit_button_);
-	player_infected_ui_->AddChildUI("Exit Button", game_over_exit_button_);
+		game_over_exit_button_ = make_shared<UI_Button>();
+		game_over_exit_button_->InitButton("T_Gameover_ExitBtn_Normal.png", "T_Gameover_ExitBtn_Hover.png");
+		game_over_exit_button_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height * 3.0f / 4.0f }, 500.0f, 150.0f);
+
+		player_dead_ui_->AddChildUI("Exit Button", game_over_exit_button_);
+		car_is_crashed_ui_->AddChildUI("Exit Button", game_over_exit_button_);
+		player_infected_ui_->AddChildUI("Exit Button", game_over_exit_button_);
+	}
 }
 
 void UI_Actor_Ingame::CreateMenuUI()
@@ -420,6 +473,106 @@ void UI_Actor_Ingame::UpdateIngameUI()
 			hp_img_->render_data_.tex_id = "T_HpBarRed.png";
 
 		hp_img_->SetLocalRectByMin({ status_ui->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f - 200.0f, 150.0f }, 400.0f * hp_ratio, 30.0f);
+	}
+
+	// Infected UI Update
+	{
+		string str = to_string(player_->infection_probability_) + "%";
+		infected_text_->SetText(str);
+		if (player_->infection_probability_ >= 10)
+			infected_text_->SetLocalRectByMin({ 52.0f, 185.0f }, 100.0f, 100.0f);
+		else
+			infected_text_->SetLocalRectByMin({ 61.0f, 185.0f }, 100.0f, 100.0f);
+		
+
+		float infected_rate = player_->GetStatus("infection")->GetCurrentValue() / player_->GetStatus("infection")->GetMaxValue();
+
+		if (player_->is_infected)
+		{
+			ui_comp_->ui_list.insert({ "1_Addicted UI", addicted_ui_ });
+			addicted_ui_->SetAlpha(infected_rate);
+			
+			infected_text_->SetText("Infected");
+			infected_text_->SetLocalRectByMin({ 30.0f, 185.0f }, 100.0f, 100.0f);
+		}
+		else if(!player_->is_infected && ui_comp_->ui_list.find("1_Addicted UI") != ui_comp_->ui_list.end())
+			ui_comp_->ui_list.erase("1_Addicted UI");
+
+		infected_img_->SetLocalRectByMin({ status_ui->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f - 154.0f, 190.0f }, 352.0f * infected_rate, 8.0f);
+	}
+
+	// Buff UI Update
+	{
+		auto damage_buf_status = player_->GetStatus("gunfire_damage");
+		auto speed_buf_status = player_->GetStatus("max_speed");
+		
+		bool damage_buf_onoff = player_->GetStatus("gunfire_damage")->GetIsOn();
+		bool speed_buf_onoff = player_->GetStatus("max_speed")->GetIsOn();
+		
+		string slot1_img = "";
+		string slot2_img = "";
+		
+		float timer1 = damage_buf_status->GetTimer();
+		float timer2 = speed_buf_status->GetTimer();
+
+		if (damage_buf_onoff && speed_buf_onoff)
+		{
+			if (timer1 > timer2)
+			{
+				slot1_img = "T_Buff_Damage.png";
+				slot2_img = "T_Buff_Speed.png";
+				buff_timer1_->SetText(to_string((int)timer1));
+				buff_timer2_->SetText(to_string((int)timer2));
+			}
+			else
+			{
+				slot1_img = "T_Buff_Speed.png";
+				slot2_img = "T_Buff_Damage.png";
+				buff_timer1_->SetText(to_string((int)timer2));
+				buff_timer2_->SetText(to_string((int)timer1));
+			}	
+		}
+		else if (damage_buf_onoff)
+		{
+			slot1_img = "T_Buff_Damage.png";
+			buff_timer1_->SetText(to_string((int)timer1));
+		}
+		else if (speed_buf_onoff)
+		{
+			slot1_img = "T_Buff_Speed.png";
+			buff_timer1_->SetText(to_string((int)timer2));
+		}
+		
+		float timer_x = slot_width / 2.0f - 15.0f;
+		float timer_y = slot_height;// +slot_height / 2.0f;
+
+		if (slot1_img != "")
+		{
+			buff_slot1_->SetImage(slot1_img);
+
+			if (buff_timer1_->GetText().size() >= 2)
+				buff_timer1_->SetLocalRectByMin({timer_x, timer_y}, 0.0f, 0.0f);
+			else
+				buff_timer1_->SetLocalRectByMin({ timer_x + 5.0f, timer_y }, 0.0f, 0.0f);
+
+			ui_comp_->ui_list.insert({ "1_buff_slot1", buff_slot1_ });
+		}
+		else if (ui_comp_->ui_list.find("1_buff_slot1") != ui_comp_->ui_list.end())
+			ui_comp_->ui_list.erase("1_buff_slot1");
+		
+		if (slot2_img != "")
+		{
+			buff_slot2_->SetImage(slot2_img);
+
+			if (buff_timer2_->GetText().size() >= 2)
+				buff_timer2_->SetLocalRectByMin({ timer_x, timer_y }, 0.0f, 0.0f);
+			else
+				buff_timer2_->SetLocalRectByMin({ timer_x + 5.0f, timer_y }, 0.0f, 0.0f);
+
+			ui_comp_->ui_list.insert({ "1_buff_slot2", buff_slot2_ });
+		}
+		else if (ui_comp_->ui_list.find("1_buff_slot2") != ui_comp_->ui_list.end())
+			ui_comp_->ui_list.erase("1_buff_slot2");
 	}
 
 	// Wave / Time Update
