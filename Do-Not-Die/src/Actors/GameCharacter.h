@@ -14,14 +14,16 @@ public:
 	float GetCurrentValue();
 	float GetDefaultValue();
 	float GetVariation();
-	int GetTimer();
+	float GetTimer();
+	bool GetIsOn();
 	void TimeLimitedVariation(float time, float variation);
 	void PermanentVariation(float variation);
 
 	float current_value_ = 0;
+	bool is_on_;
+
 private:
 	bool Tick();
-
 	float timer_ = 0.0f;
 	float min_value_ = 0;
 	float max_value_ = 0;
