@@ -77,7 +77,7 @@ void InGameScene::OnInit()
 	QUADTREE->CreatePhysicsCS();
 	QUADTREE->InitCollisionMeshes();
 	QUADTREE->SetBlockingFields("DND_Blocking_1");
-	QUADTREE->view_collisions_ = true;
+	//QUADTREE->view_collisions_ = true;
 
 	XMVECTOR plyer_spawn = QUADTREE->GetGuideLines("DND_PlayerStart_1")->begin()->line_nodes.begin()->second;
 	player_actor->SetSpawnPoint(plyer_spawn);
@@ -87,7 +87,7 @@ void InGameScene::OnInit()
 	
 	environment_.CreateEnvironment();
 	//environment_.SetWorldTime(120, 240);
-	environment_.SetWorldTime(30, 30);
+	environment_.SetWorldTime(60, 10);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 1000);
 	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.1f, 0.25f);
@@ -150,13 +150,13 @@ void InGameScene::OnRender()
 	level.Update();
 	level.Render();
 
-	QUADTREE->RenderCollisionMeshes();
+	//QUADTREE->RenderCollisionMeshes();
 
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);
 
 #ifdef _DEBUG
-	GUI->RenderWidgets();
+	//GUI->RenderWidgets();
 #endif
 }
 
@@ -205,7 +205,7 @@ void InGameScene::ShowCarCrashing()
 	seq_info.sequence_end = sys_wave_.GetCarPosition() - XMVector3Normalize(sys_wave_.GetCarPosition() - seq_info.sequence_start) * 500;
 	seq_info.target_start = sys_camera.GetCamera()->target_pos;
 	seq_info.target_end = sys_wave_.GetCarPosition();
-	seq_info.play_time = 5.0f;
+	seq_info.play_time = 3.0f;
 	seq_info.acceler = 1.f;
 	seq_info.decceler = 0.1f;
 
