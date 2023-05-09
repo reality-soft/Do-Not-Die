@@ -493,7 +493,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 			addicted_ui_->SetAlpha(infected_rate);
 			
 			infected_text_->SetText("Infected");
-			infected_text_->SetLocalRectByMin({ 30.0f, 185.0f }, 100.0f, 100.0f);
+			infected_text_->SetLocalRectByMin({ 10.0f, 185.0f }, 100.0f, 100.0f);
 		}
 		else if(!player_->is_infected && ui_comp_->ui_list.find("1_Addicted UI") != ui_comp_->ui_list.end())
 			ui_comp_->ui_list.erase("1_Addicted UI");
