@@ -108,17 +108,17 @@ void InGameScene::OnInit()
 #endif
 
 	//BossZombie Test
-	//BossZombie* boss = GetActor<BossZombie>(AddActor<BossZombie>());
+	BossZombie* boss = GetActor<BossZombie>(AddActor<BossZombie>());
 
-	//int guidline_index = 4;
+	int guidline_index = 4;
 
-	//const auto zomebie_tracks_ = QUADTREE->GetGuideLines("DND_NpcTrack_1");
+	const auto zomebie_tracks_ = QUADTREE->GetGuideLines("DND_NpcTrack_1");
 
-	//vector<XMVECTOR> target_poses;
-	//for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
-	//	target_poses.push_back(target_pos.second);
-	//}
-	//boss->SetBehaviorTree(target_poses);
+	vector<XMVECTOR> target_poses;
+	for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
+		target_poses.push_back(target_pos.second);
+	}
+	boss->SetBehaviorTree(target_poses);
 }
 
 void InGameScene::OnUpdate()

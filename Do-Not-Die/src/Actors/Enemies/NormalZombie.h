@@ -7,7 +7,7 @@ public:
 	virtual void OnInit(entt::registry& registry) override;
 
 public:
-	void Attack();
+	virtual void Attack() override;
 
 public:
 	void AddImpulse(XMVECTOR direction, float strength);

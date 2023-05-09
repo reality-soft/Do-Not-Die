@@ -3,7 +3,8 @@
 #include "AnimationStateMachine.h"
 #include "Player.h"
 #include "BossZombie_ASM.h"
-#include "Enemy_BTN.h"
+#include "BaseEnemy_BTN.h"
+#include "BossZombie_BTN.h"
 
 void BossZombie::OnInit(entt::registry& registry)
 {
@@ -23,7 +24,7 @@ void BossZombie::OnInit(entt::registry& registry)
 
 	// setting character objects
 	reality::C_SkeletalMesh skm;
-	skm.local = TransformS(XMFLOAT3(0.1f, 0.1f, 0.1f));
+	skm.local = TransformS(XMFLOAT3(0.06f, 0.06f, 0.06f)) * XMMatrixRotationY(XMConvertToRadians(180));
 	skm.world = skm.local * XMMatrixIdentity();
 	skm.skeletal_mesh_id = "DND_BossZombie.skmesh";
 	skm.vertex_shader_id = "SkinningVS.cso";
@@ -35,23 +36,11 @@ void BossZombie::OnInit(entt::registry& registry)
 	registry.emplace<reality::C_CapsuleCollision>(entity_id_, capsule);
 
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
-	if (skeletal_mesh)
-	{
-		C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
-
-		animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-
-		// TEST _ BOSS ZOMBIE
-		//animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_Idle.anim", 0.0);
-		//animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_JumpAttack.anim", 0.0);
-		//animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_Kick.anim", 0.0);
-		//animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_Punch_L.anim", 0.0);
-		//animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_Punch_R.anim", 0.0);
-		//animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_Run.anim", 0.0);
-		//animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_StrongPunch.anim", 0.0);
-		animation_component.GetAnimSlotByName("Base")->SetAnimation("DND_BossZombie_Walk.anim", 0.0, false);
-		reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
-	}
+	
+	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
+	animation_component.SetBaseAnimObject<BossZombieBaseAnimationStateMachine>(entity_id_, skm.skeletal_mesh_id, 0);
+	animation_component.AddNewAnimSlot<BossZombieUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 3, "Spine_02");
+	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(reality::C_CapsuleCollision));
 	transform_tree_.AddNodeToNode(TYPE_ID(C_CapsuleCollision), TYPE_ID(C_SkeletalMesh));
@@ -66,7 +55,7 @@ void BossZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 
 	// in combat zone
 	shared_ptr<SelectorNode> follow_player_or_car = make_shared<SelectorNode>();
-	follow_player_or_car->AddChild<EnemyFollowPlayer>(entity_id_, XMVectorZero());
+	//follow_player_or_car->AddChild<EnemyFollowPlayer>(entity_id_, XMVectorZero());
 	follow_player_or_car->AddChild<EnemyFollowCar>(entity_id_, XMVectorZero());
 
 	shared_ptr<InfiniteRepeatNode> repeat_node = make_shared<InfiniteRepeatNode>(follow_player_or_car);
@@ -81,4 +70,19 @@ void BossZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 	vector<pair<std::function<bool()>, shared_ptr<BehaviorNode>>> children_;
 	children_.push_back(make_pair([this]() { return in_defense_bound_; }, repeat_node));
 	behavior_tree_.SetRootNode<IfElseIfNode>(children_, move_to_combat_zone);
+}
+
+void BossZombie::Attack()
+{
+	if (is_attacking_ == true)
+		return;
+
+	auto c_enemy_capsule = reg_scene_->try_get<C_CapsuleCollision>(entity_id_);
+	if (c_enemy_capsule == nullptr)
+		return;
+
+	RayShape attack_ray;
+	attack_ray.start = _XMFLOAT3(GetTipBaseAB(c_enemy_capsule->capsule)[3]);
+	attack_ray.end = _XMFLOAT3((_XMVECTOR3(attack_ray.start) + (front_ * attack_distance_)));
+	EVENT->PushEvent<AttackEvent_SingleRay>(attack_ray, entity_id_);
 }

@@ -1,6 +1,6 @@
 #include "Engine_include.h"
-#include "NormalZombie.h"
-
+#include "BaseEnemy.h"
+// common
 class EnemyMoveToTarget : public reality::ActionNode
 {
 public:
@@ -23,48 +23,6 @@ public:
 
 		if (XMVector3Length(target_pos - cur_pos).m128_f32[0] < 30.0f) {
 			return reality::BehaviorStatus::SUCCESS;
-		}
-
-		return reality::BehaviorStatus::RUNNING;
-	}
-
-protected:
-	XMVECTOR target_position_;
-	entt::entity owner_id_;
-};
-
-class EnemyFollowPlayer : public reality::ActionNode
-{
-public:
-	EnemyFollowPlayer(entt::entity enemy_id, XMVECTOR target_position)
-		: owner_id_(enemy_id), target_position_(target_position)
-	{
-	};
-
-	virtual reality::BehaviorStatus Action() override
-	{
-		static float search_time = 0.0f;
-		search_time += TM_DELTATIME;
-
-		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
-		BaseEnemy* enemy = reality::SCENE_MGR->GetActor<BaseEnemy>(owner_id_);
-
-		XMVECTOR direction_to_player = XMVector3Normalize(player->GetCurPosition() - enemy->GetCurPosition());
-		target_position_ = player->GetCurPosition();
-		
-		if (enemy->player_in_sight_ == false || player->player_in_defense_ == false)
-			return reality::BehaviorStatus::FAILURE;
-		
-
-		float distance_to_player = Distance(player->GetCurPosition(), enemy->GetCurPosition());
-
-		if (distance_to_player >= 30)
-		{
-			enemy->SetMovement(direction_to_player);
-		}
-		if (Distance(player->GetCurPosition(), enemy->GetCurPosition()) < 50.0f)
-		{			
-			enemy->Attack();
 		}
 
 		return reality::BehaviorStatus::RUNNING;

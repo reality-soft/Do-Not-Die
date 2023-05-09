@@ -3,7 +3,7 @@
 #include "AnimationStateMachine.h"
 #include "Player.h"
 #include "BossZombie_ASM.h"
-#include "Enemy_BTN.h"
+#include "BaseEnemy_BTN.h"
 
 void BaseEnemy::OnUpdate()
 {

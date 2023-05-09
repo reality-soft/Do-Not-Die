@@ -3,7 +3,8 @@
 #include "AnimationStateMachine.h"
 #include "Player.h"
 #include "NormalZombie_ASM.h"
-#include "Enemy_BTN.h"
+#include "BaseEnemy_BTN.h"
+#include "NormalZombie_BTN.h"
 
 using namespace reality;
 
