@@ -169,7 +169,7 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			animation_state_machine->SetAnimation("Zombie_Idle_1_v2_IPC_Anim.anim", 0.3f, true);
+			animation_state_machine->SetAnimation("DND_Idle_1.anim", 0.3f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -236,7 +236,7 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieHit_1.wav", 0.5f, false);
-			animation_state_machine->SetAnimation("Zombie_Atk_KnockBack_1_IPC_Anim_Unreal Take.anim", 0.8f, true);
+			animation_state_machine->SetAnimation("DND_KnockBack_1.anim", 0.8f, true);
 			SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId())->is_hit_ = false;
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
@@ -259,7 +259,7 @@ public:
 			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
 			enemy->GetCapsuleComponent()->capsule.height = 3.f;
 			enemy->GetCapsuleComponent()->capsule.radius = 3.f;
-			animation_state_machine->SetAnimation("Zombie_Death_Back_Mid_1_IPC_Anim_Unreal Take.anim", 0.5f, true);
+			animation_state_machine->SetAnimation("DND_Death_1.anim", 0.5f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -516,7 +516,7 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieAttack_1.mp3", 0.5f, false);
-			animation_state_machine->SetAnimation("Zombie_Atk_Arms_3_SHORT_Loop_IPC_Retargeted_Unreal Take.anim", 0.5f, true);						
+			animation_state_machine->SetAnimation("DND_Attack_1.anim", 0.5f, true);						
 			SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId())->GetStatus("max_speed")->SetDefualtValue(50);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
