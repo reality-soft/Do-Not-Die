@@ -7,6 +7,9 @@
 
 void BaseEnemy::OnUpdate()
 {
+	UpdateStatus();
+	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
+
 	ChasePlayer();
 	behavior_tree_.Update();
 	Character::OnUpdate();
