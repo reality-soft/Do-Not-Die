@@ -200,6 +200,8 @@ void InGameScene::SetCursorInvisible()
 
 void InGameScene::ShowCarCrashing()
 {
+	ingame_ui.GetUIComponent()->ui_list.clear();
+
 	SequenceInfo seq_info;
 	seq_info.sequence_start = sys_camera.world_matrix.r[3];
 	seq_info.sequence_end = sys_wave_.GetCarPosition() - XMVector3Normalize(sys_wave_.GetCarPosition() - seq_info.sequence_start) * 500;
