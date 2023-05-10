@@ -69,29 +69,6 @@ void NormalZombie::OnInit(entt::registry& registry)
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 }
 
-void NormalZombie::OnUpdate()
-{
-	ChasePlayer();
-	behavior_tree_.Update();
-	Character::OnUpdate();
-}
-
-void NormalZombie::SetCharacterAnimation(string anim_id) const
-{
-	reality::C_Animation* animation_component_ptr = reg_scene_->try_get<reality::C_Animation>(entity_id_);
-	int base_index = animation_component_ptr->name_to_anim_slot_index["Base"];
-	animation_component_ptr->anim_slots[base_index].second->SetAnimation(anim_id, 0.3, true);
-	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
-}
-
-void NormalZombie::Jump()
-{
-}
-
-void NormalZombie::Idle()
-{
-}
-
 void NormalZombie::Attack()
 {
 	if (is_attacking_ == true)
@@ -108,21 +85,6 @@ void NormalZombie::Attack()
 	//attack_ray.end = _XMFLOAT3((_XMVECTOR3(attack_ray.start) + (front_ * attack_distance_)));
 	//EVENT->PushEvent<AttackEvent_SingleRay>(attack_ray, entity_id_);
 }
-
-//float NormalZombie::GetMaxHp() const
-//{
-//	return max_hp_;
-//}
-//
-//void NormalZombie::SetCurHp(int hp)
-//{
-//}
-
-//void NormalZombie::TakeDamage(int damage)
-//{
-//	is_hit_ = true;
-//	cur_hp_ -= damage;
-//}
 
 void NormalZombie::AddImpulse(XMVECTOR direction, float strength)
 {

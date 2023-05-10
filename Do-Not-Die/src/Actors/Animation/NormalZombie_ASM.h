@@ -96,7 +96,7 @@ public:
 			});
 		transitions_.insert({ HIT_BASE, Transition(IDLE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
 				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
-				if (IsAnimationEnded() && enemy->GetStatus("hp")->GetCurrentValue() > 0.0f && enemy->IsMoving() == false) {
+				if (IsAnimationEnded() && enemy->GetStatus("hp")->GetCurrentValue() > 0.0f && enemy->is_moving_ == false) {
 					return true;
 				}
 				else {
@@ -106,7 +106,7 @@ public:
 			});
 		transitions_.insert({ HIT_BASE, Transition(MOVE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
 				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
-				if (IsAnimationEnded() && enemy->GetStatus("hp")->GetCurrentValue() > 0 && enemy->IsMoving() == true) {
+				if (IsAnimationEnded() && enemy->GetStatus("hp")->GetCurrentValue() > 0 && enemy->is_moving_ == true) {
 					return true;
 				}
 				else {
@@ -343,7 +343,7 @@ public:
 		});
 		transitions_.insert({ HIT, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
-				if (IsAnimationEnded() && enemy->GetStatus("hp")->GetCurrentValue() > 0.0f && enemy->IsMoving() == false) {
+				if (IsAnimationEnded() && enemy->GetStatus("hp")->GetCurrentValue() > 0.0f && enemy->is_moving_ == false) {
 					return true;
 				}
 				else {
@@ -353,7 +353,7 @@ public:
 		});
 		transitions_.insert({ HIT, Transition(MOVE,[this](const AnimationStateMachine* animation_state_machine) {
 				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
-				if (IsAnimationEnded() && enemy->GetStatus("hp")->GetCurrentValue() > 0 && enemy->IsMoving() == true) {
+				if (IsAnimationEnded() && enemy->GetStatus("hp")->GetCurrentValue() > 0 && enemy->is_moving_ == true) {
 					return true;
 				}
 				else {

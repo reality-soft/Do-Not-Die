@@ -33,5 +33,7 @@ public:
 
 protected:
 	reality::BehaviorTree behavior_tree_;
+
+public:
 	float attack_distance_ = 80.0f;
 };

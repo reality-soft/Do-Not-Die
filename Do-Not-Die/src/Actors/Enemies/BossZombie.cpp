@@ -15,8 +15,14 @@ void BossZombie::OnInit(entt::registry& registry)
 	// setting character data
 	GetMovementComponent()->max_speed = 100;
 	GetMovementComponent()->acceleration = 100;
-	max_hp_ = cur_hp_ = 100;
-	damage_ = 10.0f;
+
+	AddStatus("hp", CharacterStatus(100, 100, 0, 100));
+	AddStatus("default_damage", CharacterStatus(10, 10, 10, 10));
+	AddStatus("max_speed", CharacterStatus(RandomIntInRange(100, 200), 0, 100, 200));
+
+	GetMovementComponent()->speed = 0;
+	GetMovementComponent()->acceleration = 100;
+	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
 
 	// set trigger sensor
 	C_TriggerSensor trigger_sensor;

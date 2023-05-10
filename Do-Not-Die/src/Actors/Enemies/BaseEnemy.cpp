@@ -40,27 +40,6 @@ void BaseEnemy::ChasePlayer()
 		player_in_sight_ = true;
 }
 
-float BaseEnemy::GetMaxHp() const
-{
-	return max_hp_;
-}
-
-float BaseEnemy::GetCurHp() const
-{
-	return cur_hp_;
-}
-
-void BaseEnemy::SetCurHp(int hp)
-{
-	cur_hp_ = hp;
-}
-
-void BaseEnemy::TakeDamage(int damage)
-{
-	is_hit_ = true;
-	cur_hp_ -= damage;
-}
-
 void BaseEnemy::SetMovement(const XMVECTOR& direction)
 {
 	if (XMVector3Length(direction).m128_f32[0] <= 0.00001f) {
