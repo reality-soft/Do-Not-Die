@@ -164,7 +164,7 @@ void reality::WaveSystem::PlayerExtractRepair()
 
 		SpawnRepairItem(trigger_comp->sphere_volume.center);
 
-		EVENT->PushEvent<MakeTextEvent>("Extract Success!");
+		EVENT->PushEvent<MakeTextEvent>("Extract Success!", 1920.0f / 2.0f - 100.0f);
 
 		DeleteExtractPoint(player->repair_extract_trigger);
 		player->extract_during_time_ = 0.0f;
@@ -185,7 +185,7 @@ void reality::WaveSystem::PlayerRepairCar()
 	if(player->HasRepairPart() == false)
 	{
 		if(DINPUT->GetKeyState(DIK_E) == KEY_PUSH)
-			EVENT->PushEvent<MakeTextEvent>("There is no Repair Part in Inventory!");
+			EVENT->PushEvent<MakeTextEvent>("There is no Repair Part in Inventory!", 1920.0f / 2.0f - 250.0f);
 		return;
 	}
 		
@@ -209,7 +209,7 @@ void reality::WaveSystem::PlayerRepairCar()
 		car_health = min(car_health_max, car_health + 20);
 		player->repair_during_time_ = 0.0f; 
 		car_repair_count++;
-		EVENT->PushEvent<MakeTextEvent>("Repair Success!");
+		EVENT->PushEvent<MakeTextEvent>("Repair Success!", 1920.0f / 2.0f - 100.0f);
 	}
 }
 

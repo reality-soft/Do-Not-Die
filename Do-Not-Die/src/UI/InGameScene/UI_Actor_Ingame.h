@@ -105,7 +105,7 @@ namespace reality
 	public:
 		void UpdateIngameUI();
 		void UpdateMenuUI();
-		void SetEventMsg(string msg);
+		void SetEventMsg(string msg, float x);
 		void ShowPlayerDead();
 		void ShowPlayerInfected();
 		void ShowCarCrashed();

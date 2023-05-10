@@ -869,9 +869,10 @@ void UI_Actor_Ingame::UpdateMenuUI()
 	}
 }
 
-void UI_Actor_Ingame::SetEventMsg(string msg)
+void UI_Actor_Ingame::SetEventMsg(string msg, float x)
 {
 	event_msg_text_->SetText(msg);
+	event_msg_text_->SetLocalRectByMin({x, event_msg_text_->rect_transform_[R1920x1080].local_rect.min.y}, 0.0f, 0.0f);
 	event_msg_timer_ = 0.0f; 
 	ui_comp_->ui_list.insert({ "Event Message UI", event_msg_text_ });
 }

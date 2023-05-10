@@ -41,14 +41,15 @@ private:
 class MakeTextEvent : public Event
 {
 public:
-	MakeTextEvent(string text) : text_(text) {};
+	MakeTextEvent(string text, float x) : text_(text), x_(x) {};
 	virtual void Process() override {
 		auto ingamescene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 		auto& ui_actor = ingamescene->GetUIActor();
-		ui_actor.SetEventMsg(text_);
+		ui_actor.SetEventMsg(text_, x_);
 	};
 private:
 	string text_;
+	float x_;
 };
 
 class GrenadeEvent : public Event
