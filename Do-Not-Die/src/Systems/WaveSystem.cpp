@@ -184,7 +184,8 @@ void reality::WaveSystem::PlayerRepairCar()
 
 	if(player->HasRepairPart() == false)
 	{
-		EVENT->PushEvent<MakeTextEvent>("There is no Repair Part in Inventory!");
+		if(DINPUT->GetKeyState(DIK_E) == KEY_PUSH)
+			EVENT->PushEvent<MakeTextEvent>("There is no Repair Part in Inventory!");
 		return;
 	}
 		
