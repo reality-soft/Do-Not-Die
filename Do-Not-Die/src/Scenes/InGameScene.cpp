@@ -154,6 +154,7 @@ void InGameScene::OnUpdate()
 	ingame_ui.SetGameTimer(sys_wave_.countdown_timer_);
 	ingame_ui.OnUpdate();
 	
+	
 	CursorStateUpdate();
 }
 
@@ -228,6 +229,7 @@ void InGameScene::ShowCarCrashing()
 	if (sys_camera.PlaySequence(seq_info, -1) == true)
 	{
 		ingame_ui.ShowCarCrashed();
+		ingame_ui.SetOnOff(false);
 
 		static float time = 0.0f;
 		static int index = 0;
@@ -250,15 +252,19 @@ void InGameScene::GameResultProcess()
 	{
 	case GameResultType::ePlayerDead:
 		ingame_ui.ShowPlayerDead();
+		ingame_ui.SetOnOff(false);
 		break;
 	case GameResultType::eCarCrashed:
 		ShowCarCrashing();
+		ingame_ui.SetOnOff(false);
 		break;
 	case GameResultType::ePlayerInfected:
 		ingame_ui.ShowPlayerInfected();
+		ingame_ui.SetOnOff(false);
 		break;
 	case GameResultType::eGameCleared:
 		bool fade_out_finished = ingame_ui.FadeOut();
+		ingame_ui.SetOnOff(false);
 		if (fade_out_finished)
 			SCENE_MGR->ChangeScene(ENDING);
 		break;

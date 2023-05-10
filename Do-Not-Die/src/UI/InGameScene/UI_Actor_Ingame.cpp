@@ -15,7 +15,7 @@ void UI_Actor_Ingame::OnInit(entt::registry& registry)
 	UIActor::OnInit(registry);
 
 	ui_comp_ = &registry.get<C_UI>(GetEntityId());
-
+	onoff_ = true;
 	CreateIngameUI();
 
 	CreateMenuUI();
@@ -25,6 +25,16 @@ void UI_Actor_Ingame::OnInit(entt::registry& registry)
 void UI_Actor_Ingame::OnUpdate()
 {
  	UIActor::OnUpdate();
+
+	// If Game Over, Exit Button Check
+	if (!onoff_)
+	{
+		if (game_over_exit_button_->GetCurrentState() == E_UIState::UI_SELECT)
+		{
+			DestroyWindow(ENGINE->GetWindowHandle());
+		}
+		return;
+	}
 
 	UpdateIngameUI();
 
@@ -431,14 +441,6 @@ void UI_Actor_Ingame::UpdateIngameUI()
 
 	float win_size_1920_width = E_Resolution_Size[E_Resolution::R1920x1080].x;
 	float win_size_1920_height = E_Resolution_Size[E_Resolution::R1920x1080].y;
-
-	// If Game Over, Exit Button Check
-	{
-		if (game_over_exit_button_->GetCurrentState() == E_UIState::UI_SELECT)
-		{
-			DestroyWindow(ENGINE->GetWindowHandle());
-		}
-	}
 
 	// Time Icon Move Update
 	{
@@ -896,7 +898,7 @@ void UI_Actor_Ingame::ShowCarCrashed()
 
 }
 
-void reality::UI_Actor_Ingame::Hitted()
+void UI_Actor_Ingame::Hitted()
 {
 	hit_timer_ = hit_ui_time_;
 }

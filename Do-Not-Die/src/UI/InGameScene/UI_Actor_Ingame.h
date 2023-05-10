@@ -14,8 +14,10 @@ namespace reality
 	private:
 		Player* player_;
 	private:
+		bool  onoff_;
 		C_UI* ui_comp_;
 	public:
+		void  SetOnOff(bool onoff) { onoff_ = onoff; }
 		C_UI* GetUIComponent() { return ui_comp_; }
 	private:
 		// Weapon
