@@ -98,7 +98,7 @@ void NormalZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 
 	// in combat zone
 	shared_ptr<SelectorNode> follow_player_or_car = make_shared<SelectorNode>();
-	follow_player_or_car->AddChild<EnemyFollowPlayer>(entity_id_, XMVectorZero());
+	follow_player_or_car->AddChild<NormalZombieFollowPlayer>(entity_id_, XMVectorZero());
 	follow_player_or_car->AddChild<EnemyFollowCar>(entity_id_, XMVectorZero());	
 
 	shared_ptr<InfiniteRepeatNode> repeat_node = make_shared<InfiniteRepeatNode>(follow_player_or_car);

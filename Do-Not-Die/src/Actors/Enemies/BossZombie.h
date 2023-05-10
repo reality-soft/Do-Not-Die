@@ -1,6 +1,10 @@
 #pragma once
 #include "BaseEnemy.h"
 
+enum class BossZombieAttackType {
+	PUNCH_ATTACK
+};
+
 class BossZombie : public BaseEnemy
 {
 public:
@@ -9,4 +13,7 @@ public:
 
 public:
 	virtual void Attack() override;
+
+public:
+	BossZombieAttackType cur_attack_type = BossZombieAttackType::PUNCH_ATTACK;
 };

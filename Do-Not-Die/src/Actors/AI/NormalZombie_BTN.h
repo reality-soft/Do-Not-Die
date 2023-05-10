@@ -3,10 +3,10 @@
 #include "NormalZombie.h"
 #include "Player.h"
 
-class EnemyFollowPlayer : public reality::ActionNode
+class NormalZombieFollowPlayer : public reality::ActionNode
 {
 public:
-	EnemyFollowPlayer(entt::entity enemy_id, XMVECTOR target_position)
+	NormalZombieFollowPlayer(entt::entity enemy_id, XMVECTOR target_position)
 		: owner_id_(enemy_id), target_position_(target_position)
 	{
 	};

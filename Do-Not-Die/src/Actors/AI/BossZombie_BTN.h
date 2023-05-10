@@ -2,46 +2,61 @@
 #include "Engine_include.h"
 #include "BossZombie.h"
 
-class DLL_API SelectAttackNode : public BehaviorNode
+class BossZombieFollowPlayer : public reality::ActionNode
 {
 public:
-    SelectAttackNode() {};
-    SelectAttackNode(const vector<shared_ptr<BehaviorNode>>& children) : BehaviorNode(children) {}
-    SelectAttackNode(const SelectAttackNode& other) : BehaviorNode(other) {}
-    SelectAttackNode& operator=(const SelectAttackNode& other) {
-        if (this != &other) {
-            BehaviorNode::operator=(other);
-        }
-        return *this;
-    }
+	BossZombieFollowPlayer(entt::entity enemy_id)
+		: owner_id_(enemy_id)
+	{
+	};
 
+	virtual reality:: BehaviorStatus Action() override
+	{
+		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
+		BaseEnemy* enemy = reality::SCENE_MGR->GetActor<BaseEnemy>(owner_id_);
+
+		if (enemy->player_in_sight_ == false || player->player_in_defense_ == false)
+			return reality::BehaviorStatus::FAILURE;
+
+		XMVECTOR direction_to_player = XMVector3Normalize(player->GetCurPosition() - enemy->GetCurPosition());
+		enemy->SetMovement(direction_to_player);
+
+		return reality::BehaviorStatus::RUNNING;
+	}
+
+protected:
+	entt::entity owner_id_;
+};
+
+class BossPunchAttack : public reality::ActionNode
+{
 public:
-    virtual void Execute() override
-    {
-        if (children_.size() == 0) {
-            status_ = BehaviorStatus::SUCCESS;
-            return;
-        }
-        status_ = BehaviorStatus::RUNNING;
+	BossPunchAttack(entt::entity enemy_id)
+		: owner_id_(enemy_id)
+	{
+	};
 
-        BehaviorStatus child_status = children_[executing_child_node_index_]->GetStatus();
+	virtual reality::BehaviorStatus Action() override
+	{
+		static float search_time = 0.0f;
+		search_time += TM_DELTATIME;
 
-        switch (child_status) {
-        case BehaviorStatus::IDLE:
-        case BehaviorStatus::RUNNING:
-            children_[executing_child_node_index_]->Execute();
-            break;
-        case BehaviorStatus::FAILURE:
-            if (executing_child_node_index_ == children_.size() - 1) {
-                status_ = BehaviorStatus::FAILURE;
-            }
-            else {
-                executing_child_node_index_++;
-            }
-            break;
-        case BehaviorStatus::SUCCESS:
-            status_ = BehaviorStatus::SUCCESS;
-            break;
-        }
-    };
+		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
+		BossZombie* enemy = reality::SCENE_MGR->GetActor<BossZombie>(owner_id_);
+
+		if (enemy->is_attacking_ == false) {
+			enemy->cur_attack_type = BossZombieAttackType::PUNCH_ATTACK;
+			enemy->Attack();
+		}
+		if (enemy->is_attack_ended_ == true) {
+			enemy->is_attacking_ = false;
+			enemy->is_attack_ended_ = false;
+			return BehaviorStatus::SUCCESS;
+		}
+
+		return BehaviorStatus::RUNNING;
+	}
+
+protected:
+	entt::entity owner_id_;
 };
