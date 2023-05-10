@@ -220,7 +220,9 @@ public:
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-
+			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
+			enemy->is_attack_ended = true;
+			enemy->is_attacking_ = false;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
