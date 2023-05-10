@@ -226,7 +226,7 @@ void Player::SetCharacterMovementAnimation()
 
 void Player::MoveRight()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 
 	GetMovementComponent()->accelaration_vector[0] += 1;
@@ -234,7 +234,7 @@ void Player::MoveRight()
 
 void Player::MoveLeft()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 
 	GetMovementComponent()->accelaration_vector[0] -= 1;
@@ -242,7 +242,7 @@ void Player::MoveLeft()
 
 void Player::MoveForward()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 
 	GetMovementComponent()->accelaration_vector[2] += 1;
@@ -250,7 +250,7 @@ void Player::MoveForward()
 
 void Player::MoveBack()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 
 	GetMovementComponent()->accelaration_vector[2] -= 1;
@@ -258,7 +258,7 @@ void Player::MoveBack()
 
 void Player::Roll()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 	if (GetMovementComponent()->jump_pulse > 1.0f || GetMovementComponent()->gravity_pulse > 1.0f) {
 		return;
@@ -277,7 +277,7 @@ void Player::Roll()
 
 void Player::Jump()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 
 	//if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
