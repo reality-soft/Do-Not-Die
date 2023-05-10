@@ -74,6 +74,10 @@ namespace reality
 			shared_ptr<UI_Text>		interaction_text_;
 		// Addictive Window
 		shared_ptr<UI_Image>	addicted_ui_;
+		// Hitted Image
+		float					hit_timer_ = 0.0f;
+		float					hit_ui_time_ = 3.0f;
+		shared_ptr<UI_Image>	hitted_ui_;
 		// Text Event
 		shared_ptr<UI_Text>		event_msg_text_;
 
@@ -103,6 +107,7 @@ namespace reality
 		void ShowPlayerDead();
 		void ShowPlayerInfected();
 		void ShowCarCrashed();
+		void Hitted();
 	private:
 		void OpenMenu();
 		void CloseMenu();

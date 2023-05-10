@@ -343,6 +343,14 @@ void UI_Actor_Ingame::CreateIngameUI()
 		//ui_comp_->ui_list.insert({ "Addicted UI", addicted_ui_ });
 	}
 
+	/// Hitted UI
+	{
+		hitted_ui_ = make_shared<UI_Image>();
+		hitted_ui_->InitImage("T_Hitted.png");
+		hitted_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
+
+	}
+
 	// Event Message UI
 	{
 		event_msg_text_ = make_shared<UI_Text>();
@@ -499,6 +507,19 @@ void UI_Actor_Ingame::UpdateIngameUI()
 			ui_comp_->ui_list.erase("1_Addicted UI");
 
 		infected_img_->SetLocalRectByMin({ status_ui->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f - 154.0f, 190.0f }, 352.0f * infected_rate, 8.0f);
+	}
+
+	// Hitted UI Update
+	{
+		if (hit_timer_ > 0.0f)
+		{
+			if (ui_comp_->ui_list.find("0_Hitted UI") == ui_comp_->ui_list.end())
+				ui_comp_->ui_list.insert({"0_Hitted UI" , hitted_ui_ });
+			hit_timer_ -= TIMER->GetDeltaTime();
+			hitted_ui_->SetAlpha(hit_timer_ / hit_ui_time_);
+		}
+		else if(ui_comp_->ui_list.find("0_Hitted UI") != ui_comp_->ui_list.end())
+			ui_comp_->ui_list.erase("0_Hitted UI");
 	}
 
 	// Buff UI Update
@@ -873,6 +894,11 @@ void UI_Actor_Ingame::ShowCarCrashed()
 	ui_comp_->ui_list.insert({ "Car Crashed UI", car_is_crashed_ui_ });
 	while (ShowCursor(true) <= 0);
 
+}
+
+void reality::UI_Actor_Ingame::Hitted()
+{
+	hit_timer_ = hit_ui_time_;
 }
 
 void UI_Actor_Ingame::OpenMenu()
