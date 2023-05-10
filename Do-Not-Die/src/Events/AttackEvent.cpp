@@ -15,7 +15,6 @@ void AttackEvent_SingleRay::Process()
 void AttackEvent_SingleRay::EnemyProcess()
 {
 	auto enemy_actor = SCENE_MGR->GetActor<NormalZombie>(actor_id_);
-	enemy_actor->is_attacking_ = true;
 
 	auto callback_car = QUADTREE->RaycastCarOnly(ray);
 	if (callback_car.success)
@@ -32,10 +31,13 @@ void AttackEvent_SingleRay::EnemyProcess()
 				hit_actor_ = callback_actor.ent;
 				EVENT->PushEvent<TakeDamageEvent>(enemy_actor->GetStatus("default_damage")->GetCurrentValue(), hit_actor_);
 				EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_actor.point, callback_actor.normal);
+				auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+				ingame_scene->GetUIActor().Hitted();
 			}
 		}
 	}
 }
+
 void AttackEvent_SingleRay::PlayerProcess()
 {
 	auto callback_total = QUADTREE->Raycast(ray, actor_id_);

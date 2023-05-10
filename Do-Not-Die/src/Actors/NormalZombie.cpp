@@ -102,11 +102,13 @@ void NormalZombie::Attack()
 	auto c_enemy_capsule = reg_scene_->try_get<C_CapsuleCollision>(entity_id_);
 	if (c_enemy_capsule == nullptr)
 		return;
+
+	is_attacking_ = true;
 	 
-	RayShape attack_ray;
-	attack_ray.start = _XMFLOAT3(GetTipBaseAB(c_enemy_capsule->capsule)[3]);
-	attack_ray.end = _XMFLOAT3((_XMVECTOR3(attack_ray.start) + (front_ * attack_distance_)));
-	EVENT->PushEvent<AttackEvent_SingleRay>(attack_ray, entity_id_);
+	//RayShape attack_ray;
+	//attack_ray.start = _XMFLOAT3(GetTipBaseAB(c_enemy_capsule->capsule)[3]);
+	//attack_ray.end = _XMFLOAT3((_XMVECTOR3(attack_ray.start) + (front_ * attack_distance_)));
+	//EVENT->PushEvent<AttackEvent_SingleRay>(attack_ray, entity_id_);
 }
 
 //float NormalZombie::GetMaxHp() const

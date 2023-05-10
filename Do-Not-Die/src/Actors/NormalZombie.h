@@ -32,10 +32,10 @@ private:
 
 private:
 	reality::BehaviorTree behavior_tree_;
-	float attack_distance_ = 80.0f;
 
 public:
 	//bool is_hit_ = false;
+	float attack_distance_ = 80.0f;
 	bool in_defense_bound_ = false;
 	bool player_in_sight_ = true;
 	bool is_attacking_ = false;

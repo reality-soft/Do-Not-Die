@@ -512,10 +512,11 @@ public:
 	class Attack : public AnimationState {
 	public:
 		Attack() : AnimationState(ATTACK) {}
+		int combo_ = 0;
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieAttack_1.mp3", 0.5f, false);
+			combo_ = 0;
 			animation_state_machine->SetAnimation("DND_Attack_1.anim", 0.5f, true);						
 			SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId())->GetStatus("max_speed")->SetDefualtValue(50);
 		}
@@ -525,10 +526,27 @@ public:
 			enemy->is_attack_ended = true;
 			enemy->is_attacking_ = false;
 			SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId())->GetStatus("max_speed")->SetDefualtValue(RandomIntInRange(100, 200));
+			combo_ = 0;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
+			if ((animation_state_machine->GetCurAnimation().cur_frame_ > 15.0f && combo_ == 0) ||
+				(animation_state_machine->GetCurAnimation().cur_frame_ > 77.0f && combo_ == 1))
+			{
+				combo_++;
+
+				EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieAttack_1.mp3", 0.5f, false);
+
+				auto c_enemy_capsule = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_CapsuleCollision>(enemy->GetEntityId());
+
+				if (c_enemy_capsule == nullptr) return;
+
+				RayShape attack_ray;
+				attack_ray.start = _XMFLOAT3(GetTipBaseAB(c_enemy_capsule->capsule)[3]);
+				attack_ray.end = _XMFLOAT3((_XMVECTOR3(attack_ray.start) + (enemy->GetFront() * enemy->attack_distance_)));
+				EVENT->PushEvent<AttackEvent_SingleRay>(attack_ray, enemy->GetEntityId());
+			}
 		}
 	};
 };
