@@ -2,7 +2,8 @@
 #include "BaseEnemy.h"
 
 enum class BossZombieAttackType {
-	PUNCH_ATTACK
+	PUNCH_ATTACK,
+	JUMP_ATTACK
 };
 
 class BossZombie : public BaseEnemy
@@ -12,8 +13,9 @@ public:
 	virtual void SetBehaviorTree(const vector<XMVECTOR>& target_poses) override;
 
 public:
-	virtual void Attack() override;
+	void PunchAttack();
+	void JumpAttack();
 
 public:
-	BossZombieAttackType cur_attack_type = BossZombieAttackType::PUNCH_ATTACK;
+	BossZombieAttackType cur_attack_type_ = BossZombieAttackType::PUNCH_ATTACK;
 };

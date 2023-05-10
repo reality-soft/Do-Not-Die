@@ -40,7 +40,6 @@ void BossZombie::OnInit(entt::registry& registry)
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<BossZombieBaseAnimationStateMachine>(entity_id_, skm.skeletal_mesh_id, 0);
-	animation_component.AddNewAnimSlot<BossZombieUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 3, "Spine1");
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(reality::C_CapsuleCollision));
@@ -56,6 +55,8 @@ void BossZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 	shared_ptr<RandomSelectorNode> boss_zombie_attack_select = make_shared<RandomSelectorNode>();
 	boss_zombie_attack_select->AddChild<BossPunchAttack>(entity_id_);
 	boss_zombie_attack_select->SetNumToExecute(3);
+	boss_zombie_attack_select->AddChild<BossJumpAttack>(entity_id_);
+	boss_zombie_attack_select->SetNumToExecute(3);
 
 	vector<pair<std::function<bool()>, shared_ptr<BehaviorNode>>> children_if_else;
 	children_if_else.push_back(
@@ -67,7 +68,6 @@ void BossZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 			}, 
 		make_shared<BossZombieFollowPlayer>(entity_id_)));
 	shared_ptr<IfElseIfNode> boss_zombie_follow_and_attack_player = make_shared<IfElseIfNode>(children_if_else, dynamic_pointer_cast<BehaviorNode>(boss_zombie_attack_select));
-
 
 	vector<shared_ptr<BehaviorNode>> children_selector;
 	children_selector.push_back(boss_zombie_follow_and_attack_player);
@@ -88,12 +88,33 @@ void BossZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 	behavior_tree_.SetRootNode<IfElseIfNode>(children_root, move_to_combat_zone);
 }
 
-void BossZombie::Attack()
+void BossZombie::PunchAttack()
 {
 	if (is_attacking_ == true)
 		return;
 
 	is_attacking_ = true;
+	cur_attack_type_ = BossZombieAttackType::PUNCH_ATTACK;
+
+	auto c_enemy_capsule = reg_scene_->try_get<C_CapsuleCollision>(entity_id_);
+	if (c_enemy_capsule == nullptr)
+		return;
+
+	SphereShape attack_sphere;
+	auto capsule_info = GetTipBaseAB(c_enemy_capsule->capsule);
+	XMVECTOR shepre_center = capsule_info[3] + (front_ * c_enemy_capsule->capsule.radius * 3);
+	attack_sphere.center = _XMFLOAT3(shepre_center);
+	attack_sphere.radius = c_enemy_capsule->capsule.radius * 2;
+	EVENT->PushEvent<AttackEvent_BoundSphere>(20.0f, attack_sphere, entity_id_);
+}
+
+void BossZombie::JumpAttack()
+{
+	if (is_attacking_ == true)
+		return;
+
+	is_attacking_ = true;
+	cur_attack_type_ = BossZombieAttackType::JUMP_ATTACK;
 
 	auto c_enemy_capsule = reg_scene_->try_get<C_CapsuleCollision>(entity_id_);
 	if (c_enemy_capsule == nullptr)
