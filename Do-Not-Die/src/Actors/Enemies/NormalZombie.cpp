@@ -2,8 +2,9 @@
 #include "AttackEvent.h"
 #include "AnimationStateMachine.h"
 #include "Player.h"
-#include "Enemy_ASM.h"
-#include "Enemy_BTN.h"
+#include "NormalZombie_ASM.h"
+#include "BaseEnemy_BTN.h"
+#include "NormalZombie_BTN.h"
 
 using namespace reality;
 
@@ -63,16 +64,13 @@ void NormalZombie::OnInit(entt::registry& registry)
 
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
-	animation_component.SetBaseAnimObject<ZombieBaseAnimationStateMachine>(entity_id_, skm.skeletal_mesh_id, 0);
-	animation_component.AddNewAnimSlot<ZombieUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 3, "Spine_02");
+	animation_component.SetBaseAnimObject<NormalZombieBaseAnimationStateMachine>(entity_id_, skm.skeletal_mesh_id, 0);
+	animation_component.AddNewAnimSlot<NormalZombieUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 3, "Spine_02");
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 }
 
 void NormalZombie::OnUpdate()
 {
-	UpdateStatus();
-	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
-
 	ChasePlayer();
 	behavior_tree_.Update();
 	Character::OnUpdate();
@@ -141,29 +139,6 @@ void NormalZombie::AddImpulse(XMVECTOR direction, float strength)
 	}
 }
 
-void NormalZombie::SetMovement(const XMVECTOR& direction)
-{
-	if (XMVector3Length(direction).m128_f32[0] <= 0.00001f) {
-		return;
-	}
-
-
-	XMVECTOR dir = direction; dir.m128_f32[1] = 0.0f;
-
-	is_moving_ = true;
-	XMVECTOR front = { 0.0f, 0.0f, 1.0f, 0.0f };
-	XMVECTOR right = { 1.0f, 0.0f, 0.0f, 0.0f };
-
-	float dot_product = XMVectorGetX(XMVector3Dot(front, dir));
-	float angle = XMVectorGetX(XMVector3AngleBetweenVectors(front, dir));
-	if (XMVectorGetX(XMVector3Dot(right, dir)) < 0)
-		angle = XM_2PI - angle;
-
-	rotation_ = XMMatrixRotationY(angle);
-
-	GetMovementComponent()->accelaration_vector[2] = 1;
-}
-
 void NormalZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 {
 	SetPos(target_poses[0] + XMVECTOR{ 0, 50.0f, 0, 0 });
@@ -172,7 +147,7 @@ void NormalZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 
 	// in combat zone
 	shared_ptr<SelectorNode> follow_player_or_car = make_shared<SelectorNode>();
-	follow_player_or_car->AddChild<EnemyFollowPlayer>(entity_id_, XMVectorZero());
+	follow_player_or_car->AddChild<NormalZombieFollowPlayer>(entity_id_, XMVectorZero());
 	follow_player_or_car->AddChild<EnemyFollowCar>(entity_id_, XMVectorZero());	
 
 	shared_ptr<InfiniteRepeatNode> repeat_node = make_shared<InfiniteRepeatNode>(follow_player_or_car);
@@ -194,36 +169,3 @@ void NormalZombie::SetMeshId(const string& mesh_id)
 	C_SkeletalMesh* skm = reg_scene_->try_get< reality::C_SkeletalMesh>(entity_id_);
 	skm->skeletal_mesh_id = mesh_id;
 }
-
-void NormalZombie::ChasePlayer()
-{
-	if (in_defense_bound_ == false)
-		return;
-
-	auto player = SCENE_MGR->GetPlayer<Player>(0);
-	if (player == nullptr)
-		return;
-
-	auto c_enemy_capsule = reg_scene_->try_get<C_CapsuleCollision>(entity_id_);
-	if (c_enemy_capsule == nullptr)
-		return;
-
-	auto c_player_capsule = reg_scene_->try_get<C_CapsuleCollision>(player->entity_id_);
-	if (c_player_capsule == nullptr)
-		return;
-
-	RayShape sight_ray;
-	sight_ray.start = _XMFLOAT3(GetTipBaseAB(c_enemy_capsule->capsule)[3]);
-	sight_ray.end = _XMFLOAT3(GetTipBaseAB(c_player_capsule->capsule)[3]);
-
-	auto callback = QUADTREE->RaycastCarOnly(sight_ray);
-	if (callback.success)
-		player_in_sight_ = false;
-	else
-		player_in_sight_ = true;
-}
-
-//float NormalZombie::GetCurHp() const
-//{
-//	return cur_hp_;
-//}

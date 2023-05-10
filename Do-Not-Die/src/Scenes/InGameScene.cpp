@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "NormalZombie.h"
 #include "BossZombie.h"
+#include "BaseEnemy.h"
 #include "FX_Flame.h"
 #include "FX_Explosion.h"
 #include "FbxMgr.h"
@@ -109,6 +110,19 @@ void InGameScene::OnInit()
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("infection prob", &player_actor->infection_probability_);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("infection value", &player_actor->GetStatus("infection")->current_value_);
 #endif
+
+	//BossZombie Test
+	BossZombie* boss = GetActor<BossZombie>(AddActor<BossZombie>());
+
+	int guidline_index = 4;
+
+	const auto zomebie_tracks_ = QUADTREE->GetGuideLines("DND_NpcTrack_1");
+
+	vector<XMVECTOR> target_poses;
+	for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
+		target_poses.push_back(target_pos.second);
+	}
+	boss->SetBehaviorTree(target_poses);
 }
 
 void InGameScene::OnUpdate()
@@ -150,7 +164,7 @@ void InGameScene::OnRender()
 	level.Update();
 	level.Render();
 
-	//QUADTREE->RenderCollisionMeshes();
+	QUADTREE->RenderCollisionMeshes();
 
 	sys_render.OnUpdate(reg_scene_);
 	sys_ui.OnUpdate(reg_scene_);

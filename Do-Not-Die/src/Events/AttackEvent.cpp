@@ -14,7 +14,8 @@ void AttackEvent_SingleRay::Process()
 
 void AttackEvent_SingleRay::EnemyProcess()
 {
-	auto enemy_actor = SCENE_MGR->GetActor<NormalZombie>(actor_id_);
+	auto enemy_actor = SCENE_MGR->GetActor<BaseEnemy>(actor_id_);
+	enemy_actor->is_attacking_ = true;
 
 	auto callback_car = QUADTREE->RaycastCarOnly(ray);
 	if (callback_car.success)

@@ -5,7 +5,7 @@
 #include "NormalZombie.h"
 using namespace reality;
 
-class ZombieBaseAnimationStateMachine : public AnimationStateMachine {
+class NormalZombieBaseAnimationStateMachine : public AnimationStateMachine {
 public:
 	enum States {
 		IDLE_BASE,
@@ -15,7 +15,7 @@ public:
 		DIE_BASE,
 	};
 
-	ZombieBaseAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
+	NormalZombieBaseAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
 
 	virtual void OnInit() override {
 		states_.insert({ IDLE_BASE, make_shared<Idle_Base>() });
@@ -26,7 +26,7 @@ public:
 
 		transitions_.insert({ IDLE_BASE, Transition(MOVE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
 				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
-				if (enemy->IsMoving()) {
+				if (enemy->is_moving_) {
 					return true;
 				}
 				else {
@@ -56,7 +56,7 @@ public:
 			});
 		transitions_.insert({ MOVE_BASE, Transition(IDLE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
 				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
-				if (enemy->IsMoving() == false) {
+				if (enemy->is_moving_ == false) {
 					return true;
 				}
 				else {
@@ -220,11 +220,9 @@ public:
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
-
 		}
 	};
 
@@ -275,7 +273,7 @@ public:
 	};
 };
 
-class ZombieUpperBodyAnimationStateMachine : public AnimationStateMachine {
+class NormalZombieUpperBodyAnimationStateMachine : public AnimationStateMachine {
 public:
 	enum States {
 		IDLE,
@@ -285,7 +283,7 @@ public:
 		ATTACK
 	};
 
-	ZombieUpperBodyAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
+	NormalZombieUpperBodyAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
 
 	virtual void OnInit() override {
 		states_.insert({ IDLE, make_shared<Idle>() });
@@ -295,7 +293,7 @@ public:
 		states_.insert({ ATTACK, make_shared<Attack>() });
 		transitions_.insert({ IDLE, Transition(MOVE,[this](const AnimationStateMachine* animation_state_machine) {
 				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
-				if (enemy->IsMoving()) {
+				if (enemy->is_moving_) {
 					return true;
 				}
 				else {
@@ -305,7 +303,7 @@ public:
 		});
 		transitions_.insert({ MOVE, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
 				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
-				if (enemy->IsMoving() == false) {
+				if (enemy->is_moving_ == false) {
 					return true;
 				}
 				else {
@@ -523,7 +521,7 @@ public:
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
-			enemy->is_attack_ended = true;
+			enemy->is_attack_ended_ = true;
 			enemy->is_attacking_ = false;
 			SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId())->GetStatus("max_speed")->SetDefualtValue(RandomIntInRange(100, 200));
 			combo_ = 0;
