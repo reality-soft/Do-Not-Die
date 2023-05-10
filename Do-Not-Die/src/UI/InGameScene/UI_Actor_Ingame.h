@@ -15,6 +15,8 @@ namespace reality
 		Player* player_;
 	private:
 		C_UI* ui_comp_;
+	public:
+		C_UI* GetUIComponent() { return ui_comp_; }
 	private:
 		// Weapon
 		shared_ptr<UI_Image>	ar_ui_;

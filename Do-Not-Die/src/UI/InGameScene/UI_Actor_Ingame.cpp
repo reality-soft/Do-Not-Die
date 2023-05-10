@@ -877,6 +877,8 @@ void UI_Actor_Ingame::ShowCarCrashed()
 
 void UI_Actor_Ingame::OpenMenu()
 {
+	SCENE_MGR->GetPlayer<Player>(0)->controller_enable_ = false;
+
 	ui_comp_->ui_list.insert({ "Menu UI", menu_window_ });
 	
 	ui_comp_->ui_list.erase("Weapon_AR UI");
@@ -898,6 +900,8 @@ void UI_Actor_Ingame::OpenMenu()
 
 void UI_Actor_Ingame::CloseMenu()
 {
+	SCENE_MGR->GetPlayer<Player>(0)->controller_enable_ = true;
+
 	ui_comp_->ui_list.erase("Menu UI");
 
 	ui_comp_->ui_list.insert({ "Weapon_AR UI", ar_ui_ });
