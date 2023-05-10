@@ -1281,12 +1281,10 @@ public:
 
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			player->is_rolling_ = true;
+			player->controller_enable_ = false;
 
 			C_Movement* movement_component = player->GetMovementComponent();
-
-			movement_component->velocity.m128_f32[0] = 0.0f;
-			movement_component->velocity.m128_f32[2] = 0.0f;
-			movement_component->acceleration = 300.0f;
+			player->GetStatus("max_speed")->PermanentVariation(150);
 
 			for (int i = 0;i < 3;i++) {
 				roll_direction_[i] = movement_component->accelaration_vector[i];
@@ -1327,6 +1325,9 @@ public:
 		{
 			entt::entity owner_id = animation_state_machine->GetOwnerId();
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+
+			player->GetStatus("max_speed")->PermanentVariation(-150);
+			player->controller_enable_ = true;
 			player->is_rolling_ = false;
 			player->roll_ = false;
 		}
@@ -1336,12 +1337,10 @@ public:
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			C_Movement* movement_component = player->GetMovementComponent();
 
-			movement_component->velocity = XMVectorZero();
-
 			for (int i = 0;i < 3;i++) {
 				movement_component->accelaration_vector[i] = roll_direction_[i];
 			}
-			movement_component->acceleration = 30000.0f;
+			movement_component->acceleration = 500.0f;
 		}
 	};
 
