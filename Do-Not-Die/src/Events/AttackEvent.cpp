@@ -61,7 +61,7 @@ void AttackEvent_BoundSphere::Process()
 	if (character_actor == nullptr)
 		return;
 	
-	if (character_actor->tag == "enemy")
+	if (character_actor->tag == "enemy" || character_actor->tag == "boss enemy")
 		EnemyProcess();
 	else if (character_actor->tag == "player")
 		PlayerProcess();
@@ -111,13 +111,16 @@ void AttackEvent_BoundSphere::PlayerProcess()
 	for (const auto& ent : capsule_view)
 	{
 		auto actor = SCENE_MGR->GetActor<Character>(ent);
-		if (actor == nullptr || actor->tag != "enemy")
+		if (actor == nullptr)
 			continue;
 
-		const auto& capsule = player_actor->reg_scene_->get<C_CapsuleCollision>(ent).capsule;
-		if (CapsuleToSphere(capsule, sphere_) == CollideType::INTERSECT)
+		if (actor->tag == "enemy" || actor->tag == "boss enemy")
 		{
-			hit_actors_.push_back(ent);
+			const auto& capsule = player_actor->reg_scene_->get<C_CapsuleCollision>(ent).capsule;
+			if (CapsuleToSphere(capsule, sphere_) == CollideType::INTERSECT)
+			{
+				hit_actors_.push_back(ent);
+			}
 		}
 	}
 }
