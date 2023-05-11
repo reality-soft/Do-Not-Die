@@ -143,7 +143,7 @@ void Player::OnInit(entt::registry& registry)
 
 void Player::OnUpdate()
 {
-	GetCapsuleComponent()->raycast_enable = !is_rolling_;
+	GetCapsuleComponent()->hit_enable = !(is_rolling_ || is_hit_);
 
 	if (GetStatus("hp")->GetCurrentValue() <= 0) {
 		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
