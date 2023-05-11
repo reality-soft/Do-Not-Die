@@ -47,7 +47,7 @@ void BaseEnemy::SetMovement(const XMVECTOR& direction)
 {
 	if (XMVector3Length(direction).m128_f32[0] <= 0.00001f) {
 		return;
-	}
+	} 
 
 	XMVECTOR dir = direction; dir.m128_f32[1] = 0.0f;
 

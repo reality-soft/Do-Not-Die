@@ -45,8 +45,6 @@ public:
 		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
 		BossZombie* enemy = reality::SCENE_MGR->GetActor<BossZombie>(owner_id_);
 
-		bool left_hook_end = false;
-
 		if (enemy->is_attacking_ == false) 
 		{
 			enemy->is_attacking_ = true;

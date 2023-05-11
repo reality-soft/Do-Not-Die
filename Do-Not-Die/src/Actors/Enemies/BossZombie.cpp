@@ -14,8 +14,14 @@ void BossZombie::OnInit(entt::registry& registry)
 	tag = "boss enemy";
 
 	// setting character data
-	AddStatus("hp", CharacterStatus(100, 100, 0, 100));
-	AddStatus("default_damage", CharacterStatus(10, 10, 10, 10));
+	AddStatus("hp", CharacterStatus(1000, 1000, 0, 1000));
+
+	AddStatus("car_damage", CharacterStatus(10, 10, 10, 10));
+	AddStatus("hook_damage", CharacterStatus(15, 15, 15, 15));
+	AddStatus("kick_damage", CharacterStatus(30, 30, 30, 30));
+	AddStatus("punch_damage", CharacterStatus(50, 50, 50, 50));
+	AddStatus("jump_damage", CharacterStatus(50, 50, 50, 50));
+
 	AddStatus("max_speed", CharacterStatus(RandomIntInRange(200, 250), 0, 200, 250));
 
 	GetMovementComponent()->speed = 0;
@@ -39,6 +45,11 @@ void BossZombie::OnInit(entt::registry& registry)
 	capsule.tag = "enemy";
 	capsule.SetCapsuleData(XMFLOAT3(0, 0, 0), 100, 40);
 	registry.emplace<reality::C_CapsuleCollision>(entity_id_, capsule);
+
+	C_SoundGenerator sound_generator;
+	sound_generator.local = XMMatrixIdentity();
+	sound_generator.world = XMMatrixIdentity();
+	registry.emplace<reality::C_SoundGenerator>(entity_id_, sound_generator);
 
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
 
@@ -94,36 +105,58 @@ void BossZombie::LeftHook()
 {
 	SphereShape attack_sphere = CreateFrontAttackSphere(30.f);
 
-	EVENT->PushEvent<AttackEvent_BoundSphere>(15.0f, attack_sphere, entity_id_);
+	EVENT->PushEvent<AttackEvent_BoundSphere>(GetStatus("hook_damage")->GetCurrentValue(), attack_sphere, entity_id_);
+	EVENT->PushEvent<AttackEvent_AboutCar>(entity_id_);
 }
 
 void BossZombie::RightHook()
 {
 	SphereShape attack_sphere = CreateFrontAttackSphere(30.f);
 
-	EVENT->PushEvent<AttackEvent_BoundSphere>(15.0f, attack_sphere, entity_id_);
+	EVENT->PushEvent<AttackEvent_BoundSphere>(GetStatus("hook_damage")->GetCurrentValue(), attack_sphere, entity_id_);
+	EVENT->PushEvent<AttackEvent_AboutCar>(entity_id_);
 }
 
 void BossZombie::KickAttack()
 {
 	SphereShape attack_sphere = CreateFrontAttackSphere(30.0f);
 
-	EVENT->PushEvent<AttackEvent_BoundSphere>(30.0f, attack_sphere, entity_id_);
+	EVENT->PushEvent<AttackEvent_BoundSphere>(GetStatus("kick_damage")->GetCurrentValue(), attack_sphere, entity_id_);
+	EVENT->PushEvent<AttackEvent_AboutCar>(entity_id_);
 }
 
 void BossZombie::PunchAttack()
 {	
 	SphereShape attack_sphere = CreateFrontAttackSphere(50.0f);
-
-	EVENT->PushEvent<AttackEvent_BoundSphere>(50.0f, attack_sphere, entity_id_);
+	
+	EVENT->PushEvent<AttackEvent_BoundSphere>(GetStatus("punch_damage")->GetCurrentValue(), attack_sphere, entity_id_);
+	EVENT->PushEvent<AttackEvent_AboutCar>(entity_id_);
 }
 
 void BossZombie::JumpAttack()
 {
+	EVENT->PushEvent<CameraShakeEvent>(SCENE_MGR->GetPlayer<Player>(0)->entity_id_, 0.3f, 10.0f, 0.2f);
+
 	SphereShape attack_sphere;
 	attack_sphere.center = _XMFLOAT3(GetCurPosition());
-	attack_sphere.radius = 100.0f;
-	EVENT->PushEvent<AttackEvent_BoundSphere>(30.0f, attack_sphere, entity_id_);
+	attack_sphere.radius = 150.0f;
+
+	EVENT->PushEvent<AttackEvent_BoundSphere>(GetStatus("jump_damage")->GetCurrentValue(), attack_sphere, entity_id_);
+	EVENT->PushEvent<AttackEvent_AboutCar>(entity_id_);
+}
+
+void BossZombie::Attack()
+{
+	if (is_attacking_ == false)
+	{
+		is_attacking_ = true;
+		
+		cur_attack_type_ = (BossZombieAttackType)RandomIntInRange(0, 3);
+	}
+	if (is_attack_ended_ == true) {
+		is_attacking_ = false;
+		is_attack_ended_ = false;
+	}
 }
 
 SphereShape BossZombie::CreateFrontAttackSphere(float radius)
