@@ -65,10 +65,11 @@ void InGameScene::OnInit()
 
 	QUADTREE->ImportGuideLines("DND_Blocking_1.mapdat", GuideType::eBlocking);
 	QUADTREE->ImportGuideLines("DND_NpcTrack_1.mapdat", GuideType::eNpcTrack);
+	QUADTREE->ImportGuideLines("DND_CarAttack_1.mapdat", GuideType::eNpcTrack);
+	QUADTREE->ImportGuideLines("DND_BossTrack_1.mapdat", GuideType::eNpcTrack);
 	QUADTREE->ImportGuideLines("DND_PlayerStart_1.mapdat", GuideType::eSpawnPoint);
 	QUADTREE->ImportGuideLines("DND_ItemSpawn_1.mapdat", GuideType::eSpawnPoint);
 	QUADTREE->ImportGuideLines("DND_RepairPart_1.mapdat", GuideType::eSpawnPoint);
-	QUADTREE->ImportGuideLines("DND_CarAttack_1.mapdat", GuideType::eNpcTrack);
 	QUADTREE->ImportGuideLines("DND_CarEvent_1.mapdat", GuideType::eSpawnPoint);
 	QUADTREE->ImportGuideLines("DND_FX_CorpseFire_1.mapdat", GuideType::eSpawnPoint);
 	QUADTREE->ImportGuideLines("DND_FX_CarFire_1.mapdat", GuideType::eSpawnPoint);
@@ -88,10 +89,10 @@ void InGameScene::OnInit()
 	
 	environment_.CreateEnvironment();
 	//environment_.SetWorldTime(120, 240);
-	environment_.SetWorldTime(10, 60);
+	environment_.SetWorldTime(1, 60);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
-	environment_.SetFogDistanceByTime(5000, 1000);
-	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.1f, 0.25f);
+	environment_.SetFogDistanceByTime(5000, 2000);
+	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.1, 0.1, 0.15, 1), 0.05f, 0.25f);
 
 	// LOADING FINISH
 	loading_progress = LOADING_FINISHED;
@@ -110,19 +111,6 @@ void InGameScene::OnInit()
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("infection prob", &player_actor->infection_probability_);
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("infection value", &player_actor->GetStatus("infection")->current_value_);
 #endif
-
-	//BossZombie Test
-	BossZombie* boss = GetActor<BossZombie>(AddActor<BossZombie>());
-
-	int guidline_index = 4;
-
-	const auto zomebie_tracks_ = QUADTREE->GetGuideLines("DND_NpcTrack_1");
-
-	vector<XMVECTOR> target_poses;
-	for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
-		target_poses.push_back(target_pos.second);
-	}
-	boss->SetBehaviorTree(target_poses);
 }
 
 void InGameScene::OnUpdate()
@@ -131,10 +119,14 @@ void InGameScene::OnUpdate()
 	{
 		sys_wave_.wave_count_++;
 	}
-
 	if (game_result_type != GameResultType::eNone)
 	{
 		GameResultProcess();
+	}
+
+	if (sys_wave_.boss_zombie_spawn)
+	{
+		ShowBossZombie();
 	}
 	
 	QUADTREE->Frame(&sys_camera);
@@ -242,6 +234,30 @@ void InGameScene::ShowCarCrashing()
 			time = 0.0f;
 		}			
 	}
+}
+
+void InGameScene::ShowBossZombie()
+{
+	static bool show_end = false;
+
+	if (show_end)	
+		return;
+	
+
+	auto boss = SCENE_MGR->GetActor<BossZombie>(sys_wave_.boss_zombie_ent);
+	if (boss == nullptr)
+		return;
+
+	auto player = SCENE_MGR->GetPlayer<Player>(0);
+	if (player == nullptr)
+		return;
+
+	if (Distance(player->GetCurPosition(), boss->GetCurPosition()) > 4000.0f)
+		return;
+
+	show_end = sys_camera.ZoomToTarget(boss->GetCurPosition(), (boss->GetCurPosition() + XMVectorSet(0, 100, 0, 0)) + (boss->GetFront() * 500), 2.0f, 3.0f);
+	player->controller_enable_ = show_end;
+
 }
 
 void InGameScene::GameResultProcess()

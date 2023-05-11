@@ -20,6 +20,8 @@ namespace reality
 		int car_health_max = 300;
 		int car_repair_count = 0;
 		GuideLine fx_car_fire_;
+		entt::entity boss_zombie_ent;
+		bool boss_zombie_spawn = false;
 
 	private:
 		void CreateExtractPoints(entt::registry& reg);
@@ -32,6 +34,7 @@ namespace reality
 		void DeleteExtractPoint(entt::entity ent);
 		void SpawnZombies(float interval);
 		void SpawnCarSmokes();
+		void SpawnBossZombie();
 
 		void WaveStart();
 		void WaveFinish();
@@ -43,6 +46,7 @@ namespace reality
 
 		shared_ptr<Environment> world_env_;
 		vector<GuideLine>* zomebie_tracks_;
+		GuideLine boss_track_;
 		GuideLine item_spawns_;
 		GuideLine repair_spawns_;
 		GuideLine car_event_;
