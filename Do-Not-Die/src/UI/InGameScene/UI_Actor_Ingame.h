@@ -77,9 +77,9 @@ namespace reality
 		// Addictive Window
 		shared_ptr<UI_Image>	addicted_ui_;
 		// Hitted Image
-		float					hit_timer_ = 0.0f;
+		vector<float>			hitted_ui_timer_;
 		float					hit_ui_time_ = 3.0f;
-		shared_ptr<UI_Image>	hitted_ui_;
+		shared_ptr<UI_Image>	hitted_ui_[5];
 		// Text Event
 		shared_ptr<UI_Text>		event_msg_text_;
 
