@@ -45,13 +45,9 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
-	SpawnZombies(1.f);
+	SpawnZombies(3.f);
 	SpawnCarSmokes();
 
-	if (wave_count_ > 5 && SCENE_MGR->GetPlayer<Player>(0)->GetStatus("hp")->GetCurrentValue() > 0 && SCENE_MGR->GetNumOfActor("enemy") == 0)
-	{
-		EVENT->PushEvent<GameResultEvent>(GameResultType::eGameCleared);
-	}
 	if (car_health <= 0)
 	{
 		EVENT->PushEvent<GameResultEvent>(GameResultType::eCarCrashed);
@@ -286,7 +282,7 @@ void reality::WaveSystem::SpawnCarSmokes()
 {
 	for (int i = 0; i < car_health_max; i += car_health_max / 5)
 	{
-		int index = i / 60;
+		int index = i / 20;
 
 		if (i >= car_health || car_health == 0)
 		{
@@ -317,10 +313,10 @@ XMVECTOR reality::WaveSystem::GetCarPosition()
 
 void reality::WaveSystem::WaveStart()
 {
-	zombie_spawn_count_ += 1;
-
-	if (wave_count_ == 0)
+	if (wave_count_ == 4)
 		SpawnBossZombie();
+	else
+		zombie_spawn_count_ += 30;
 
 	FMOD_MGR->Stop("S_Day_BGM.wav");
 	FMOD_MGR->Play("S_Night_BGM.wav", SoundType::MUSIC, true, 1.0f, {});

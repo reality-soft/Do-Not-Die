@@ -12,7 +12,6 @@ public:
 		MOVE_BASE,
 		ATTACK_BASE,
 		HIT_BASE,
-		DIE_BASE,
 	};
 
 	NormalZombieBaseAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
@@ -22,7 +21,6 @@ public:
 		states_.insert({ MOVE_BASE, make_shared<Move_Base>() });
 		states_.insert({ ATTACK_BASE, make_shared<Attack_Base>() });
 		states_.insert({ HIT_BASE, make_shared<Hit_Base>() });
-		states_.insert({ DIE_BASE, make_shared<Die_Base>() });
 
 		transitions_.insert({ IDLE_BASE, Transition(MOVE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
 				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
@@ -125,47 +123,6 @@ public:
 			})
 			});
 
-		transitions_.insert({ HIT_BASE, Transition(DIE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
-				if (enemy->GetStatus("hp")->GetCurrentValue() <= 0.0f) {
-					return true;
-				}
-				else {
-					return false;
-				}
-			})
-			});
-		transitions_.insert({ MOVE_BASE, Transition(DIE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
-				if (enemy->GetStatus("hp")->GetCurrentValue() <= 0.0f) {
-					return true;
-				}
-				else {
-					return false;
-				}
-			})
-			});
-		transitions_.insert({ IDLE_BASE, Transition(DIE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
-				if (enemy->GetStatus("hp")->GetCurrentValue() <= 0.0f) {
-					return true;
-				}
-				else {
-					return false;
-				}
-			})
-			});
-
-		transitions_.insert({ DIE_BASE, Transition(IDLE_BASE,[this](const AnimationStateMachine* animation_state_machine) {
-				if (IsAnimationEnded() == true) {
-					return true;
-				}
-				else {
-					return false;
-				}
-			})
-			});
-
 		cur_state_ = states_[IDLE_BASE];
 	}
 
@@ -259,30 +216,30 @@ public:
 		}
 	};
 
-	class Die_Base : public AnimationState {
-	public:
-		Die_Base() : AnimationState(DIE_BASE) {}
-	public:
-		virtual void Enter(AnimationStateMachine* animation_state_machine) override
-		{
-			EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieDie_1.wav", 0.5f, false);
-			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
-			enemy->GetCapsuleComponent()->capsule.height = 3.f;
-			enemy->GetCapsuleComponent()->capsule.radius = 3.f;
-			animation_state_machine->SetAnimation("DND_Death_1.anim", 0.5f, true);
-		}
-		virtual void Exit(AnimationStateMachine* animation_state_machine) override
-		{
-			EVENT->PushEvent<KillEvent>();
-			EVENT->PushEvent<DeleteActorEvent>(animation_state_machine->GetOwnerId());
+	//class Die_Base : public AnimationState {
+	//public:
+	//	Die_Base() : AnimationState(DIE_BASE) {}
+	//public:
+	//	virtual void Enter(AnimationStateMachine* animation_state_machine) override
+	//	{
+	//		EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieDie_1.wav", 0.5f, false);
+	//		NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
+	//		enemy->GetCapsuleComponent()->capsule.height = 3.f;
+	//		enemy->GetCapsuleComponent()->capsule.radius = 3.f;
+	//		animation_state_machine->SetAnimation("DND_Death_1.anim", 0.5f, true);
+	//	}
+	//	virtual void Exit(AnimationStateMachine* animation_state_machine) override
+	//	{
+	//		EVENT->PushEvent<KillEvent>();
+	//		EVENT->PushEvent<DeleteActorEvent>(animation_state_machine->GetOwnerId());
 
-		}
-		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
-		{
-			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
-			enemy->CancelMovement();
-		}
-	};
+	//	}
+	//	virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+	//	{
+	//		NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
+	//		enemy->CancelMovement();
+	//	}
+	//};
 };
 
 class NormalZombieUpperBodyAnimationStateMachine : public AnimationStateMachine {
@@ -561,3 +518,88 @@ public:
 		}
 	};
 };
+
+class NormalZombieFullBodyAnimationStateMachine : public AnimationStateMachine {
+public:
+	enum States {
+		NONE,
+		DIE,
+
+	};
+
+	NormalZombieFullBodyAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
+
+	virtual void OnInit() override {
+		states_.insert({ NONE, make_shared<None>() });
+		states_.insert({ DIE, make_shared<Die>() });
+
+
+		// Die
+		{
+			transitions_.insert({ NONE, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
+				entt::entity owner_id = animation_state_machine->GetOwnerId();
+				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id);
+				if (enemy->GetStatus("hp")->GetCurrentValue() <= 0.001f) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+			transitions_.insert({ DIE, Transition(NONE,[this](const AnimationStateMachine* animation_state_machine) {
+				if (IsAnimationEnded()) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+		}
+
+		cur_state_ = states_[NONE];
+	}
+
+	class None : public AnimationState {
+	public:
+		None() : AnimationState(NONE) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			animation_state_machine->SetAnimation("", 0.2f, true);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+	};
+
+	class Die : public AnimationState {
+	public:
+		Die() : AnimationState(DIE) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieDie_1.wav", 0.5f, false);
+			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
+			enemy->GetCapsuleComponent()->capsule.height = 3.f;
+			enemy->GetCapsuleComponent()->capsule.radius = 3.f;
+			animation_state_machine->SetAnimation("DND_Death_1.anim", 0.5f, false);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+			EVENT->PushEvent<KillEvent>();
+			EVENT->PushEvent<DeleteActorEvent>(animation_state_machine->GetOwnerId());
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
+			enemy->CancelMovement();
+		}
+	};
+
+};
+

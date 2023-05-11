@@ -159,7 +159,7 @@ void AttackEvent_AboutCar::Process()
 		return;
 
 	XMVECTOR point_b = GetTipBaseAB(c_capsule->capsule)[3];
-	RayShape ray_about_car(point_b, point_b + enemy->GetFront() * 1000);
+	RayShape ray_about_car(point_b, point_b + enemy->GetFront() * 100);
 	auto callback_car = QUADTREE->RaycastCarOnly(ray_about_car);
 
 	if (callback_car.success)

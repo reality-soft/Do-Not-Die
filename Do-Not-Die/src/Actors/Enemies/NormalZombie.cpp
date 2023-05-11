@@ -67,6 +67,7 @@ void NormalZombie::OnInit(entt::registry& registry)
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<NormalZombieBaseAnimationStateMachine>(entity_id_, skm.skeletal_mesh_id, 0);
 	animation_component.AddNewAnimSlot<NormalZombieUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 3, "Spine_02");
+	animation_component.AddNewAnimSlot<NormalZombieFullBodyAnimationStateMachine>("FullBody", entity_id_, skm.skeletal_mesh_id, 1, "Root");
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 }
 
