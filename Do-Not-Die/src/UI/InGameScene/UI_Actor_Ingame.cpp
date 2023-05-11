@@ -934,6 +934,8 @@ void UI_Actor_Ingame::ShowPlayerInfected()
 {
 	ui_comp_->ui_list.clear();
 	ui_comp_->ui_list.insert({ "Player Infected UI", player_infected_ui_ });
+	addicted_ui_->SetAlpha(1.0f);
+	ui_comp_->ui_list.insert({ "A_Addicted UI", addicted_ui_ });
 	while (ShowCursor(true) <= 0);
 }
 
