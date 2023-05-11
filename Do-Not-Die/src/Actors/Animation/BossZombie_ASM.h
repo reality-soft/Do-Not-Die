@@ -358,8 +358,6 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			//jump_ = true;
-
 			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
 			owner_actor_->rotate_enable_ = false;
 
@@ -391,7 +389,7 @@ public:
 			}
 		}
 
-		bool jump_ = true;
+		bool jump_ = false;
 		BossZombie* owner_actor_ = nullptr;
 	};
 };
