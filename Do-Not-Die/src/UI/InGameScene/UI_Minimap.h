@@ -23,6 +23,8 @@ namespace reality
 		void RenderMinimap();
 		void RenderPlayerIcon(XMMATRIX world);
 		void RenderZombieIcon(XMMATRIX world);
+		void RenderTruckIcon(XMMATRIX world);
+		void RenderBossIcon(XMMATRIX world);
 		void UpdateTextureCoordAlongPlayer();
 		void RenderExceptTextureSet();
 	private:
