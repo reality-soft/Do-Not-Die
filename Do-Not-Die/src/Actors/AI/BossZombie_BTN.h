@@ -20,6 +20,10 @@ public:
 
 		XMVECTOR direction_to_player = XMVector3Normalize(player->GetCurPosition() - enemy->GetCurPosition());
 		enemy->SetMovement(direction_to_player);
+		
+		float distance_to_player = Distance(player->GetCurPosition(), enemy->GetCurPosition());
+		if (distance_to_player <= 100)
+			return reality::BehaviorStatus::SUCCESS;
 
 		return reality::BehaviorStatus::RUNNING;
 	}
