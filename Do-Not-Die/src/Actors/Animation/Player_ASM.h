@@ -1399,12 +1399,32 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			animation_state_machine->SetAnimation("player_zombie_walk.anim", 0.5f, true);
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			player->reg_scene_->try_get<C_StaticMesh>(owner_id)->static_mesh_id = "";
+
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+
+			static float move_time = RandomFloatInRange(3.0f, 7.0f);
+			static float rotation_angle = RandomFloatInRange(0.0f, 180.0f);
+			player->GetMovementComponent()->accelaration_vector[2] = 1;
+			player->GetMovementComponent()->max_speed = 20.0f;
+			XMMATRIX rotation_matrix = XMMatrixRotationY(rotation_angle);
+			player->transform_tree_.root_node->Rotate(*player->reg_scene_, owner_id, player->GetCurPosition(), rotation_matrix);
+			if (move_time <= 0.0f) {
+				move_time = RandomFloatInRange(3.0f, 7.0f);
+				rotation_angle = RandomFloatInRange(0.0f, 180.0f);
+				player->rotation_ = XMMatrixRotationY(rotation_angle);
+			}
+
+			move_time -= TM_DELTATIME;
 		}
 	};
 };

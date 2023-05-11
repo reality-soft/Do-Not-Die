@@ -125,7 +125,7 @@ void Player::OnInit(entt::registry& registry)
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 5, "Spine_01");
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
 	animation_component.AddNewAnimSlot<PlayerFullBodyAnimationStateMachine>("FullBody", entity_id_, skm.skeletal_mesh_id, 1, "Root");
 	auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_component.GetAnimSlotByName("UpperBody");
 	sm->SetPlayer(this);
@@ -171,10 +171,11 @@ void Player::OnUpdate()
 		is_dead_ = true;
 	}
 
-	if (GetStatus("infection")->GetCurrentValue() >= 100.f)
+	if (GetStatus("infection")->GetCurrentValue() >= 5.f)
 	{
 		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerInfected);
-		is_zombie_ == true;
+		controller_enable_ = false;
+		is_zombie_ = true;
 		return;
 	}
 }
@@ -288,10 +289,10 @@ void Player::Jump()
 	if (controller_enable_ == false)
 		return;
 
-	//if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
+	if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
 		GetMovementComponent()->jump_pulse = 150.0f;
 		EVENT->PushEvent<SoundGenerateEvent>(entity_id_, SFX, "S_CH_Jump_Start.wav", 1.0f, false);
-	//}
+	}
 }
 
 void Player::Attack()
@@ -472,30 +473,6 @@ void Player::SetPos(const XMVECTOR& position)
 	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
 
-//float Player::GetMaxHp() const
-//{
-//	return max_hp_;
-//}
-//
-//void Player::SetCurHp(int hp)
-//{
-//	cur_hp_ = hp;
-//}
-//
-//void Player::TakeDamage(int damage)
-//{
-//	if (is_hit_)
-//		return;	
-//
-//	is_hit_ = true;
-//	cur_hp_ -= damage;	
-//}
-//
-//float Player::GetCurHp() const
-//{
-//	return cur_hp_;
-//}
-
 void Player::AddFlashLight()
 {
 	auto& spot_light_comp = reg_scene_->emplace<C_SpotLight>(entity_id_);
@@ -582,7 +559,7 @@ void Player::CalculateMovementAngle()
 
 void Player::ChangeWeapon()
 {
-	if (is_aiming_ == true || is_reloading_ || is_rolling_ == true) {
+	if (is_aiming_ == true || is_reloading_ || is_rolling_ == true || controller_enable_ == false) {
 		return;
 	}
 	int cur_equipped_weapon = static_cast<int>(cur_equipped_weapon_);
