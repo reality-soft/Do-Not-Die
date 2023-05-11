@@ -95,10 +95,13 @@ void StartScene::FinishProgress()
 {
 	bool sound_finished = sys_sound.FadeOutDelete("MichaelFK_Empyrean_cut.wav", 3.0f);
 	start_scene_ui.DisappearUI();
-  
+
 	// Hide Cursor
 	while (ShowCursor(false) >= 0);
 	
 	if (sound_finished)
+	{
+		FMOD_MGR->Play("S_Day_BGM.wav", SoundType::MUSIC, true, 1.0f, {});
 		SCENE_MGR->ChangeScene(E_SceneType::INGAME);
+	}
 }
