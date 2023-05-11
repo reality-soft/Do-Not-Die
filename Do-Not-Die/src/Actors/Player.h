@@ -123,7 +123,8 @@ public:
 
 	int infection_probability_ = 0;
 	int hit_count_ = 0;
-	bool is_infected = false;
+	bool is_infected_ = false;
+	bool is_zombie_ = false;
 
 private:
 	void UpdateTimer();

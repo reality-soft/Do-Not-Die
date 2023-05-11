@@ -509,7 +509,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 
 		float infected_rate = player_->GetStatus("infection")->GetCurrentValue() / player_->GetStatus("infection")->GetMaxValue();
 
-		if (player_->is_infected)
+		if (player_->is_infected_)
 		{
 			ui_comp_->ui_list.insert({ "1_Addicted UI", addicted_ui_ });
 			addicted_ui_->SetAlpha(infected_rate);
@@ -517,7 +517,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 			infected_text_->SetText("Infected");
 			infected_text_->SetLocalRectByMin({ 10.0f, 185.0f }, 100.0f, 100.0f);
 		}
-		else if(!player_->is_infected && ui_comp_->ui_list.find("1_Addicted UI") != ui_comp_->ui_list.end())
+		else if(!player_->is_infected_ && ui_comp_->ui_list.find("1_Addicted UI") != ui_comp_->ui_list.end())
 			ui_comp_->ui_list.erase("1_Addicted UI");
 
 		infected_img_->SetLocalRectByMin({ status_ui->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f - 154.0f, 190.0f }, 352.0f * infected_rate, 8.0f);

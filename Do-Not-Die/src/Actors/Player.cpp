@@ -145,11 +145,6 @@ void Player::OnUpdate()
 {
 	GetCapsuleComponent()->hit_enable = !(is_rolling_ || is_hit_);
 
-	if (GetStatus("hp")->GetCurrentValue() <= 0) {
-		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
-		is_dead_ = true;
-	}
-
 	if (controller_enable_)
 	{
 		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
@@ -169,6 +164,19 @@ void Player::OnUpdate()
 	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
 	IncreaseInfection();
 	UpdateStatus();
+
+	if (GetStatus("hp")->GetCurrentValue() <= 0) {
+		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
+		controller_enable_ = false;
+		is_dead_ = true;
+	}
+
+	if (GetStatus("infection")->GetCurrentValue() >= 100.f)
+	{
+		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerInfected);
+		is_zombie_ == true;
+		return;
+	}
 }
 
 void Player::SetCharacterMovementAnimation()
@@ -404,24 +412,18 @@ void Player::TakeDamage(int damage)
 	is_hit_ = true;
 	GetStatus("hp")->PermanentVariation(-damage);
 
-	if (is_infected == true)
+	if (is_infected_ == true)
 		return;
 
 	++hit_count_;
 	infection_probability_ = pow(hit_count_, 2);
-	is_infected = Probability(infection_probability_);
+	is_infected_ = Probability(infection_probability_);
 };
 
 void Player::IncreaseInfection()
 {
-	if (is_infected == false)
+	if (is_infected_ == false)
 		return;
-
-	if (GetStatus("infection")->GetCurrentValue() >= 100.f)
-	{
-		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerInfected);
-		return;
-	}
 
 	static float timer = 0;
 	timer += TM_DELTATIME;

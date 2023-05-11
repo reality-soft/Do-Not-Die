@@ -1178,7 +1178,8 @@ public:
 		NONE, 
 		DODGE_ROLL,
 		DIE,
-		DEAD
+		DEAD,
+		ZOMBIE
 	};
 
 	PlayerFullBodyAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
@@ -1188,6 +1189,7 @@ public:
 		states_.insert({ DODGE_ROLL, make_shared<DodgeRoll>() });
 		states_.insert({ DIE, make_shared<Die>() });
 		states_.insert({ DEAD, make_shared<Dead>() });
+		states_.insert({ ZOMBIE, make_shared<Zombie>() });
 
 		// Dodge Roll
 		{
@@ -1241,6 +1243,20 @@ public:
 			});
 			transitions_.insert({ DIE, Transition(DEAD,[this](const AnimationStateMachine* animation_state_machine) {
 				if (IsAnimationEnded()) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+		}
+
+		{
+			transitions_.insert({ NONE, Transition(ZOMBIE,[this](const AnimationStateMachine* animation_state_machine) {
+				entt::entity owner_id = animation_state_machine->GetOwnerId();
+				Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+				if (player->is_zombie_) {
 					return true;
 				}
 				else {
@@ -1367,6 +1383,22 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			animation_state_machine->SetAnimation("player_dead_pose.anim", 0.2f, true);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+	};
+
+	class Zombie : public AnimationState {
+	public:
+		Zombie() : AnimationState(ZOMBIE) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			animation_state_machine->SetAnimation("player_zombie_walk.anim", 0.5f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
