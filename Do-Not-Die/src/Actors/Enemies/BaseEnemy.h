@@ -12,10 +12,6 @@ private:
 	void ChasePlayer();
 
 public:
-	//float	 GetMaxHp() const override;
-	//float	 GetCurHp() const override;
-	//void SetCurHp(int hp) override;
-	//void TakeDamage(int damage) override;
 	void AddImpulse(XMVECTOR direction, float strength);
 
 public:
@@ -23,7 +19,6 @@ public:
 	virtual void Attack() {};
 
 public:
-	bool is_hit_ = false;
 	bool is_moving_ = false;
 	bool is_attacking_ = false;
 	bool is_attack_ended_ = false;
