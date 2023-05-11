@@ -10,7 +10,7 @@ using namespace reality;
 void BossZombie::OnInit(entt::registry& registry)
 {
 	Character::OnInit(registry);
-	tag = "enemy";
+	tag = "boss enemy";
 
 	// setting character data
 	GetMovementComponent()->max_speed = 100;
