@@ -37,7 +37,7 @@ namespace reality
 		void WaveFinish();
 	private:
 		bool zombie_spawn_ = false;
-		UINT zombie_spawn_count_ = 0;
+		UINT zombie_spawn_count_ = 1;
 		int zombie_count = 0;
 
 

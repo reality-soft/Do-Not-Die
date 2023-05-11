@@ -47,7 +47,7 @@ public:
 		XMVECTOR owner_pos = owner->GetCurPosition();
 
 		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
-		if (owner->player_in_sight_ && player->player_in_defense_ == true) {
+		if (owner->player_in_sight_ && player->player_in_defense_ == true && player->is_dead_ && player->is_zombie_) {
 			return reality::BehaviorStatus::FAILURE;
 		}
 

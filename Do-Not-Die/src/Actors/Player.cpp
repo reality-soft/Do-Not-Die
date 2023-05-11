@@ -125,7 +125,7 @@ void Player::OnInit(entt::registry& registry)
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 5, "Spine_01");
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
 	animation_component.AddNewAnimSlot<PlayerFullBodyAnimationStateMachine>("FullBody", entity_id_, skm.skeletal_mesh_id, 1, "Root");
 	auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_component.GetAnimSlotByName("UpperBody");
 	sm->SetPlayer(this);
@@ -144,11 +144,6 @@ void Player::OnInit(entt::registry& registry)
 void Player::OnUpdate()
 {
 	GetCapsuleComponent()->hit_enable = !(is_rolling_ || is_hit_);
-
-	if (GetStatus("hp")->GetCurrentValue() <= 0) {
-		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
-		is_dead_ = true;
-	}
 
 	if (controller_enable_)
 	{
@@ -169,6 +164,20 @@ void Player::OnUpdate()
 	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
 	IncreaseInfection();
 	UpdateStatus();
+
+	if (GetStatus("hp")->GetCurrentValue() <= 0) {
+		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
+		controller_enable_ = false;
+		is_dead_ = true;
+	}
+
+	if (GetStatus("infection")->GetCurrentValue() >= 5.f)
+	{
+		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerInfected);
+		controller_enable_ = false;
+		is_zombie_ = true;
+		return;
+	}
 }
 
 void Player::SetCharacterMovementAnimation()
@@ -280,10 +289,10 @@ void Player::Jump()
 	if (controller_enable_ == false)
 		return;
 
-	//if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
+	if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
 		GetMovementComponent()->jump_pulse = 150.0f;
 		EVENT->PushEvent<SoundGenerateEvent>(entity_id_, SFX, "S_CH_Jump_Start.wav", 1.0f, false);
-	//}
+	}
 }
 
 void Player::Attack()
@@ -404,24 +413,18 @@ void Player::TakeDamage(int damage)
 	is_hit_ = true;
 	GetStatus("hp")->PermanentVariation(-damage);
 
-	if (is_infected == true)
+	if (is_infected_ == true)
 		return;
 
 	++hit_count_;
 	infection_probability_ = pow(hit_count_, 2);
-	is_infected = Probability(infection_probability_);
+	is_infected_ = Probability(infection_probability_);
 };
 
 void Player::IncreaseInfection()
 {
-	if (is_infected == false)
+	if (is_infected_ == false)
 		return;
-
-	if (GetStatus("infection")->GetCurrentValue() >= 100.f)
-	{
-		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerInfected);
-		return;
-	}
 
 	static float timer = 0;
 	timer += TM_DELTATIME;
@@ -469,30 +472,6 @@ void Player::SetPos(const XMVECTOR& position)
 	cur_position_ = position;
 	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
 }
-
-//float Player::GetMaxHp() const
-//{
-//	return max_hp_;
-//}
-//
-//void Player::SetCurHp(int hp)
-//{
-//	cur_hp_ = hp;
-//}
-//
-//void Player::TakeDamage(int damage)
-//{
-//	if (is_hit_)
-//		return;	
-//
-//	is_hit_ = true;
-//	cur_hp_ -= damage;	
-//}
-//
-//float Player::GetCurHp() const
-//{
-//	return cur_hp_;
-//}
 
 void Player::AddFlashLight()
 {
@@ -580,7 +559,7 @@ void Player::CalculateMovementAngle()
 
 void Player::ChangeWeapon()
 {
-	if (is_aiming_ == true || is_reloading_ || is_rolling_ == true) {
+	if (is_aiming_ == true || is_reloading_ || is_rolling_ == true || controller_enable_ == false) {
 		return;
 	}
 	int cur_equipped_weapon = static_cast<int>(cur_equipped_weapon_);
