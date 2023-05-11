@@ -16,7 +16,8 @@ public:
 		LEFT_RIGHT_HOOK,
 		KICK_ATTACK,
 		PUNCH_ATTACK,
-		JUMP_ATTACK
+		JUMP_ATTACK,
+		DIE,
 	};
 
 	BossZombieBaseAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
@@ -28,6 +29,7 @@ public:
 		states_.insert({ KICK_ATTACK, make_shared<KickAttack>() });
 		states_.insert({ PUNCH_ATTACK, make_shared<PunchAttack>() });
 		states_.insert({ JUMP_ATTACK, make_shared<JumpAttack>() });
+		states_.insert({ DIE, make_shared<Die>() });
 
 		transitions_.insert({ IDLE, Transition(MOVE,[this](const AnimationStateMachine* animation_state_machine) {
 				BaseEnemy* enemy = SCENE_MGR->GetActor<BaseEnemy>(owner_id_);
@@ -186,6 +188,74 @@ public:
 			});
 		}
 
+		//DIE
+		{
+			transitions_.insert({ IDLE, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
+				BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(owner_id_);
+				if (enemy->GetStatus("hp")->GetCurrentValue() <= 0) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+			transitions_.insert({ MOVE, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
+				BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(owner_id_);
+				if (enemy->GetStatus("hp")->GetCurrentValue() <= 0) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+
+			transitions_.insert({ LEFT_RIGHT_HOOK, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
+				BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(owner_id_);
+				if (enemy->GetStatus("hp")->GetCurrentValue() <= 0) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+
+			transitions_.insert({ KICK_ATTACK, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
+				BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(owner_id_);
+				if (enemy->GetStatus("hp")->GetCurrentValue() <= 0) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+
+			transitions_.insert({ PUNCH_ATTACK, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
+				BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(owner_id_);
+				if (enemy->GetStatus("hp")->GetCurrentValue() <= 0) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+
+			transitions_.insert({ JUMP_ATTACK, Transition(DIE,[this](const AnimationStateMachine* animation_state_machine) {
+				BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(owner_id_);
+				if (enemy->GetStatus("hp")->GetCurrentValue() <= 0) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+		}
+
 
 		cur_state_ = states_[IDLE];
 	}
@@ -217,16 +287,26 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			vector<AnimNotify> notifies;
-			notifies.push_back({ 1, make_shared<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "Zombie_Move_1.mp3", 0.5f, false), true });
-			animation_state_machine->SetAnimation("DND_BossZombie_Run.anim", 0.8f, true, notifies);
+			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
+
+			EVENT->PushEvent<SoundGenerateEvent>(owner_actor_->entity_id_, SFX, "BossRun_2.wav", 1.0f, false);
+			animation_state_machine->SetAnimation("DND_BossZombie_Run.anim", 0.8f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
+			timer = 0.0f;
 		}
-		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override 
 		{
+			timer += TM_DELTATIME;
+			if (timer >= 1.3f)
+			{
+				EVENT->PushEvent<SoundGenerateEvent>(owner_actor_->entity_id_, SFX, "BossRun_2.wav", 1.0f, false);
+				timer = 0.0f;
+			}
 		}
+		float timer = 0;
+		BossZombie* owner_actor_ = nullptr;
 	};
 
 	class LeftRightHook : public AnimationState {
@@ -241,6 +321,7 @@ public:
 			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
 			owner_actor_->rotate_enable_ = false;
 
+			EVENT->PushEvent<SoundGenerateEvent>(owner_actor_->entity_id_, SFX, "BossHook.wav", 1.0f, false);
 			animation_state_machine->SetAnimation("DND_BossZombie_Punch_L.anim", 0.8f, true, notifies);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
@@ -291,6 +372,7 @@ public:
 			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
 			owner_actor_->rotate_enable_ = false;
 
+			EVENT->PushEvent<SoundGenerateEvent>(owner_actor_->entity_id_, SFX, "BossKick.wav", 1.0f, false);
 			animation_state_machine->SetAnimation("DND_BossZombie_Kick.anim", 0.8f, true, notifies);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
@@ -327,8 +409,8 @@ public:
 			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
 			owner_actor_->rotate_enable_ = false;
 
-			vector<AnimNotify> notifies;
-			animation_state_machine->SetAnimation("DND_BossZombie_StrongPunch.anim", 0.8f, true, notifies);
+			EVENT->PushEvent<SoundGenerateEvent>(owner_actor_->entity_id_, SFX, "BossPunch.wav", 1.0f, false);
+			animation_state_machine->SetAnimation("DND_BossZombie_StrongPunch.anim", 0.8f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -361,9 +443,8 @@ public:
 			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
 			owner_actor_->rotate_enable_ = false;
 
-			vector<AnimNotify> notifies;
-			animation_state_machine->SetAnimation("DND_BossZombie_JumpAttack.anim", 0.8f, true, notifies);
-
+			EVENT->PushEvent<SoundGenerateEvent>(owner_actor_->entity_id_, SFX, "BossJump.wav", 1.0f, false);
+			animation_state_machine->SetAnimation("DND_BossZombie_JumpAttack.anim", 0.8f, true);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -392,4 +473,32 @@ public:
 		bool jump_ = false;
 		BossZombie* owner_actor_ = nullptr;
 	};
+
+	class Die : public AnimationState {
+	public:
+		Die() : AnimationState(DIE) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			//vector<AnimNotify> notifies;
+			//notifies.push_back({ 1, make_shared<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "Zombie_Move_1.mp3", 0.5f, false), true });
+			
+			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
+			owner_actor_->GetCapsuleComponent()->hit_enable = false;
+
+			animation_state_machine->SetAnimation("DND_BossZombie_Death.anim", 1.0f, false);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+			//animation_state_machine->SetAnimation("DND_BossZombie_DeathPose.anim", 1.0f, true);
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+			owner_actor_->CancelMovement();
+			owner_actor_->rotate_enable_ = false;
+		}
+
+		BossZombie* owner_actor_ = nullptr;
+	};
+
 };

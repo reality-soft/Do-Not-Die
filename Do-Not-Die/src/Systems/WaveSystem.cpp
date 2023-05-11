@@ -2,6 +2,7 @@
 #include "GameEvents.h"
 #include "Player.h"
 #include "NormalZombie.h"
+#include "BossZombie.h"
 #include "Item.h"
 #include "FX_Flame.h"
 #include "FX_Smoke.h"
@@ -14,6 +15,7 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 	repair_spawns_ = QUADTREE->GetGuideLines("DND_RepairPart_1")->at(0);
 	car_event_ = QUADTREE->GetGuideLines("DND_CarEvent_1")->at(0);
 	zomebie_tracks_ = QUADTREE->GetGuideLines("DND_NpcTrack_1");
+	boss_track_ = QUADTREE->GetGuideLines("DND_BossTrack_1")->at(0);
 	fx_car_fire_ = QUADTREE->GetGuideLines("DND_FX_CarFire_1")->at(0);
 	fx_corpse_fire_ = QUADTREE->GetGuideLines("DND_FX_CorpseFire_1")->at(0);
 
@@ -253,8 +255,6 @@ void reality::WaveSystem::SpawnZombies(float interval)
 	int guidline_index = RandomIntInRange(0, zomebie_tracks_->size() - 1);
 	int mesh_index = RandomIntInRange(0, enemy_meshes.size() - 1);
 
-	//guidline_index = 4;
-
 	vector<XMVECTOR> target_poses;
 	for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
 		target_poses.push_back(target_pos.second);
@@ -264,6 +264,22 @@ void reality::WaveSystem::SpawnZombies(float interval)
 
 	cur_time = 0.0f;
 	zombie_spawn_count_ -= 1;	
+}
+
+void reality::WaveSystem::SpawnBossZombie()
+{
+	BossZombie* boss = SCENE_MGR->GetScene(INGAME)->GetActor<BossZombie>(SCENE_MGR->GetScene(INGAME)->AddActor<BossZombie>());
+	boss_zombie_ent = boss->entity_id_;
+
+	boss->targeting_car_health = &car_health;
+
+	vector<XMVECTOR> target_poses;
+	for (const auto& target_pos : boss_track_.line_nodes) {
+		target_poses.push_back(target_pos.second);
+	}
+	boss->SetBehaviorTree(target_poses);
+
+	boss_zombie_spawn = true;
 }
 
 void reality::WaveSystem::SpawnCarSmokes()
@@ -301,9 +317,13 @@ XMVECTOR reality::WaveSystem::GetCarPosition()
 
 void reality::WaveSystem::WaveStart()
 {
+	zombie_spawn_count_ += 1;
+
+	if (wave_count_ == 0)
+		SpawnBossZombie();
+
 	FMOD_MGR->Stop("S_Day_BGM.wav");
 	FMOD_MGR->Play("S_Night_BGM.wav", SoundType::MUSIC, true, 1.0f, {});
-	zombie_spawn_count_ += 0;
 }
 
 void reality::WaveSystem::WaveFinish()

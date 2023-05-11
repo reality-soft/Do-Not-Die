@@ -556,6 +556,7 @@ public:
 				attack_ray.start = _XMFLOAT3(GetTipBaseAB(c_enemy_capsule->capsule)[3]);
 				attack_ray.end = _XMFLOAT3((_XMVECTOR3(attack_ray.start) + (enemy->GetFront() * enemy->attack_distance_)));
 				EVENT->PushEvent<AttackEvent_SingleRay>(attack_ray, enemy->GetEntityId());
+				EVENT->PushEvent<AttackEvent_AboutCar>(enemy->GetEntityId());
 			}
 		}
 	};

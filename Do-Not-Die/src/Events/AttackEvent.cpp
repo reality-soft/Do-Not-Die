@@ -17,26 +17,18 @@ void AttackEvent_SingleRay::EnemyProcess()
 	auto enemy_actor = SCENE_MGR->GetActor<BaseEnemy>(actor_id_);
 	enemy_actor->is_attacking_ = true;
 
-	auto callback_car = QUADTREE->RaycastCarOnly(ray);
-	if (callback_car.success)
+	auto callback_actor = QUADTREE->RaycastActorTargeted(ray, SCENE_MGR->GetPlayer<Player>(0)->entity_id_);
+	if (callback_actor.success)
 	{
-		*enemy_actor->targeting_car_health = max(0, *enemy_actor->targeting_car_health - 5);
-	}
-	else
-	{
-		auto callback_actor = QUADTREE->RaycastActorTargeted(ray, SCENE_MGR->GetPlayer<Player>(0)->entity_id_);
-		if (callback_actor.success)
+		if (SCENE_MGR->GetActor<GameCharacter>(callback_actor.ent)->tag == "player")
 		{
-			if (SCENE_MGR->GetActor<GameCharacter>(callback_actor.ent)->tag == "player")
-			{
-				hit_actor_ = callback_actor.ent;
-				EVENT->PushEvent<TakeDamageEvent>(enemy_actor->GetStatus("default_damage")->GetCurrentValue(), hit_actor_);
-				EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_actor.point, callback_actor.normal);
-				auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
-				ingame_scene->GetUIActor().Hitted();
-			}
+			hit_actor_ = callback_actor.ent;
+			EVENT->PushEvent<TakeDamageEvent>(enemy_actor->GetStatus("default_damage")->GetCurrentValue(), hit_actor_);
+			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_actor.point, callback_actor.normal);
+			auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+			ingame_scene->GetUIActor().Hitted();
 		}
-	}
+	}	
 }
 
 void AttackEvent_SingleRay::PlayerProcess()
@@ -127,5 +119,26 @@ void AttackEvent_BoundSphere::PlayerProcess()
 		{
 			hit_actors_.push_back(ent);
 		}
+	}
+}
+
+void AttackEvent_AboutCar::Process()
+{
+	BaseEnemy* enemy = SCENE_MGR->GetActor<BaseEnemy>(actor_id_);
+	if (enemy == nullptr)
+		return;
+
+	auto c_capsule = enemy->GetCapsuleComponent();
+	if (c_capsule == nullptr)
+		return;
+
+	XMVECTOR point_b = GetTipBaseAB(c_capsule->capsule)[3];
+	RayShape ray_about_car(point_b, point_b + enemy->GetFront() * 1000);
+	auto callback_car = QUADTREE->RaycastCarOnly(ray_about_car);
+
+	if (callback_car.success)
+	{
+		float damage = enemy->GetStatus("car_damage")->GetCurrentValue();
+		*enemy->targeting_car_health = max(0, *enemy->targeting_car_health - damage);
 	}
 }

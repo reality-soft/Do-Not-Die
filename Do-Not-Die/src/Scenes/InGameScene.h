@@ -79,6 +79,7 @@ public:
 
 private:
 	void ShowCarCrashing();
+	void ShowBossZombie();
 	void GameResultProcess();
 
 private:
