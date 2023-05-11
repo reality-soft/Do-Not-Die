@@ -3,6 +3,9 @@
 #include "AnimationStateMachine.h"
 #include "AnimationState.h"
 #include "BossZombie.h"
+#include "FX_Range.h"
+#include "FX_Smash.h"
+#include "BossZombie.h"
 using namespace reality;
 
 class BossZombieBaseAnimationStateMachine : public AnimationStateMachine {
@@ -437,8 +440,6 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			jump_ = true;
-
 			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
 			owner_actor_->rotate_enable_ = false;
 
@@ -456,14 +457,20 @@ public:
 		{
 			owner_actor_->CancelMovement();
 			int frame = animation_state_machine->GetCurAnimation().cur_frame_;
+			if (!jump_ && frame == 36)
+			{
+				EFFECT_MGR->SpawnEffect<FX_Range>(owner_actor_->GetCurPosition(), XMQuaternionIdentity(), { 200.0f, 200.0f, 200.0f, 1.0f });
+				jump_ = true;
+			}
 			if (jump_ && (int)animation_state_machine->GetCurAnimation().cur_frame_ == 94)
 			{
 				owner_actor_->JumpAttack();
+				EFFECT_MGR->SpawnEffect<FX_Smash>(owner_actor_->GetCurPosition(), XMQuaternionIdentity(), { 200.0f, 200.0f, 200.0f, 1.0f });
 				jump_ = false;
 			}
 		}
 
-		bool jump_ = true;
+		bool jump_ = false;
 		BossZombie* owner_actor_ = nullptr;
 	};
 

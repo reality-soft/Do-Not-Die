@@ -60,7 +60,7 @@ namespace reality
 			shared_ptr<UI_Text>		repair_text_;
 			shared_ptr<UI_Text>		kill_text_;
 		// Crosshair
-		shared_ptr<UI_Image>	crosshair_ui_;
+		shared_ptr<UI_Image>	crosshair_ui_[(int)EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE];
 		// Menu
 		shared_ptr<UI_Image>	menu_window_;
 			shared_ptr<UI_Image>	menu_title_;

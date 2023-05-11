@@ -11,7 +11,7 @@ using namespace reality;
 void BossZombie::OnInit(entt::registry& registry)
 {
 	Character::OnInit(registry);
-	tag = "enemy";
+	tag = "boss enemy";
 
 	// setting character data
 	AddStatus("hp", CharacterStatus(1000, 1000, 0, 1000));
@@ -77,16 +77,10 @@ void BossZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 	boss_zombie_attack_select->AddChild<BossJumpAttack>(entity_id_);
 	boss_zombie_attack_select->SetNumToExecute(3);
 
-	vector<pair<std::function<bool()>, shared_ptr<BehaviorNode>>> children_if_else;
-	children_if_else.push_back(
-		make_pair([this]() {
-		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
-		BaseEnemy* enemy = reality::SCENE_MGR->GetActor<BaseEnemy>(entity_id_);
-		float distance_to_player = Distance(player->GetCurPosition(), enemy->GetCurPosition());
-		return (distance_to_player >= 100); 
-			}, 
-		make_shared<BossZombieFollowPlayer>(entity_id_)));
-	shared_ptr<IfElseIfNode> boss_zombie_follow_and_attack_player = make_shared<IfElseIfNode>(children_if_else, dynamic_pointer_cast<BehaviorNode>(boss_zombie_attack_select));
+	vector<shared_ptr<BehaviorNode>> children_sequence;
+	children_sequence.push_back(make_shared<BossZombieFollowPlayer>(entity_id_));
+	children_sequence.push_back(boss_zombie_attack_select);
+	shared_ptr<SequenceNode> boss_zombie_follow_and_attack_player = make_shared<SequenceNode>(children_sequence);
 
 	vector<shared_ptr<BehaviorNode>> children_selector;
 	children_selector.push_back(boss_zombie_follow_and_attack_player);

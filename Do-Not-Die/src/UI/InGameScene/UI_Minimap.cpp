@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "UI_Minimap.h"
 #include "Player.h"
+#include "BossZombie.h"
 #include "NormalZombie.h"
+#include "InGameScene.h"
 
 #define MINIMAP_OFFSET 0.1
 #define MINIMAP_LENGTH 15800.0f
@@ -34,22 +36,35 @@ void UI_Minimap::UpdateThisUI()
 	// 1. Render Minimap Image
 	RenderMinimap();
 
+	// 2. Render Truck Icon
+	auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+	XMMATRIX truck_world = XMMatrixTranslationFromVector(ingame_scene->GetWaveSystem().GetCarPosition());
+	RenderTruckIcon(truck_world);
 
-	// 2. Render Actor Icon
-	auto player = SCENE_MGR->GetPlayer<Player>(0);
-
+	// 3. Render Actor Icon
 	auto view_of_capsule = reg_->view<C_CapsuleCollision>();
 	for (auto& entity : view_of_capsule)
 	{
+		auto actor = SCENE_MGR->GetActor<Actor>(entity);
+		
 		// if player, continue;
-		if (entity == player->GetEntityId())
+		if (actor->tag == "player")
 		{
+			auto player = (Player*)actor;
 			XMMATRIX player_world = player->GetRotation() * XMMatrixTranslationFromVector(player->GetCurPosition());
 			RenderPlayerIcon(player_world);
 		}
-		else
+		else if (actor->tag == "boss enemy")
 		{
-			auto zombie = SCENE_MGR->GetActor<NormalZombie>(entity);
+			// Boss Zombie Icon
+			auto boss_zombie = (BossZombie*)actor;
+			XMMATRIX boss_world = XMMatrixTranslationFromVector(boss_zombie->GetCurPosition());
+			RenderBossIcon(boss_world);
+		}
+		else if(actor->tag == "enemy")
+		{
+			// Zombie Icon
+			auto zombie = (NormalZombie*)actor;
 			if (zombie)
 			{
 				XMMATRIX zombie_world = XMMatrixTranslationFromVector(zombie->GetCurPosition());
@@ -58,7 +73,7 @@ void UI_Minimap::UpdateThisUI()
 		}
 	}
 
-	// 3. Return from Minimap RenderTarget to Backbuffer
+	// 4. Return from Minimap RenderTarget to Backbuffer
 	DX11APP->SetBackBufferRTV();
 }
 
@@ -160,7 +175,7 @@ void UI_Minimap::RenderPlayerIcon(XMMATRIX world)
 	XMMATRIX S, R, T;
 
 	// Scale
-	XMVECTOR scale = XMVectorSet(0.032f, 0.032f, 0.0f, 1.0f);
+	XMVECTOR scale = XMVectorSet(0.024f, 0.024f, 0.0f, 1.0f);
 	S = XMMatrixScalingFromVector(scale);
 	// Rotation
 	C_Camera& player_camera = reg_->get<C_Camera>(SCENE_MGR->GetPlayer<Character>(0)->GetEntityId());
@@ -205,6 +220,64 @@ void UI_Minimap::RenderZombieIcon(XMMATRIX world)
 
 	// Set Texture
 	Texture* texture = RESOURCE->UseResource<Texture>("T_Zombie_Icon.png");
+	DX11APP->GetDeviceContext()->PSSetShaderResources(0, 1, texture->srv.GetAddressOf());
+
+	RenderExceptTextureSet();
+}
+
+void UI_Minimap::RenderTruckIcon(XMMATRIX world)
+{
+	// Regulate World Coord
+	XMVECTOR world_scale, world_rot, world_pos;
+	XMMatrixDecompose(&world_scale, &world_rot, &world_pos, world);
+
+	XMMATRIX S, R, T;
+
+	// Scale
+	XMVECTOR scale = XMVectorSet(0.032f, 0.032f, 0.0f, 1.0f);
+	S = XMMatrixScalingFromVector(scale);
+	// Rotation
+	R = XMMatrixIdentity();
+	// Translation
+	XMVECTOR pos = ConvertWorldToScreenXZ(world_pos);
+	XMStoreFloat2(&minimap_player_pos, pos);
+	T = XMMatrixTranslationFromVector(pos);
+	XMMATRIX minimap_world = S * R * T;
+
+	// Set Constant Buffer
+	UISystem::SetCbData(XMMatrixTranspose(minimap_world));
+
+	// Set Texture
+	Texture* texture = RESOURCE->UseResource<Texture>("T_TruckIcon.png");
+	DX11APP->GetDeviceContext()->PSSetShaderResources(0, 1, texture->srv.GetAddressOf());
+
+	RenderExceptTextureSet();
+}
+
+void UI_Minimap::RenderBossIcon(XMMATRIX world)
+{
+	// Regulate World Coord
+	XMVECTOR world_scale, world_rot, world_pos;
+	XMMatrixDecompose(&world_scale, &world_rot, &world_pos, world);
+
+	XMMATRIX S, R, T;
+
+	// Scale
+	XMVECTOR scale = XMVectorSet(0.024f, 0.024f, 0.0f, 1.0f);
+	S = XMMatrixScalingFromVector(scale);
+	// Rotation
+	R = XMMatrixIdentity();
+	// Translation
+	XMVECTOR pos = ConvertWorldToScreenXZ(world_pos);
+	XMStoreFloat2(&minimap_player_pos, pos);
+	T = XMMatrixTranslationFromVector(pos);
+	XMMATRIX minimap_world = S * R * T;
+
+	// Set Constant Buffer
+	UISystem::SetCbData(XMMatrixTranspose(minimap_world));
+
+	// Set Texture
+	Texture* texture = RESOURCE->UseResource<Texture>("T_Boss_Icon.png");
 	DX11APP->GetDeviceContext()->PSSetShaderResources(0, 1, texture->srv.GetAddressOf());
 
 	RenderExceptTextureSet();

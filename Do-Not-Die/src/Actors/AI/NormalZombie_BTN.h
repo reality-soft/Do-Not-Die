@@ -22,7 +22,8 @@ public:
 		XMVECTOR direction_to_player = XMVector3Normalize(player->GetCurPosition() - enemy->GetCurPosition());
 		target_position_ = player->GetCurPosition();
 
-		if (enemy->player_in_sight_ == false || player->player_in_defense_ == false)
+		if (enemy->player_in_sight_ == false || player->player_in_defense_ == false 
+			|| player->is_zombie_ == true || player->is_dead_ == true)
 			return reality::BehaviorStatus::FAILURE;
 
 
