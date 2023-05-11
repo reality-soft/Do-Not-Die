@@ -1300,7 +1300,7 @@ public:
 			player->controller_enable_ = false;
 
 			C_Movement* movement_component = player->GetMovementComponent();
-			player->GetStatus("max_speed")->PermanentVariation(150);
+			player->GetStatus("max_speed")->PermanentVariation(100);
 
 			for (int i = 0;i < 3;i++) {
 				roll_direction_[i] = movement_component->accelaration_vector[i];
@@ -1342,7 +1342,7 @@ public:
 			entt::entity owner_id = animation_state_machine->GetOwnerId();
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 
-			player->GetStatus("max_speed")->PermanentVariation(-150);
+			player->GetStatus("max_speed")->PermanentVariation(-100);
 			player->controller_enable_ = true;
 			player->is_rolling_ = false;
 			player->roll_ = false;

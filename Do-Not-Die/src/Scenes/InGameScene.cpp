@@ -88,8 +88,8 @@ void InGameScene::OnInit()
 	loading_progress = LOADING_ACTOR;
 	
 	environment_.CreateEnvironment();
-	//environment_.SetWorldTime(120, 240);
-	environment_.SetWorldTime(1, 60);
+	environment_.SetWorldTime(120, 180);
+	//environment_.SetWorldTime(1, 60);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 2000);
 	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.1, 0.1, 0.15, 1), 0.05f, 0.25f);
@@ -254,6 +254,8 @@ void InGameScene::ShowBossZombie()
 
 	if (Distance(player->GetCurPosition(), boss->GetCurPosition()) > 4000.0f)
 		return;
+
+	sys_sound.PlayBackground("BossShowdown.wav", false, 0, 1.0f);
 
 	show_end = sys_camera.ZoomToTarget(boss->GetCurPosition(), (boss->GetCurPosition() + XMVectorSet(0, 100, 0, 0)) + (boss->GetFront() * 500), 2.0f, 3.0f);
 	player->controller_enable_ = show_end;
