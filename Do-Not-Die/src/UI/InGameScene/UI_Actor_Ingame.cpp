@@ -46,7 +46,7 @@ void UI_Actor_Ingame::SetGameTimer(float timer)
 	wave_timer_ = timer;
 }
 
-bool reality::UI_Actor_Ingame::FadeOut()
+bool UI_Actor_Ingame::FadeOut()
 {
 	static float timer = 0.0f;
 	static float alpha = 0.0f;
@@ -355,10 +355,22 @@ void UI_Actor_Ingame::CreateIngameUI()
 
 	/// Hitted UI
 	{
-		hitted_ui_ = make_shared<UI_Image>();
-		hitted_ui_->InitImage("T_Hitted.png");
-		hitted_ui_->SetLocalRectByMin({ 0.0f, 0.0f }, win_size_1920_width, win_size_1920_height);
+		
+		for (int i = 0; i < ARRAYSIZE(hitted_ui_); i++)
+		{
+			string img_id = "T_Hitted" + to_string(i+1) + ".png";
+			hitted_ui_[i] = make_shared<UI_Image>();
+			hitted_ui_[i]->InitImage(img_id);
+			//ui_comp_->ui_list.insert({ "0_Hitted UI" + to_string(i + 1) , hitted_ui_[i] });
+		}
+		
+		hitted_ui_timer_.resize(ARRAYSIZE(hitted_ui_));
 
+		//hitted_ui_[0]->SetLocalRectByMin({ 300.0f * 0.0f, 0.0f }, 300.0f, 300.0f);
+		//hitted_ui_[1]->SetLocalRectByMin({ 300.0f * 1.0f, 0.0f }, 300.0f, 300.0f);
+		//hitted_ui_[2]->SetLocalRectByMin({ 300.0f * 2.0f, 0.0f }, 300.0f, 300.0f);
+		//hitted_ui_[3]->SetLocalRectByMin({ 300.0f * 3.0f, 0.0f }, 300.0f, 300.0f);
+		//hitted_ui_[4]->SetLocalRectByMin({ 300.0f * 4.0f, 0.0f }, 300.0f, 300.0f);
 	}
 
 	// Event Message UI
@@ -513,15 +525,33 @@ void UI_Actor_Ingame::UpdateIngameUI()
 
 	// Hitted UI Update
 	{
-		if (hit_timer_ > 0.0f)
+		float delta_time = TIMER->GetDeltaTime();
+		for (int i = 0; i < ARRAYSIZE(hitted_ui_); i++)
 		{
-			if (ui_comp_->ui_list.find("0_Hitted UI") == ui_comp_->ui_list.end())
-				ui_comp_->ui_list.insert({"0_Hitted UI" , hitted_ui_ });
-			hit_timer_ -= TIMER->GetDeltaTime();
-			hitted_ui_->SetAlpha(hit_timer_ / hit_ui_time_);
+			float& timer = hitted_ui_timer_[i];
+			string ui_id = "0_Hitted UI" + to_string(i + 1);
+			if (timer - delta_time < 0.0f)
+			{
+				if (ui_comp_->ui_list.find(ui_id) != ui_comp_->ui_list.end())
+					ui_comp_->ui_list.erase(ui_id);
+				continue;
+			}
+
+			timer -= TIMER->GetDeltaTime();
+			hitted_ui_[i]->SetAlpha(timer / hit_ui_time_ * 0.5f);
+			if (ui_comp_->ui_list.find(ui_id) == ui_comp_->ui_list.end())
+				ui_comp_->ui_list.insert({ ui_id, hitted_ui_[i] });
 		}
-		else if(ui_comp_->ui_list.find("0_Hitted UI") != ui_comp_->ui_list.end())
-			ui_comp_->ui_list.erase("0_Hitted UI");
+
+		//if (hit_timer_ > 0.0f)
+		//{
+		//	if (ui_comp_->ui_list.find("0_Hitted UI") == ui_comp_->ui_list.end())
+		//		ui_comp_->ui_list.insert({"0_Hitted UI" , hitted_ui_ });
+		//	hit_timer_ -= TIMER->GetDeltaTime();
+		//	hitted_ui_->SetAlpha(hit_timer_ / hit_ui_time_);
+		//}
+		//else if(ui_comp_->ui_list.find("0_Hitted UI") != ui_comp_->ui_list.end())
+		//	ui_comp_->ui_list.erase("0_Hitted UI");
 	}
 
 	// Buff UI Update
@@ -901,7 +931,19 @@ void UI_Actor_Ingame::ShowCarCrashed()
 
 void UI_Actor_Ingame::Hitted()
 {
-	hit_timer_ = hit_ui_time_;
+	static int count = 0;
+
+	hitted_ui_timer_[count] = hit_ui_time_;
+
+	float size = 600.0f;
+
+	float random_x = RandomFloatInRange(0, 1920.0f - size);
+	float random_y = RandomFloatInRange(0, 1080.0f - size);
+
+	hitted_ui_[count]->SetLocalRectByMin({ random_x, random_y }, size, size);
+
+	if (++count >= ARRAYSIZE(hitted_ui_))
+		count = 0;
 }
 
 void UI_Actor_Ingame::OpenMenu()
