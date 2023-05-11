@@ -33,7 +33,7 @@ void Grenade::OnInit(entt::registry& registry)
 	timer_ = 0.0f;
 	explosion_time_ = 3.0f;
 	range_ = 500.0f;
-	damage_ = 300.0f;
+	damage_ = 100.0f;
 }
 
 void Grenade::OnUpdate()
