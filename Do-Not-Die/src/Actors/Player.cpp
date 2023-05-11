@@ -171,7 +171,7 @@ void Player::OnUpdate()
 		is_dead_ = true;
 	}
 
-	if (GetStatus("infection")->GetCurrentValue() >= 100.0f)
+	if (GetStatus("infection")->GetCurrentValue() >= 100.f)
 	{
 		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerInfected);
 		controller_enable_ = false;

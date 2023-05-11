@@ -69,10 +69,31 @@ void AttackEvent_BoundSphere::Process()
 	for (const auto& hit : hit_actors_)
 	{
 		EVENT->PushEvent<TakeDamageEvent>(damage_, hit);
-
 		
-		XMVECTOR hit_point = _XMVECTOR3(sphere_.center);
-		XMVECTOR hit_normal = -character_actor->GetFront();
+
+		auto hit_actor = SCENE_MGR->GetActor<GameCharacter>(hit);
+		if (hit_actor == nullptr)
+			return;
+
+		auto hit_capsule_comp = hit_actor->GetCapsuleComponent();
+		if (hit_capsule_comp == nullptr)
+			return;
+		
+		
+
+		RayShape ray;
+		ray.start = _XMFLOAT3(GetTipBaseAB(hit_capsule_comp->capsule)[0]);
+		ray.end = _XMFLOAT3(GetTipBaseAB(hit_capsule_comp->capsule)[1]);
+		XMVECTOR point = PointRaySegment(ray, _XMVECTOR3(sphere_.center));
+
+		XMVECTOR dir = (character_actor->GetCurPosition() - point);
+		dir.m128_f32[1] = 0.0f;
+		dir = XMVector3Normalize(dir);
+
+		point += dir * hit_capsule_comp->capsule.radius;
+
+		XMVECTOR hit_point = point;
+		XMVECTOR hit_normal = dir;
 		EFFECT_MGR->SpawnEffectFromNormal<FX_MeleeImpact>(hit_point, hit_normal);
 
 		auto general_zombie = SCENE_MGR->GetActor<NormalZombie>(hit);
@@ -98,6 +119,8 @@ void AttackEvent_BoundSphere::EnemyProcess()
 	if (CapsuleToSphere(player_actor->GetCapsuleComponent()->capsule, sphere_) == CollideType::INTERSECT)
 	{
 		hit_actors_.push_back(player_actor->entity_id_);
+		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		ingame_scene->GetUIActor().Hitted();
 	}
 }
 

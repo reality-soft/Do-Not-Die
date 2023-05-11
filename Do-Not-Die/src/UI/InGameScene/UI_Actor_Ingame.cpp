@@ -327,10 +327,10 @@ void UI_Actor_Ingame::CreateIngameUI()
 		float crosshair_size = 50.0f;
 		float dot_cross_hair_size = 8.0f;
 
-		crosshair_ui_[(int)EQUIPPED_WEAPON::AUTO_RIFLE]->InitImage("T_CrossHairBlack.png");
+		crosshair_ui_[(int)EQUIPPED_WEAPON::AUTO_RIFLE]->InitImage("T_CrossHairWhite.png");
 		crosshair_ui_[(int)EQUIPPED_WEAPON::AUTO_RIFLE]->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f }, 
 			crosshair_size, crosshair_size);
-		crosshair_ui_[(int)EQUIPPED_WEAPON::HAND_GUN]->InitImage("T_CrossHairBlack.png");
+		crosshair_ui_[(int)EQUIPPED_WEAPON::HAND_GUN]->InitImage("T_CrossHairWhite.png");
 		crosshair_ui_[(int)EQUIPPED_WEAPON::HAND_GUN]->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f }, 
 			crosshair_size, crosshair_size);
 		crosshair_ui_[(int)EQUIPPED_WEAPON::MELEE_WEAPON]->InitImage("T_DotCrossHair.png");
@@ -515,14 +515,6 @@ void UI_Actor_Ingame::UpdateIngameUI()
 
 	// Infected UI Update
 	{
-		string str = to_string(player_->infection_probability_) + "%";
-		infected_text_->SetText(str);
-		if (player_->infection_probability_ >= 10)
-			infected_text_->SetLocalRectByMin({ 52.0f, 185.0f }, 100.0f, 100.0f);
-		else
-			infected_text_->SetLocalRectByMin({ 61.0f, 185.0f }, 100.0f, 100.0f);
-		
-
 		float infected_rate = player_->GetStatus("infection")->GetCurrentValue() / player_->GetStatus("infection")->GetMaxValue();
 
 		if (player_->is_infected_)
@@ -533,8 +525,17 @@ void UI_Actor_Ingame::UpdateIngameUI()
 			infected_text_->SetText("Infected");
 			infected_text_->SetLocalRectByMin({ 10.0f, 185.0f }, 100.0f, 100.0f);
 		}
-		else if(!player_->is_infected_ && ui_comp_->ui_list.find("1_Addicted UI") != ui_comp_->ui_list.end())
-			ui_comp_->ui_list.erase("1_Addicted UI");
+		else
+		{
+			if (!player_->is_infected_ && ui_comp_->ui_list.find("1_Addicted UI") != ui_comp_->ui_list.end())
+				ui_comp_->ui_list.erase("1_Addicted UI");
+			string str = to_string(player_->infection_probability_) + "%";
+			infected_text_->SetText(str);
+			if (player_->infection_probability_ >= 10)
+				infected_text_->SetLocalRectByMin({ 52.0f, 185.0f }, 100.0f, 100.0f);
+			else
+				infected_text_->SetLocalRectByMin({ 61.0f, 185.0f }, 100.0f, 100.0f);
+		}
 
 		infected_img_->SetLocalRectByMin({ status_ui->rect_transform_[E_Resolution::R1920x1080].world_rect.width / 2.0f - 154.0f, 190.0f }, 352.0f * infected_rate, 8.0f);
 	}
@@ -934,6 +935,8 @@ void UI_Actor_Ingame::ShowPlayerInfected()
 {
 	ui_comp_->ui_list.clear();
 	ui_comp_->ui_list.insert({ "Player Infected UI", player_infected_ui_ });
+	addicted_ui_->SetAlpha(1.0f);
+	ui_comp_->ui_list.insert({ "A_Addicted UI", addicted_ui_ });
 	while (ShowCursor(true) <= 0);
 }
 
