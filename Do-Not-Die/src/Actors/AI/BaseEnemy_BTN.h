@@ -76,7 +76,7 @@ public:
 			distance = XMVector3LinePointDistance(capsule_info[0], capsule_info[1], target_position_).m128_f32[0];
 		}
 		
-		if (distance <= 10)
+		if (distance <= 50)
 		{
 			owner->Attack();
 		}

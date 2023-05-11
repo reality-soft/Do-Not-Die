@@ -20,6 +20,7 @@ public:
 	void KickAttack();
 	void PunchAttack();
 	void JumpAttack();
+	virtual void Attack() override;
 
 	SphereShape CreateFrontAttackSphere(float radius);
 
