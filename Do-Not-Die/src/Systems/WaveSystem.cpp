@@ -301,7 +301,7 @@ XMVECTOR reality::WaveSystem::GetCarPosition()
 
 void reality::WaveSystem::WaveStart()
 {
-	zombie_spawn_count_ += 10;
+	zombie_spawn_count_ += 0;
 }
 
 void reality::WaveSystem::WaveFinish()

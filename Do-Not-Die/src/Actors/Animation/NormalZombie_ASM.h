@@ -74,6 +74,16 @@ public:
 				}
 			})
 			});
+		transitions_.insert({ ATTACK_BASE, Transition(HIT_BASE,[this](const AnimationStateMachine* animation_state_machine) {
+				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
+				if (enemy->is_hit_ && enemy->GetStatus("hp")->GetCurrentValue() > 0.0f) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
 		transitions_.insert({ IDLE_BASE, Transition(HIT_BASE,[this](const AnimationStateMachine* animation_state_machine) {
 				NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(owner_id_);
 				if (enemy->is_hit_) {
@@ -221,7 +231,6 @@ public:
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
 			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
-			enemy->is_attack_ended = true;
 			enemy->is_attacking_ = false;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override

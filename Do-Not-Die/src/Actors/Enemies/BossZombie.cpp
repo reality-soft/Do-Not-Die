@@ -5,6 +5,7 @@
 #include "BossZombie_ASM.h"
 #include "BaseEnemy_BTN.h"
 #include "BossZombie_BTN.h"
+
 using namespace reality;
 
 void BossZombie::OnInit(entt::registry& registry)
@@ -13,12 +14,9 @@ void BossZombie::OnInit(entt::registry& registry)
 	tag = "boss enemy";
 
 	// setting character data
-	GetMovementComponent()->max_speed = 100;
-	GetMovementComponent()->acceleration = 100;
-
 	AddStatus("hp", CharacterStatus(100, 100, 0, 100));
 	AddStatus("default_damage", CharacterStatus(10, 10, 10, 10));
-	AddStatus("max_speed", CharacterStatus(RandomIntInRange(100, 200), 0, 100, 200));
+	AddStatus("max_speed", CharacterStatus(RandomIntInRange(200, 250), 0, 200, 250));
 
 	GetMovementComponent()->speed = 0;
 	GetMovementComponent()->acceleration = 100;
@@ -43,7 +41,7 @@ void BossZombie::OnInit(entt::registry& registry)
 	registry.emplace<reality::C_CapsuleCollision>(entity_id_, capsule);
 
 	SkeletalMesh* skeletal_mesh = RESOURCE->UseResource<SkeletalMesh>(skm.skeletal_mesh_id);
-	
+
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<BossZombieBaseAnimationStateMachine>(entity_id_, skm.skeletal_mesh_id, 0);
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
@@ -59,6 +57,10 @@ void BossZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 
 	// in combat zone
 	shared_ptr<RandomSelectorNode> boss_zombie_attack_select = make_shared<RandomSelectorNode>();
+	boss_zombie_attack_select->AddChild<BossLeftRightHook>(entity_id_);
+	boss_zombie_attack_select->SetNumToExecute(3);
+	boss_zombie_attack_select->AddChild<BossKickAttack>(entity_id_);
+	boss_zombie_attack_select->SetNumToExecute(3);
 	boss_zombie_attack_select->AddChild<BossPunchAttack>(entity_id_);
 	boss_zombie_attack_select->SetNumToExecute(3);
 	boss_zombie_attack_select->AddChild<BossJumpAttack>(entity_id_);
@@ -94,42 +96,53 @@ void BossZombie::SetBehaviorTree(const vector<XMVECTOR>& target_poses)
 	behavior_tree_.SetRootNode<IfElseIfNode>(children_root, move_to_combat_zone);
 }
 
-void BossZombie::PunchAttack()
+void BossZombie::LeftHook()
 {
-	if (is_attacking_ == true)
-		return;
+	SphereShape attack_sphere = CreateFrontAttackSphere(30.f);
 
-	is_attacking_ = true;
-	cur_attack_type_ = BossZombieAttackType::PUNCH_ATTACK;
+	EVENT->PushEvent<AttackEvent_BoundSphere>(15.0f, attack_sphere, entity_id_);
+}
 
-	auto c_enemy_capsule = reg_scene_->try_get<C_CapsuleCollision>(entity_id_);
-	if (c_enemy_capsule == nullptr)
-		return;
+void BossZombie::RightHook()
+{
+	SphereShape attack_sphere = CreateFrontAttackSphere(30.f);
 
-	SphereShape attack_sphere;
-	auto capsule_info = GetTipBaseAB(c_enemy_capsule->capsule);
-	XMVECTOR shepre_center = capsule_info[3] + (front_ * c_enemy_capsule->capsule.radius * 3);
-	attack_sphere.center = _XMFLOAT3(shepre_center);
-	attack_sphere.radius = c_enemy_capsule->capsule.radius * 2;
-	EVENT->PushEvent<AttackEvent_BoundSphere>(20.0f, attack_sphere, entity_id_);
+	EVENT->PushEvent<AttackEvent_BoundSphere>(15.0f, attack_sphere, entity_id_);
+}
+
+void BossZombie::KickAttack()
+{
+	SphereShape attack_sphere = CreateFrontAttackSphere(30.0f);
+
+	EVENT->PushEvent<AttackEvent_BoundSphere>(30.0f, attack_sphere, entity_id_);
+}
+
+void BossZombie::PunchAttack()
+{	
+	SphereShape attack_sphere = CreateFrontAttackSphere(50.0f);
+
+	EVENT->PushEvent<AttackEvent_BoundSphere>(50.0f, attack_sphere, entity_id_);
 }
 
 void BossZombie::JumpAttack()
 {
-	if (is_attacking_ == true)
-		return;
-
-	is_attacking_ = true;
-	cur_attack_type_ = BossZombieAttackType::JUMP_ATTACK;
-
-	auto c_enemy_capsule = reg_scene_->try_get<C_CapsuleCollision>(entity_id_);
-	if (c_enemy_capsule == nullptr)
-		return;
-
 	SphereShape attack_sphere;
-	auto capsule_info = GetTipBaseAB(c_enemy_capsule->capsule);
-	XMVECTOR shepre_center = capsule_info[3] + (front_ * c_enemy_capsule->capsule.radius * 3);
-	attack_sphere.center = _XMFLOAT3(shepre_center);
-	attack_sphere.radius = c_enemy_capsule->capsule.radius * 2;
-	EVENT->PushEvent<AttackEvent_BoundSphere>(20.0f, attack_sphere, entity_id_);
+	attack_sphere.center = _XMFLOAT3(GetCurPosition());
+	attack_sphere.radius = 100.0f;
+	EVENT->PushEvent<AttackEvent_BoundSphere>(30.0f, attack_sphere, entity_id_);
+}
+
+SphereShape BossZombie::CreateFrontAttackSphere(float radius)
+{
+	SphereShape attack_sphere;
+
+	auto c_capsule = GetCapsuleComponent();
+	if (c_capsule)
+	{
+		XMVECTOR point_a = GetTipBaseAB(c_capsule->capsule)[2];
+		attack_sphere.center = _XMFLOAT3((point_a + GetFront() * c_capsule->capsule.radius * 2));
+		attack_sphere.radius = radius;
+	}
+
+	return attack_sphere;
 }
