@@ -139,7 +139,7 @@ void BossZombie::JumpAttack()
 
 	SphereShape attack_sphere;
 	attack_sphere.center = _XMFLOAT3(GetCurPosition());
-	attack_sphere.radius = 150.0f;
+	attack_sphere.radius = 120.0f;
 
 	EVENT->PushEvent<AttackEvent_BoundSphere>(GetStatus("jump_damage")->GetCurrentValue(), attack_sphere, entity_id_);
 	EVENT->PushEvent<AttackEvent_AboutCar>(entity_id_);
