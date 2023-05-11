@@ -15,9 +15,9 @@ namespace reality
 		XMVECTOR GetCarPosition();
 
 		float countdown_timer_ = 0;
-		UINT wave_count_ = 0;
-		int car_health = 100;
-		int car_health_max = 300;
+		UINT wave_count_ = 1;
+		int car_health = 60;
+		int car_health_max = 100;
 		int car_repair_count = 0;
 		GuideLine fx_car_fire_;
 		entt::entity boss_zombie_ent;
@@ -40,7 +40,7 @@ namespace reality
 		void WaveFinish();
 	private:
 		bool zombie_spawn_ = false;
-		UINT zombie_spawn_count_ = 1;
+		UINT zombie_spawn_count_ = 0;
 		int zombie_count = 0;
 
 
