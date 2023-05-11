@@ -28,6 +28,70 @@ protected:
 	entt::entity owner_id_;
 };
 
+class BossLeftRightHook : public reality::ActionNode
+{
+public:
+	BossLeftRightHook(entt::entity enemy_id)
+		: owner_id_(enemy_id)
+	{
+	};
+
+	virtual reality::BehaviorStatus Action() override
+	{
+		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
+		BossZombie* enemy = reality::SCENE_MGR->GetActor<BossZombie>(owner_id_);
+
+		bool left_hook_end = false;
+
+		if (enemy->is_attacking_ == false) 
+		{
+			enemy->is_attacking_ = true;
+			enemy->cur_attack_type_ = BossZombieAttackType::LEFT_RIGHT_HOOK;
+			
+		}
+		if (enemy->is_attack_ended_ == true) {
+			enemy->is_attacking_ = false;
+			enemy->is_attack_ended_ = false;
+			return BehaviorStatus::SUCCESS;
+		}
+
+		return BehaviorStatus::RUNNING;
+	}
+
+protected:
+	entt::entity owner_id_;
+};
+
+class BossKickAttack : public reality::ActionNode
+{
+public:
+	BossKickAttack(entt::entity enemy_id)
+		: owner_id_(enemy_id)
+	{
+	};
+
+	virtual reality::BehaviorStatus Action() override
+	{
+		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
+		BossZombie* enemy = reality::SCENE_MGR->GetActor<BossZombie>(owner_id_);
+
+		if (enemy->is_attacking_ == false) {
+			enemy->is_attacking_ = true;
+			enemy->cur_attack_type_ = BossZombieAttackType::KICK_ATTACK;
+		}
+		if (enemy->is_attack_ended_ == true) {
+			enemy->is_attacking_ = false;
+			enemy->is_attack_ended_ = false;
+			return BehaviorStatus::SUCCESS;
+		}
+
+		return BehaviorStatus::RUNNING;
+	}
+
+protected:
+	entt::entity owner_id_;
+};
+
 class BossPunchAttack : public reality::ActionNode
 {
 public:
@@ -38,14 +102,12 @@ public:
 
 	virtual reality::BehaviorStatus Action() override
 	{
-		static float search_time = 0.0f;
-		search_time += TM_DELTATIME;
-
 		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
 		BossZombie* enemy = reality::SCENE_MGR->GetActor<BossZombie>(owner_id_);
 
 		if (enemy->is_attacking_ == false) {
-			enemy->PunchAttack();
+			enemy->is_attacking_ = true;
+			enemy->cur_attack_type_ = BossZombieAttackType::PUNCH_ATTACK;
 		}
 		if (enemy->is_attack_ended_ == true) {
 			enemy->is_attacking_ = false;
@@ -70,14 +132,12 @@ public:
 
 	virtual reality::BehaviorStatus Action() override
 	{
-		static float search_time = 0.0f;
-		search_time += TM_DELTATIME;
-
 		Player* player = reality::SCENE_MGR->GetPlayer<Player>(0);
 		BossZombie* enemy = reality::SCENE_MGR->GetActor<BossZombie>(owner_id_);
 
 		if (enemy->is_attacking_ == false) {
-			enemy->JumpAttack();
+			enemy->is_attacking_ = true;
+			enemy->cur_attack_type_ = BossZombieAttackType::JUMP_ATTACK;
 		}
 		if (enemy->is_attack_ended_ == true) {
 			enemy->is_attacking_ = false;

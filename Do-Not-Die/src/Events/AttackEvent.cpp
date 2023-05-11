@@ -95,9 +95,12 @@ void AttackEvent_BoundSphere::Process()
 
 void AttackEvent_BoundSphere::EnemyProcess()
 {
-	NormalZombie* enemy_actor = SCENE_MGR->GetActor<NormalZombie>(actor_id_);
+	BaseEnemy* enemy_actor = SCENE_MGR->GetActor<BaseEnemy>(actor_id_);
 	Player* player_actor = SCENE_MGR->GetPlayer<Player>(0);
 	if (enemy_actor == nullptr || player_actor == nullptr)
+		return;
+
+	if (player_actor->GetCapsuleComponent()->hit_enable == false)
 		return;
 
 	if (CapsuleToSphere(player_actor->GetCapsuleComponent()->capsule, sphere_) == CollideType::INTERSECT)

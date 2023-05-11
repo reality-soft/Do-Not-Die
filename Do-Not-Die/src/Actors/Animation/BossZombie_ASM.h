@@ -10,6 +10,8 @@ public:
 	enum States {
 		IDLE,
 		MOVE,
+		LEFT_RIGHT_HOOK,
+		KICK_ATTACK,
 		PUNCH_ATTACK,
 		JUMP_ATTACK
 	};
@@ -19,8 +21,11 @@ public:
 	virtual void OnInit() override {
 		states_.insert({ IDLE, make_shared<Idle>() });
 		states_.insert({ MOVE, make_shared<Move>() });
+		states_.insert({ LEFT_RIGHT_HOOK, make_shared<LeftRightHook>() });
+		states_.insert({ KICK_ATTACK, make_shared<KickAttack>() });
 		states_.insert({ PUNCH_ATTACK, make_shared<PunchAttack>() });
 		states_.insert({ JUMP_ATTACK, make_shared<JumpAttack>() });
+
 		transitions_.insert({ IDLE, Transition(MOVE,[this](const AnimationStateMachine* animation_state_machine) {
 				BaseEnemy* enemy = SCENE_MGR->GetActor<BaseEnemy>(owner_id_);
 				if (enemy->is_moving_) {
@@ -41,6 +46,74 @@ public:
 				}
 			})
 			});
+
+		// Left Right Hook
+		{
+			transitions_.insert({ IDLE, Transition(LEFT_RIGHT_HOOK,[this](const AnimationStateMachine* animation_state_machine) {
+				BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(owner_id_);
+				if (enemy->is_attacking_ == true && enemy->cur_attack_type_ == BossZombieAttackType::LEFT_RIGHT_HOOK) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+			transitions_.insert({ MOVE, Transition(LEFT_RIGHT_HOOK,[this](const AnimationStateMachine* animation_state_machine) {
+				BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(owner_id_);
+				if (enemy->is_attacking_ == true && enemy->cur_attack_type_ == BossZombieAttackType::LEFT_RIGHT_HOOK) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+
+			transitions_.insert({ LEFT_RIGHT_HOOK, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
+				if (GetCurAnimationId() == "DND_BossZombie_Punch_R.anim" && IsAnimationEnded()) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+		}
+
+		// Kick Attack
+		{
+			transitions_.insert({ IDLE, Transition(KICK_ATTACK,[this](const AnimationStateMachine* animation_state_machine) {
+				BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(owner_id_);
+				if (enemy->is_attacking_ == true && enemy->cur_attack_type_ == BossZombieAttackType::KICK_ATTACK) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+			transitions_.insert({ MOVE, Transition(KICK_ATTACK,[this](const AnimationStateMachine* animation_state_machine) {
+				BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(owner_id_);
+				if (enemy->is_attacking_ == true && enemy->cur_attack_type_ == BossZombieAttackType::KICK_ATTACK) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+
+			transitions_.insert({ KICK_ATTACK, Transition(IDLE,[this](const AnimationStateMachine* animation_state_machine) {
+				if (IsAnimationEnded()) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+		}
 
 		// Punch Attack
 		{
@@ -143,7 +216,7 @@ public:
 		{
 			vector<AnimNotify> notifies;
 			notifies.push_back({ 1, make_shared<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "Zombie_Move_1.mp3", 0.5f, false), true });
-			animation_state_machine->SetAnimation("DND_BossZombie_Walk.anim", 0.8f, true, notifies);
+			animation_state_machine->SetAnimation("DND_BossZombie_Run.anim", 0.8f, true, notifies);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
@@ -151,6 +224,93 @@ public:
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 		}
+	};
+
+	class LeftRightHook : public AnimationState {
+	public:
+		LeftRightHook() : AnimationState(LEFT_RIGHT_HOOK) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			left_hook = true;
+			right_hook = true;
+
+			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
+			owner_actor_->rotate_enable_ = false;
+
+			animation_state_machine->SetAnimation("DND_BossZombie_Punch_L.anim", 0.8f, true, notifies);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+			owner_actor_->rotate_enable_ = true;
+			owner_actor_->is_attacking_ = false;
+			owner_actor_->is_attack_ended_ = true;
+			owner_actor_ = nullptr;
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+			owner_actor_->CancelMovement();
+			if (animation_state_machine->GetCurAnimation().cur_frame_ >= 28 && animation_state_machine->GetCurAnimationId() == "DND_BossZombie_Punch_L.anim")
+				animation_state_machine->SetAnimation("DND_BossZombie_Punch_R.anim", 0.8f, true, notifies);
+
+			if ((int)animation_state_machine->GetCurAnimation().cur_frame_ == 15)
+			{
+				if (left_hook && animation_state_machine->GetCurAnimationId() == "DND_BossZombie_Punch_L.anim")
+				{
+					owner_actor_->LeftHook(); 
+					left_hook = false;
+				}
+			}
+			if ((int)animation_state_machine->GetCurAnimation().cur_frame_ == 20)
+			{
+				if (right_hook && animation_state_machine->GetCurAnimationId() == "DND_BossZombie_Punch_R.anim")
+				{
+					owner_actor_->RightHook();
+					right_hook = false;
+				}
+			}
+		}
+
+		int left_hook = true;
+		int right_hook = true;
+		BossZombie* owner_actor_ = nullptr;
+		vector<AnimNotify> notifies;
+	};
+
+	class KickAttack : public AnimationState {
+	public:
+		KickAttack() : AnimationState(KICK_ATTACK) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			kick_ = true;
+
+			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
+			owner_actor_->rotate_enable_ = false;
+
+			animation_state_machine->SetAnimation("DND_BossZombie_Kick.anim", 0.8f, true, notifies);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+			owner_actor_->rotate_enable_ = true;
+			owner_actor_->is_attacking_ = false;
+			owner_actor_->is_attack_ended_ = true;
+			owner_actor_ = nullptr;
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+			owner_actor_->CancelMovement();
+
+			if (kick_ && (int)animation_state_machine->GetCurAnimation().cur_frame_ == 40)
+			{
+				owner_actor_->KickAttack();
+				kick_ = false;
+			}			
+		}
+
+		bool kick_ = true;
+		BossZombie* owner_actor_ = nullptr;
+		vector<AnimNotify> notifies;
 	};
 
 	class PunchAttack : public AnimationState {
@@ -159,20 +319,34 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
+			punch_ = true;
+
+			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
+			owner_actor_->rotate_enable_ = false;
+
 			vector<AnimNotify> notifies;
 			animation_state_machine->SetAnimation("DND_BossZombie_StrongPunch.anim", 0.8f, true, notifies);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
-			enemy->is_attack_ended_ = true;
-			enemy->is_attacking_ = false;
+			owner_actor_->rotate_enable_ = true;
+			owner_actor_->is_attacking_ = false;
+			owner_actor_->is_attack_ended_ = true;
+			owner_actor_ = nullptr;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
-			BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
-			enemy->CancelMovement();
+			owner_actor_->CancelMovement();
+
+			if (punch_ && (int)animation_state_machine->GetCurAnimation().cur_frame_ == 80)
+			{
+				owner_actor_->PunchAttack();
+				punch_ = false;
+			}
 		}
+
+		bool punch_ = true;
+		BossZombie* owner_actor_ = nullptr;
 	};
 
 	class JumpAttack : public AnimationState {
@@ -181,19 +355,33 @@ public:
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
+			jump_ = true;
+
+			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
+			owner_actor_->rotate_enable_ = false;
+
 			vector<AnimNotify> notifies;
 			animation_state_machine->SetAnimation("DND_BossZombie_JumpAttack.anim", 0.8f, true, notifies);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
 		{
-			BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
-			enemy->is_attack_ended_ = true;
-			enemy->is_attacking_ = false;
+			owner_actor_->rotate_enable_ = true;
+			owner_actor_->is_attacking_ = false;
+			owner_actor_->is_attack_ended_ = true;
+			owner_actor_ = nullptr;
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
-			BossZombie* enemy = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
-			enemy->CancelMovement();
+			owner_actor_->CancelMovement();
+			int frame = animation_state_machine->GetCurAnimation().cur_frame_;
+			if (jump_ && (int)animation_state_machine->GetCurAnimation().cur_frame_ == 94)
+			{
+				owner_actor_->JumpAttack();
+				jump_ = false;
+			}
 		}
+
+		bool jump_ = true;
+		BossZombie* owner_actor_ = nullptr;
 	};
 };
