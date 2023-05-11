@@ -319,10 +319,26 @@ void UI_Actor_Ingame::CreateIngameUI()
 
 	// CrossHair UI
 	{
-		crosshair_ui_ = make_shared<UI_Image>();
-		crosshair_ui_->InitImage("T_DotCrossHair.png");
-		crosshair_ui_->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f }, 8.0f, 8.0f);
-		ui_comp_->ui_list.insert({ "CrossHair UI", crosshair_ui_ });
+		for (int i = 0; i < ARRAYSIZE(crosshair_ui_); i++)
+		{
+			crosshair_ui_[i] = make_shared<UI_Image>();
+		}
+
+		float crosshair_size = 50.0f;
+		float dot_cross_hair_size = 8.0f;
+
+		crosshair_ui_[(int)EQUIPPED_WEAPON::AUTO_RIFLE]->InitImage("T_CrossHairBlack.png");
+		crosshair_ui_[(int)EQUIPPED_WEAPON::AUTO_RIFLE]->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f }, 
+			crosshair_size, crosshair_size);
+		crosshair_ui_[(int)EQUIPPED_WEAPON::HAND_GUN]->InitImage("T_CrossHairBlack.png");
+		crosshair_ui_[(int)EQUIPPED_WEAPON::HAND_GUN]->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f }, 
+			crosshair_size, crosshair_size);
+		crosshair_ui_[(int)EQUIPPED_WEAPON::MELEE_WEAPON]->InitImage("T_DotCrossHair.png");
+		crosshair_ui_[(int)EQUIPPED_WEAPON::MELEE_WEAPON]->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f }, dot_cross_hair_size, dot_cross_hair_size);
+		crosshair_ui_[(int)EQUIPPED_WEAPON::GRENADE]->InitImage("");
+		crosshair_ui_[(int)EQUIPPED_WEAPON::GRENADE]->SetLocalRectByCenter({ win_size_1920_width / 2.0f, win_size_1920_height / 2.0f }, 
+			dot_cross_hair_size, dot_cross_hair_size);
+
 	}
 
 	// Interaction UI
@@ -716,7 +732,7 @@ void UI_Actor_Ingame::UpdateIngameUI()
 	else
 	{
 		if (player_->IsAiming())
-			ui_comp_->ui_list.insert(make_pair("CrossHair UI", crosshair_ui_));
+			ui_comp_->ui_list.insert(make_pair("CrossHair UI", crosshair_ui_[(int)player_->cur_equipped_weapon_]));
 	}
 
 	// Item UI Update
@@ -971,7 +987,8 @@ void UI_Actor_Ingame::OpenMenu()
 
 void UI_Actor_Ingame::CloseMenu()
 {
-	SCENE_MGR->GetPlayer<Player>(0)->controller_enable_ = true;
+	auto player = SCENE_MGR->GetPlayer<Player>(0);
+	player->controller_enable_ = true;
 
 	ui_comp_->ui_list.erase("Menu UI");
 
@@ -985,7 +1002,7 @@ void UI_Actor_Ingame::CloseMenu()
 	ui_comp_->ui_list.insert({ "Minimap UI", minimap_ui });
 	ui_comp_->ui_list.insert({ "Status UI", status_ui });
 	ui_comp_->ui_list.insert({ "Objective UI", objective_ui_ });
-	ui_comp_->ui_list.insert({ "CrossHair UI", crosshair_ui_ });
+	ui_comp_->ui_list.insert({ "CrossHair UI", crosshair_ui_[(int)player->cur_equipped_weapon_]});
 
 	auto game_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 	game_scene->SetCursorInvisible();
