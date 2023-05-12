@@ -20,7 +20,7 @@ void NormalZombie::OnInit(entt::registry& registry)
 	//damage_ = 10.0f;
 
 	AddStatus("hp", CharacterStatus(100, 100, 0, 100));
-	AddStatus("car_damage", CharacterStatus(2, 2, 2, 2));
+	AddStatus("car_damage", CharacterStatus(1, 1, 1, 1));
 	AddStatus("default_damage", CharacterStatus(10, 10, 10, 10));
 	AddStatus("max_speed", CharacterStatus(RandomIntInRange(100, 200), 0, 100, 200));
 

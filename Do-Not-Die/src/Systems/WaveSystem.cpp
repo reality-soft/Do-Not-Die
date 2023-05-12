@@ -22,6 +22,8 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 	CreateExtractPoints(reg);
 	CreateCarEventTriggers(_XMFLOAT3(car_event_.line_nodes.begin()->second), 150, 800);
 	CreateStaticEffects();
+
+	wave_ui_.OnInit(reg);
 }
 
 void reality::WaveSystem::OnUpdate(entt::registry& reg)
@@ -52,6 +54,8 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	{
 		EVENT->PushEvent<GameResultEvent>(GameResultType::eCarCrashed);
 	}
+
+	wave_ui_.OnUpdate();
 }
 
 void reality::WaveSystem::SetWorldEnv(Environment* env)
@@ -313,10 +317,12 @@ XMVECTOR reality::WaveSystem::GetCarPosition()
 
 void reality::WaveSystem::WaveStart()
 {
+	wave_ui_.ShowWaveStart();
+
 	if (wave_count_ == 4)
 		SpawnBossZombie();
 	else
-		zombie_spawn_count_ += 30;
+		zombie_spawn_count_ += 20;
 
 	FMOD_MGR->Stop("S_Day_BGM.wav");
 	FMOD_MGR->Play("S_Night_BGM.wav", SoundType::MUSIC, true, 1.0f, {});
@@ -324,6 +330,8 @@ void reality::WaveSystem::WaveStart()
 
 void reality::WaveSystem::WaveFinish()
 {
+	wave_ui_.ShowWaveFinish();
+
 	FMOD_MGR->Stop("S_Night_BGM.wav");
 	FMOD_MGR->Play("S_Day_BGM.wav", SoundType::MUSIC, true, 1.0f, {});
 	wave_count_++;
