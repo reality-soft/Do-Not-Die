@@ -13,14 +13,8 @@ void NormalZombie::OnInit(entt::registry& registry)
 	Character::OnInit(registry);
 	tag = "enemy";
 
-	//// setting character data
-	//GetMovementComponent()->max_speed = 100;
-	//GetMovementComponent()->acceleration = 100;
-	//max_hp_ = cur_hp_ = 100;
-	//damage_ = 10.0f;
-
 	AddStatus("hp", CharacterStatus(100, 100, 0, 100));
-	AddStatus("car_damage", CharacterStatus(1, 1, 1, 1));
+	AddStatus("car_damage", CharacterStatus(2, 2, 2, 2));
 	AddStatus("default_damage", CharacterStatus(10, 10, 10, 10));
 	AddStatus("max_speed", CharacterStatus(RandomIntInRange(100, 200), 0, 100, 200));
 

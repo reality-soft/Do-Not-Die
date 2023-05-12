@@ -47,7 +47,7 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
-	SpawnZombies(3.f);
+	SpawnZombies(2.0f);
 	SpawnCarSmokes();
 
 	if (car_health <= 0)

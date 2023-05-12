@@ -479,11 +479,12 @@ public:
 	class Attack : public AnimationState {
 	public:
 		Attack() : AnimationState(ATTACK) {}
-		int combo_ = 0;
+		int combo_ = 1;
 	public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
-			combo_ = 0;
+			combo_ = 1;
+			EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieAttack_1.mp3", 0.5f, false);
 			animation_state_machine->SetAnimation("DND_Attack_1.anim", 0.5f, true);						
 			SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId())->GetStatus("max_speed")->SetDefualtValue(50);
 		}
@@ -498,15 +499,9 @@ public:
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
 			NormalZombie* enemy = SCENE_MGR->GetActor<NormalZombie>(animation_state_machine->GetOwnerId());
-			if ((animation_state_machine->GetCurAnimation().cur_frame_ > 15.0f && combo_ == 0) ||
-				(animation_state_machine->GetCurAnimation().cur_frame_ > 77.0f && combo_ == 1))
+			if (combo_ > 0 && animation_state_machine->GetCurAnimation().cur_frame_ >= 20.0f)
 			{
-				combo_++;
-
-				EVENT->PushEvent<SoundGenerateEvent>(animation_state_machine->GetOwnerId(), SFX, "ZombieAttack_1.mp3", 0.5f, false);
-
 				auto c_enemy_capsule = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_CapsuleCollision>(enemy->GetEntityId());
-
 				if (c_enemy_capsule == nullptr) return;
 
 				RayShape attack_ray;
@@ -514,6 +509,7 @@ public:
 				attack_ray.end = _XMFLOAT3((_XMVECTOR3(attack_ray.start) + (enemy->GetFront() * enemy->attack_distance_)));
 				EVENT->PushEvent<AttackEvent_SingleRay>(attack_ray, enemy->GetEntityId());
 				EVENT->PushEvent<AttackEvent_AboutCar>(enemy->GetEntityId());
+				combo_--;
 			}
 		}
 	};
