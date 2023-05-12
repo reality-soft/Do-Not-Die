@@ -18,6 +18,16 @@ public:
 		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
 		if (ingame_scene && ingame_scene->game_result_type == GameResultType::eNone)
 			ingame_scene->game_result_type = result;
+
+		
+		if (result != GameResultType::eGameCleared)
+		{
+			FMOD_MGR->Stop("S_Night_BGM.wav");
+			FMOD_MGR->Stop("S_Day_BGM.wav");
+			FMOD_MGR->Play("S_GameOver_BGM.mp3", MUSIC, true, 1.0f, {});
+		}
+			
+
 	}
 	
 private:
@@ -32,6 +42,7 @@ public:
 	virtual void Process() override {
 		GameCharacter* character = SCENE_MGR->GetActor<GameCharacter>(actor_hit_);
 		character->TakeDamage(damage_);
+		
 	};
 private:
 	float damage_;
