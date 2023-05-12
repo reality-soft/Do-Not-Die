@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine_include.h"
 #include "StaticShadows.h"
+#include "UI_Actor_Wave.h"
 
 namespace reality
 {
@@ -62,6 +63,8 @@ namespace reality
 		"Zombie_SchoolGirl_Female_01.skmesh",
 		"Zombie_Bellboy_Male_01.skmesh",
 		};
+
+		UI_Actor_Wave wave_ui_;
 	};
 }
 
