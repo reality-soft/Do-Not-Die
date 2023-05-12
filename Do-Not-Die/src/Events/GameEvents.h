@@ -71,7 +71,7 @@ public:
 			if (distance > range_)
 				continue;
 
-			float weight = distance / range_;
+			float weight = 1.0f - distance / range_;
 
 			enemy->TakeDamage(damage_ * weight);
 		}
