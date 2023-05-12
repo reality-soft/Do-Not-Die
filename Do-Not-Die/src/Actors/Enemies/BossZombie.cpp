@@ -14,12 +14,12 @@ void BossZombie::OnInit(entt::registry& registry)
 	tag = "boss enemy";
 
 	// setting character data
-	AddStatus("hp", CharacterStatus(1000, 1000, 0, 1000));
+	AddStatus("hp", CharacterStatus(2000, 2000, 0, 2000));
 
 	AddStatus("car_damage", CharacterStatus(10, 10, 10, 10));
-	AddStatus("hook_damage", CharacterStatus(15, 15, 15, 15));
-	AddStatus("kick_damage", CharacterStatus(30, 30, 30, 30));
-	AddStatus("punch_damage", CharacterStatus(50, 50, 50, 50));
+	AddStatus("hook_damage", CharacterStatus(30, 30, 30, 30));
+	AddStatus("kick_damage", CharacterStatus(50, 50, 50, 30));
+	AddStatus("punch_damage", CharacterStatus(75, 75, 75, 50));
 	AddStatus("jump_damage", CharacterStatus(50, 50, 50, 50));
 
 	AddStatus("max_speed", CharacterStatus(RandomIntInRange(200, 250), 0, 200, 250));
@@ -55,7 +55,7 @@ void BossZombie::OnInit(entt::registry& registry)
 
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<BossZombieBaseAnimationStateMachine>(entity_id_, skm.skeletal_mesh_id, 0);
-	animation_component.AddNewAnimSlot<BossZombieFullBodyAnimationStateMachine>("FullBody", entity_id_, skm.skeletal_mesh_id, 1, "Hips");
+	animation_component.AddNewAnimSlot<BossZombieFullBodyAnimationStateMachine>("FullBody", entity_id_, skm.skeletal_mesh_id, 1, "");
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, animation_component);
 
 	transform_tree_.root_node = make_shared<TransformTreeNode>(TYPE_ID(reality::C_CapsuleCollision));

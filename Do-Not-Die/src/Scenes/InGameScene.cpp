@@ -88,8 +88,8 @@ void InGameScene::OnInit()
 	loading_progress = LOADING_ACTOR;
 	
 	environment_.CreateEnvironment();
-	environment_.SetWorldTime(120, 180);
-	//environment_.SetWorldTime(1, 60);
+	environment_.SetWorldTime(120, 120);
+	//environment_.SetWorldTime(30, 30);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
 	environment_.SetFogDistanceByTime(5000, 2000);
 	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.1, 0.1, 0.15, 1), 0.05f, 0.25f);
@@ -209,30 +209,31 @@ void InGameScene::ShowCarCrashing()
 {
 	ingame_ui.GetUIComponent()->ui_list.clear();
 
-	SequenceInfo seq_info;
-	seq_info.sequence_start = sys_camera.world_matrix.r[3];
-	seq_info.sequence_end = sys_wave_.GetCarPosition() - XMVector3Normalize(sys_wave_.GetCarPosition() - seq_info.sequence_start) * 500;
-	seq_info.target_start = sys_camera.GetCamera()->target_pos;
-	seq_info.target_end = sys_wave_.GetCarPosition();
-	seq_info.play_time = 3.0f;
-	seq_info.acceler = 1.f;
-	seq_info.decceler = 0.1f;
+	auto zoom_pos = sys_wave_.GetCarPosition() - XMVector3Normalize(sys_wave_.GetCarPosition() - sys_camera.world_matrix.r[3]) * 500;
+	auto zoom_target = sys_wave_.GetCarPosition();
 
-	if (sys_camera.PlaySequence(seq_info, -1) == true)
+	static float timer = 0.0f;
+	timer += TM_DELTATIME;
+
+	sys_camera.ZoomToTarget(zoom_target, zoom_pos, 3.0f, 300.0f);
+
+	static bool end = false;
+
+	if (timer > 3.0f)
 	{
 		ingame_ui.ShowCarCrashed();
 		ingame_ui.SetOnOff(false);
 
-		static float time = 0.0f;
+		static float other_time = 0.0f;
 		static int index = 0;
-		time += TM_DELTATIME;
-		
-		if (time > 0.3 && index < sys_wave_.fx_car_fire_.line_nodes.size())
+		other_time += TM_DELTATIME;
+
+		if (other_time > 0.3 && index < sys_wave_.fx_car_fire_.line_nodes.size())
 		{
 			XMVECTOR spawn_pos = sys_wave_.fx_car_fire_.line_nodes.at(index++);
 			EFFECT_MGR->SpawnEffect<FX_Explosion>(spawn_pos);
-			time = 0.0f;
-		}			
+			other_time = 0.0f;
+		}
 	}
 }
 
@@ -281,6 +282,7 @@ void InGameScene::GameResultProcess()
 		ingame_ui.SetOnOff(false);
 		break;
 	case GameResultType::eGameCleared:
+		bool bgm_faded = sys_sound.FadeOutDelete("S_Night_BGM.wav", 3.0f) || sys_sound.FadeOutDelete("S_Day_BGM.wav", 3.0f);
 		bool fade_out_finished = ingame_ui.FadeOut();
 		ingame_ui.SetOnOff(false);
 		if (fade_out_finished)

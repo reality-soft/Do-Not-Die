@@ -20,7 +20,7 @@ void Player::OnInit(entt::registry& registry)
 
 	AddStatus("hp", CharacterStatus(200, 200, 0, 200));
 	AddStatus("gunfire_damage", CharacterStatus(30, 30, 30, 60));
-	AddStatus("meele_damage", CharacterStatus(50, 50, 50, 100));
+	AddStatus("meele_damage", CharacterStatus(60, 60, 60, 120));
 	AddStatus("max_speed", CharacterStatus(150, 150, 150, 300));
 	AddStatus("infection", CharacterStatus(0, 0, 0, 100));
 
@@ -125,7 +125,7 @@ void Player::OnInit(entt::registry& registry)
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 6, "Spine_01");
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 7, "Spine_01");
 	animation_component.AddNewAnimSlot<PlayerFullBodyAnimationStateMachine>("FullBody", entity_id_, skm.skeletal_mesh_id, 1, "Root");
 	auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_component.GetAnimSlotByName("UpperBody");
 	sm->SetPlayer(this);

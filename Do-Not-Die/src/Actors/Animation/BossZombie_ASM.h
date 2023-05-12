@@ -409,6 +409,7 @@ public:
 	enum States {
 		NONE,
 		DIE,
+		DEAD,
 	};
 
 	BossZombieFullBodyAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
@@ -416,6 +417,7 @@ public:
 	virtual void OnInit() override {
 		states_.insert({ NONE, make_shared<None>() });
 		states_.insert({ DIE, make_shared<Die>() });
+		states_.insert({ DEAD, make_shared<Dead>() });
 
 
 		// Die
@@ -430,8 +432,8 @@ public:
 					return false;
 				}
 			})
-				});
-			transitions_.insert({ DIE, Transition(NONE,[this](const AnimationStateMachine* animation_state_machine) {
+			});
+			transitions_.insert({ DIE, Transition(DEAD,[this](const AnimationStateMachine* animation_state_machine) {
 				if (IsAnimationEnded()) {
 					return true;
 				}
@@ -439,7 +441,7 @@ public:
 					return false;
 				}
 			})
-				});
+			});
 		}
 
 		cur_state_ = states_[NONE];
@@ -461,6 +463,25 @@ public:
 		}
 	};
 
+	class Dead : public AnimationState {
+	public:
+		Dead() : AnimationState(DEAD) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			animation_state_machine->SetAnimation("DND_BossZombie_DeathPose.anim", 1.0f, true);
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+			auto owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
+			owner_actor_->CancelMovement();
+			owner_actor_->rotate_enable_ = false;
+		}
+	};
+
 	class Die : public AnimationState {
 	public:
 		Die() : AnimationState(DIE) {}
@@ -470,6 +491,7 @@ public:
 			owner_actor_ = SCENE_MGR->GetActor<BossZombie>(animation_state_machine->GetOwnerId());
 			owner_actor_->GetCapsuleComponent()->hit_enable = false;
 
+			EVENT->PushEvent<SoundGenerateEvent>(owner_actor_->entity_id_, SFX, "BossDying.wav", 1.0f, false);
 			animation_state_machine->SetAnimation("DND_BossZombie_Death.anim", 1.0f, false);
 		}
 		virtual void Exit(AnimationStateMachine* animation_state_machine) override
