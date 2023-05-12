@@ -6,7 +6,7 @@ void MedicalBoxItem::OnCreate()
 	item_count_ = 0;
 	item_cooltime_ = 5.0f;
 
-	heal_amount = 30.0f;
+	heal_amount = 100.0f;
 }
 
 void MedicalBoxItem::UseItem()
@@ -22,7 +22,7 @@ void HealKitItem::OnCreate()
 	item_count_ = 0;
 	item_cooltime_ = 3.0f;
 
-	heal_amount = 15.0f;
+	heal_amount = 50.0f;
 }
 
 void HealKitItem::UseItem()
@@ -41,27 +41,27 @@ void EnergyDrinkItem::OnCreate()
 
 void EnergyDrinkItem::UseItem()
 {
-	owner_->GetStatus("max_speed")->TimeLimitedVariation(10, 150);
+	owner_->GetStatus("max_speed")->TimeLimitedVariation(15, 150);
 }
 
 void DrugItem::OnCreate()
 {
 	item_icon_ = "Drug.png";
 	item_count_ = 0;
-	item_cooltime_ = 20.0f;
+	item_cooltime_ = 15.0f;
 }
 
 void DrugItem::UseItem()
 {
-	owner_->GetStatus("gunfire_damage")->TimeLimitedVariation(10, 30);
-	owner_->GetStatus("meele_damage")->TimeLimitedVariation(10, 30);
+	owner_->GetStatus("gunfire_damage")->TimeLimitedVariation(15, 30);
+	owner_->GetStatus("meele_damage")->TimeLimitedVariation(15, 30);
 }
 
 void VaccineItem::OnCreate()
 {
 	item_icon_ = "Vaccine.png";
 	item_count_ = 0;
-	item_cooltime_ = 20.0f;
+	item_cooltime_ = 15.0f;
 }
 
 void VaccineItem::UseItem()
