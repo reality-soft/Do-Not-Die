@@ -135,27 +135,45 @@ void reality::WaveSystem::CreateExtractPoints(entt::registry& reg)
 
 void reality::WaveSystem::PlayerExtractRepair()
 {
+	static bool is_played = false;
+
 	auto player = SCENE_MGR->GetPlayer<Player>(0);
 	if (player == nullptr)
+	{
+		is_played = false;
 		return;
+	}
 
 	if (player->can_extract_repair_ == false)
+	{
+		is_played = false;
 		return;
+	}
 
 	auto trigger_comp = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_TriggerVolume>(player->repair_extract_trigger);
 	if (trigger_comp == nullptr)
+	{
+		is_played = false;
 		return;
+	}
 
 	if (DINPUT->GetKeyState(DIK_E) == KEY_HOLD)
 	{
 		player->extract_during_time_ += TM_DELTATIME;
 		player->InteractionRotate(_XMVECTOR3(trigger_comp->sphere_volume.center));
+		if (!is_played)
+		{
+			is_played = true;
+			EVENT->PushEvent<SoundGenerateEvent>(player->GetEntityId(), SFX, "S_Fix.mp3", 1.0f, true);
+		}
 	}
 
 	if (DINPUT->GetKeyState(DIK_E) == KEY_UP)
 	{
 		player->extract_during_time_ = 0.0f;
 		player->controller_enable_ = true;
+		FMOD_MGR->Stop("S_Fix.mp3");
+		is_played = false;
 	}
 
 	if (player->extract_during_time_ >= player->extract_time_takes_)
@@ -172,17 +190,27 @@ void reality::WaveSystem::PlayerExtractRepair()
 		player->extract_during_time_ = 0.0f;
 		player->can_extract_repair_ = false;
 		player->controller_enable_ = true;
+		FMOD_MGR->Stop("S_Fix.mp3");
+		is_played = false;
 	}
 }
 
 void reality::WaveSystem::PlayerRepairCar()
 {
+	static bool is_played = false;
+
 	auto player = SCENE_MGR->GetPlayer<Player>(0);
 	if (player == nullptr)
+	{
+		is_played = false;
 		return;
+	}
 
 	if (player->can_repair_car_ == false)
+	{
+		is_played = false;
 		return;
+	}
 
 	if(player->HasRepairPart() == false)
 	{
@@ -196,12 +224,19 @@ void reality::WaveSystem::PlayerRepairCar()
 	{
 		player->controller_enable_ = true;
 		player->repair_during_time_ = 0.0f;
+		FMOD_MGR->Stop("S_Fix.mp3");
+		is_played = false;
 	}
 
 	if (DINPUT->GetKeyState(DIK_E) == KEY_HOLD)
 	{
 		player->repair_during_time_ += TM_DELTATIME;
-		player->InteractionRotate(car_event_.line_nodes.begin()->second);		
+		player->InteractionRotate(car_event_.line_nodes.begin()->second);	
+		if (!is_played)
+		{
+			is_played = true;
+			EVENT->PushEvent<SoundGenerateEvent>(player->GetEntityId(), SFX, "S_Fix.mp3", 1.0f, true);
+		}
 	}
 
 	if (player->repair_during_time_ >= player->repair_time_takes_)
@@ -212,6 +247,8 @@ void reality::WaveSystem::PlayerRepairCar()
 		player->repair_during_time_ = 0.0f; 
 		car_repair_count++;
 		EVENT->PushEvent<MakeTextEvent>("Repair Success!", 1920.0f / 2.0f - 100.0f);
+		FMOD_MGR->Stop("S_Fix.mp3");
+		is_played = false;
 	}
 }
 
