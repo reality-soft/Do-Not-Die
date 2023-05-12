@@ -363,6 +363,7 @@ void reality::WaveSystem::WaveStart()
 
 	FMOD_MGR->Stop("S_Day_BGM.wav");
 	FMOD_MGR->Play("S_Night_BGM.wav", SoundType::MUSIC, true, 1.0f, {});
+	FMOD_MGR->Play("WaveStart.wav", SoundType::MUSIC, false, 0.5f, {});
 }
 
 void reality::WaveSystem::WaveFinish()
@@ -371,6 +372,7 @@ void reality::WaveSystem::WaveFinish()
 
 	FMOD_MGR->Stop("S_Night_BGM.wav");
 	FMOD_MGR->Play("S_Day_BGM.wav", SoundType::MUSIC, true, 1.0f, {});
+	FMOD_MGR->Play("WaveFinish.wav", SoundType::MUSIC, false, 0.5f, {});
 	wave_count_++;
 	RandomSpawnItem(30);
 }

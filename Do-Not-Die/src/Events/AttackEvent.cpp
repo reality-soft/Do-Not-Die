@@ -164,6 +164,7 @@ void AttackEvent_AboutCar::Process()
 
 	if (callback_car.success)
 	{
+		EVENT->PushEvent<SoundGenerateEvent>(enemy->entity_id_, SFX, "CarAttackSound.wav", 0.5f, false);
 		float damage = enemy->GetStatus("car_damage")->GetCurrentValue();
 		*enemy->targeting_car_health = max(0, *enemy->targeting_car_health - damage);
 	}

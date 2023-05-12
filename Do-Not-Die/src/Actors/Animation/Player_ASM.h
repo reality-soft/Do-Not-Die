@@ -62,7 +62,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -74,7 +74,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -86,7 +86,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -271,7 +271,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -283,7 +283,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -295,7 +295,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -491,7 +491,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -503,7 +503,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -515,7 +515,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -594,7 +594,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -606,7 +606,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -618,7 +618,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "HalfLife_SwitchWeapon.wav", 0.5f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -1294,6 +1294,7 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			entt::entity owner_id = animation_state_machine->GetOwnerId();
+			EVENT->PushEvent<SoundGenerateEvent>(owner_id, SFX, "RollSound.wav", 0.5f, false);
 
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			player->is_rolling_ = true;
