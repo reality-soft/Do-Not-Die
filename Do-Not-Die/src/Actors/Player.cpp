@@ -18,11 +18,18 @@ void Player::OnInit(entt::registry& registry)
 	Character::OnInit(registry);
 	tag = "player";
 
+	AddStatus("hp", CharacterStatus(200, 200, 0, 200));
+	AddStatus("gunfire_damage", CharacterStatus(30, 30, 30, 60));
+	AddStatus("meele_damage", CharacterStatus(60, 60, 60, 120));
+	AddStatus("max_speed", CharacterStatus(150, 150, 150, 300));
+	AddStatus("infection", CharacterStatus(0, 0, 0, 100));
+
 	GetMovementComponent()->speed = 0;
 	GetMovementComponent()->acceleration = 300;
-	GetMovementComponent()->max_speed = 150;
-	max_hp_ = cur_hp_ = 100;
-	damage_ = 30.0f;
+	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
+
+	//max_hp_ = cur_hp_ = 100;
+	//damage_ = 30.0f;
 
 	C_TriggerSensor trigger_sensor;
 	trigger_sensor.can_sense_tags.insert("item");
@@ -118,7 +125,7 @@ void Player::OnInit(entt::registry& registry)
 	
 	C_Animation animation_component(skeletal_mesh->skeleton.id_bone_map.size());
 	animation_component.SetBaseAnimObject<AnimationBase>(skm.skeletal_mesh_id, 0);
-	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 4, "Spine_01");
+	animation_component.AddNewAnimSlot<PlayerUpperBodyAnimationStateMachine>("UpperBody", entity_id_, skm.skeletal_mesh_id, 7, "Spine_01");
 	animation_component.AddNewAnimSlot<PlayerFullBodyAnimationStateMachine>("FullBody", entity_id_, skm.skeletal_mesh_id, 1, "Root");
 	auto sm = (PlayerUpperBodyAnimationStateMachine*)animation_component.GetAnimSlotByName("UpperBody");
 	sm->SetPlayer(this);
@@ -132,6 +139,45 @@ void Player::OnInit(entt::registry& registry)
 	inventory_timer_.resize(INVENTORY_MAX);
 
 	tag = "player";
+}
+
+void Player::OnUpdate()
+{
+	GetCapsuleComponent()->hit_enable = !(is_rolling_ || is_hit_);
+
+	if (controller_enable_)
+	{
+		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
+		rotation_ = XMMatrixRotationY(camera->pitch_yaw.y);
+	}
+
+	Character::OnUpdate();
+	CalculateMovementAngle();
+	SetCharacterMovementAnimation();
+	ChangeWeapon();
+
+	// FlashLight Update
+	UpdateFlashLight();
+	UpdateTimer();
+
+	// Status
+	GetMovementComponent()->max_speed = GetStatus("max_speed")->GetCurrentValue();
+	IncreaseInfection();
+	UpdateStatus();
+
+	if (GetStatus("hp")->GetCurrentValue() <= 0) {
+		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
+		controller_enable_ = false;
+		is_dead_ = true;
+	}
+
+	if (GetStatus("infection")->GetCurrentValue() >= 100.f)
+	{
+		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerInfected);
+		controller_enable_ = false;
+		is_zombie_ = true;
+		return;
+	}
 }
 
 void Player::SetCharacterMovementAnimation()
@@ -187,33 +233,9 @@ void Player::SetCharacterMovementAnimation()
 	reg_scene_->emplace_or_replace<reality::C_Animation>(entity_id_, *animation_component_ptr);
 }
 
-void Player::OnUpdate()
-{
-	if (cur_hp_ <= 0) {
-		EVENT->PushEvent<GameResultEvent>(GameResultType::ePlayerDead);
-		is_dead_ = true;
-	}
-
-
-	if (controller_enable_)
-	{
-		C_Camera* camera = reg_scene_->try_get<C_Camera>(entity_id_);
-		rotation_ = XMMatrixRotationY(camera->pitch_yaw.y);
-	}
-
-	Character::OnUpdate();
-	CalculateMovementAngle();
-	SetCharacterMovementAnimation();
-	ChangeWeapon();
-
-	// FlashLight Update
-	UpdateFlashLight();
-	UpdateTimer();
-}
-
 void Player::MoveRight()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 
 	GetMovementComponent()->accelaration_vector[0] += 1;
@@ -221,7 +243,7 @@ void Player::MoveRight()
 
 void Player::MoveLeft()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 
 	GetMovementComponent()->accelaration_vector[0] -= 1;
@@ -229,7 +251,7 @@ void Player::MoveLeft()
 
 void Player::MoveForward()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 
 	GetMovementComponent()->accelaration_vector[2] += 1;
@@ -237,7 +259,7 @@ void Player::MoveForward()
 
 void Player::MoveBack()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 
 	GetMovementComponent()->accelaration_vector[2] -= 1;
@@ -245,7 +267,7 @@ void Player::MoveBack()
 
 void Player::Roll()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 	if (GetMovementComponent()->jump_pulse > 1.0f || GetMovementComponent()->gravity_pulse > 1.0f) {
 		return;
@@ -264,7 +286,7 @@ void Player::Roll()
 
 void Player::Jump()
 {
-	if (controller_enable_ == false || is_rolling_ == true)
+	if (controller_enable_ == false)
 		return;
 
 	if (GetMovementComponent()->jump_pulse <= 0 && GetMovementComponent()->gravity_pulse <= 0) {
@@ -383,8 +405,36 @@ void Player::MeeleAttack()
 	attack_sphere.center = _XMFLOAT3(shepre_center);
 	attack_sphere.radius = capsule_collision->capsule.radius * 2;
 
-	EVENT->PushEvent<AttackEvent_BoundSphere>(50, attack_sphere, entity_id_);
+	EVENT->PushEvent<AttackEvent_BoundSphere>(GetStatus("meele_damage")->GetCurrentValue(), attack_sphere, entity_id_);
 }
+
+void Player::TakeDamage(int damage)
+{
+	is_hit_ = true;
+	GetStatus("hp")->PermanentVariation(-damage);
+
+	if (is_infected_ == true)
+		return;
+
+	++hit_count_;
+	infection_probability_ = pow(hit_count_, 2);
+	is_infected_ = Probability(infection_probability_);
+};
+
+void Player::IncreaseInfection()
+{
+	if (is_infected_ == false)
+		return;
+
+	static float timer = 0;
+	timer += TM_DELTATIME;
+	if (timer >= 1.0f)
+	{
+		GetStatus("infection")->PermanentVariation(0.5f);
+		timer = 0.0f;
+	}
+}
+
 
 bool Player::IsAiming()
 {
@@ -421,31 +471,6 @@ void Player::SetPos(const XMVECTOR& position)
 {
 	cur_position_ = position;
 	transform_tree_.root_node->Translate(*reg_scene_, entity_id_, XMMatrixTranslationFromVector(cur_position_));
-}
-
-float Player::GetMaxHp() const
-{
-	return max_hp_;
-}
-
-void Player::SetCurHp(int hp)
-{
-	cur_hp_ = hp;
-}
-
-void Player::TakeDamage(int damage)
-{
-	if (is_hit_ == true || is_rolling_) {
-		return;
-	}
-
-	is_hit_ = true;
-	cur_hp_ -= damage;	
-}
-
-float Player::GetCurHp() const
-{
-	return cur_hp_;
 }
 
 void Player::AddFlashLight()
@@ -534,7 +559,7 @@ void Player::CalculateMovementAngle()
 
 void Player::ChangeWeapon()
 {
-	if (is_aiming_ == true || is_reloading_ || is_rolling_ == true) {
+	if (is_aiming_ == true || is_reloading_ || is_rolling_ == true || controller_enable_ == false) {
 		return;
 	}
 	int cur_equipped_weapon = static_cast<int>(cur_equipped_weapon_);
@@ -695,7 +720,7 @@ void Player::PickClosestItem()
 	if (selectable_items_.empty())
 		return;
 
-	bool getting_item_success = false;;
+	bool getting_item_success = false;
 
 	auto closest_item = selectable_items_.begin();
 	switch (closest_item->second->item_type_)
@@ -734,6 +759,15 @@ void Player::PickClosestItem()
 		drug->AddCount(1);
 		drug->item_type_ = closest_item->second->item_type_;
 		getting_item_success = AcquireItem(drug);
+		break;
+	}
+	case ItemType::eVaccine:
+	{
+		shared_ptr<VaccineItem> vaccine = make_shared<VaccineItem>();
+		vaccine->OnCreate();
+		vaccine->AddCount(1);
+		vaccine->item_type_ = closest_item->second->item_type_;
+		getting_item_success = AcquireItem(vaccine);
 		break;
 	}
 	case ItemType::eAR_Ammo:

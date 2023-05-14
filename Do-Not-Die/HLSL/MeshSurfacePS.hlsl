@@ -23,18 +23,12 @@ float4 PS(PS_OUT input) : SV_Target
     float4 specular = textures[4].Sample(samper_state, input.t);
     
     float4 final_color = WhiteColor();
-
-    float4 normal = textures[1].Sample(samper_state, input.t) * 2.0f - 1.0f;
-    if (length(saturate(normal)) <= EPSILON) {
-        normal = float4(input.n, 1.0f);
-    }
-
-    normal = normalize(normal);
     
-    normal = mul(normal, input.normal_transform);
+    float3 normal = mul(input.n, input.normal_transform);
+    normal = normalize(normal);
 
-    albedo = ChangeSaturation(albedo, 1.3f);
-    albedo = ChangeValue(albedo, 0.5f);
+    albedo = ChangeSaturation(albedo, 1.4f);
+    albedo = ChangeValue(albedo, 0.8f);
     albedo = ApplyHemisphericAmbient(normal.xyz, albedo);
     
     final_color = ApplyCookTorrance(albedo, roughness.r, specular.r, normal.xyz, input.view_dir);

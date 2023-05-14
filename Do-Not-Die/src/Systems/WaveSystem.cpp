@@ -2,6 +2,7 @@
 #include "GameEvents.h"
 #include "Player.h"
 #include "NormalZombie.h"
+#include "BossZombie.h"
 #include "Item.h"
 #include "FX_Flame.h"
 #include "FX_Smoke.h"
@@ -14,12 +15,15 @@ void reality::WaveSystem::OnCreate(entt::registry& reg)
 	repair_spawns_ = QUADTREE->GetGuideLines("DND_RepairPart_1")->at(0);
 	car_event_ = QUADTREE->GetGuideLines("DND_CarEvent_1")->at(0);
 	zomebie_tracks_ = QUADTREE->GetGuideLines("DND_NpcTrack_1");
+	boss_track_ = QUADTREE->GetGuideLines("DND_BossTrack_1")->at(0);
 	fx_car_fire_ = QUADTREE->GetGuideLines("DND_FX_CarFire_1")->at(0);
 	fx_corpse_fire_ = QUADTREE->GetGuideLines("DND_FX_CorpseFire_1")->at(0);
 
 	CreateExtractPoints(reg);
 	CreateCarEventTriggers(_XMFLOAT3(car_event_.line_nodes.begin()->second), 150, 800);
 	CreateStaticEffects();
+
+	wave_ui_.OnInit(reg);
 }
 
 void reality::WaveSystem::OnUpdate(entt::registry& reg)
@@ -43,45 +47,47 @@ void reality::WaveSystem::OnUpdate(entt::registry& reg)
 	countdown_timer_ -= TM_DELTATIME;
 	PlayerExtractRepair();
 	PlayerRepairCar();
-	SpawnZombies(1.f);
+	SpawnZombies(3.f);
 	SpawnCarSmokes();
 
-	if (wave_count_ > 4 && SCENE_MGR->GetPlayer<Player>(0)->GetCurHp() > 0 && SCENE_MGR->GetNumOfActor("enemy") == 0)
-	{
-		EVENT->PushEvent<GameResultEvent>(GameResultType::eGameCleared);
-	}
 	if (car_health <= 0)
 	{
 		EVENT->PushEvent<GameResultEvent>(GameResultType::eCarCrashed);
 	}
+
+	wave_ui_.OnUpdate();
 }
 
 void reality::WaveSystem::SetWorldEnv(Environment* env)
 {
 	world_env_ = shared_ptr<Environment>(env);
 	countdown_timer_ = fabs(world_env_->GetTimeLimits().x * 2);
-	for (const auto& node : item_spawns_.line_nodes)
-	{
-		item_table_.insert(make_pair(node.first, false));
-	}
 }
 
 void reality::WaveSystem::RandomSpawnItem(float trigger_radius)
 {
 	list<UINT> empty_item_index;
-	for (const auto& index : item_table_)
-	{
-		if (index.second == false)
-			empty_item_index.push_back(index.first);
-	}
 
-	for (UINT index : empty_item_index)
+	const auto& item_view = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().view<C_TriggerVolume>();
+	for (const auto& spawn : item_spawns_.line_nodes)
 	{
-		ItemType item_type = (ItemType)RandomIntInRange(0, 6);
+		bool is_item_stay = false;
 
-		const auto& spawn = item_spawns_.line_nodes[index];
-		SCENE_MGR->GetScene(INGAME)->AddActor<Item>(item_type, _XMFLOAT3(spawn), trigger_radius);
-		item_table_[index] = true;
+		for (const auto& ent : item_view)
+		{
+			const auto& trigger = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().get<C_TriggerVolume>(ent);
+			if (trigger.tag != "item")
+				continue;
+
+			if (Distance(spawn.second, _XMVECTOR3(trigger.sphere_volume.center)) < trigger_radius)
+				is_item_stay = true;
+		}
+
+		if (!is_item_stay)
+		{
+			ItemType item_type = (ItemType)RandomIntInRange(0, 7);
+			SCENE_MGR->GetScene(INGAME)->AddActor<Item>(item_type, _XMFLOAT3(spawn.second), trigger_radius);
+		}
 	}
 }
 
@@ -129,27 +135,45 @@ void reality::WaveSystem::CreateExtractPoints(entt::registry& reg)
 
 void reality::WaveSystem::PlayerExtractRepair()
 {
+	static bool is_played = false;
+
 	auto player = SCENE_MGR->GetPlayer<Player>(0);
 	if (player == nullptr)
+	{
+		is_played = false;
 		return;
+	}
 
 	if (player->can_extract_repair_ == false)
+	{
+		is_played = false;
 		return;
+	}
 
 	auto trigger_comp = SCENE_MGR->GetScene(INGAME)->GetRegistryRef().try_get<C_TriggerVolume>(player->repair_extract_trigger);
 	if (trigger_comp == nullptr)
+	{
+		is_played = false;
 		return;
+	}
 
 	if (DINPUT->GetKeyState(DIK_E) == KEY_HOLD)
 	{
 		player->extract_during_time_ += TM_DELTATIME;
 		player->InteractionRotate(_XMVECTOR3(trigger_comp->sphere_volume.center));
+		if (!is_played)
+		{
+			is_played = true;
+			EVENT->PushEvent<SoundGenerateEvent>(player->GetEntityId(), SFX, "S_Fix.mp3", 1.0f, true);
+		}
 	}
 
 	if (DINPUT->GetKeyState(DIK_E) == KEY_UP)
 	{
 		player->extract_during_time_ = 0.0f;
 		player->controller_enable_ = true;
+		FMOD_MGR->Stop("S_Fix.mp3");
+		is_played = false;
 	}
 
 	if (player->extract_during_time_ >= player->extract_time_takes_)
@@ -160,27 +184,38 @@ void reality::WaveSystem::PlayerExtractRepair()
 
 		SpawnRepairItem(trigger_comp->sphere_volume.center);
 
-		EVENT->PushEvent<MakeTextEvent>("Extract Success!");
+		EVENT->PushEvent<MakeTextEvent>("Extract Success!", 1920.0f / 2.0f - 100.0f);
 
 		DeleteExtractPoint(player->repair_extract_trigger);
 		player->extract_during_time_ = 0.0f;
 		player->can_extract_repair_ = false;
 		player->controller_enable_ = true;
+		FMOD_MGR->Stop("S_Fix.mp3");
+		is_played = false;
 	}
 }
 
 void reality::WaveSystem::PlayerRepairCar()
 {
+	static bool is_played = false;
+
 	auto player = SCENE_MGR->GetPlayer<Player>(0);
 	if (player == nullptr)
+	{
+		is_played = false;
 		return;
+	}
 
 	if (player->can_repair_car_ == false)
+	{
+		is_played = false;
 		return;
+	}
 
 	if(player->HasRepairPart() == false)
 	{
-		EVENT->PushEvent<MakeTextEvent>("There is no Repair Part in Inventory!");
+		if(DINPUT->GetKeyState(DIK_E) == KEY_PUSH)
+			EVENT->PushEvent<MakeTextEvent>("There is no Repair Part in Inventory!", 1920.0f / 2.0f - 250.0f);
 		return;
 	}
 		
@@ -189,22 +224,31 @@ void reality::WaveSystem::PlayerRepairCar()
 	{
 		player->controller_enable_ = true;
 		player->repair_during_time_ = 0.0f;
+		FMOD_MGR->Stop("S_Fix.mp3");
+		is_played = false;
 	}
 
 	if (DINPUT->GetKeyState(DIK_E) == KEY_HOLD)
 	{
 		player->repair_during_time_ += TM_DELTATIME;
-		player->InteractionRotate(car_event_.line_nodes.begin()->second);		
+		player->InteractionRotate(car_event_.line_nodes.begin()->second);	
+		if (!is_played)
+		{
+			is_played = true;
+			EVENT->PushEvent<SoundGenerateEvent>(player->GetEntityId(), SFX, "S_Fix.mp3", 1.0f, true);
+		}
 	}
 
 	if (player->repair_during_time_ >= player->repair_time_takes_)
 	{
 		player->controller_enable_ = true;
 		player->UseRepairPart();
-		car_health = min(100, car_health + 20);
+		car_health = min(car_health_max, car_health + 20);
 		player->repair_during_time_ = 0.0f; 
 		car_repair_count++;
-		EVENT->PushEvent<MakeTextEvent>("Repair Success!");
+		EVENT->PushEvent<MakeTextEvent>("Repair Success!", 1920.0f / 2.0f - 100.0f);
+		FMOD_MGR->Stop("S_Fix.mp3");
+		is_played = false;
 	}
 }
 
@@ -245,10 +289,8 @@ void reality::WaveSystem::SpawnZombies(float interval)
 
 	enemy_actor->targeting_car_health = &car_health;
 	
-	int guidline_index = RandomIntInRange(0, zomebie_tracks_->size());
-	int mesh_index = RandomIntInRange(0, enemy_meshes.size());
-
-	guidline_index = 4;
+	int guidline_index = RandomIntInRange(0, zomebie_tracks_->size() - 1);
+	int mesh_index = RandomIntInRange(0, enemy_meshes.size() - 1);
 
 	vector<XMVECTOR> target_poses;
 	for (const auto& target_pos : zomebie_tracks_->at(guidline_index).line_nodes) {
@@ -261,9 +303,25 @@ void reality::WaveSystem::SpawnZombies(float interval)
 	zombie_spawn_count_ -= 1;	
 }
 
+void reality::WaveSystem::SpawnBossZombie()
+{
+	BossZombie* boss = SCENE_MGR->GetScene(INGAME)->GetActor<BossZombie>(SCENE_MGR->GetScene(INGAME)->AddActor<BossZombie>());
+	boss_zombie_ent = boss->entity_id_;
+
+	boss->targeting_car_health = &car_health;
+
+	vector<XMVECTOR> target_poses;
+	for (const auto& target_pos : boss_track_.line_nodes) {
+		target_poses.push_back(target_pos.second);
+	}
+	boss->SetBehaviorTree(target_poses);
+
+	boss_zombie_spawn = true;
+}
+
 void reality::WaveSystem::SpawnCarSmokes()
 {
-	for (int i = 0; i < 100; i += 20)
+	for (int i = 0; i < car_health_max; i += car_health_max / 5)
 	{
 		int index = i / 20;
 
@@ -296,11 +354,25 @@ XMVECTOR reality::WaveSystem::GetCarPosition()
 
 void reality::WaveSystem::WaveStart()
 {
-	zombie_spawn_count_ += 2;
+	wave_ui_.ShowWaveStart();
+
+	if (wave_count_ == 4)
+		SpawnBossZombie();
+	else
+		zombie_spawn_count_ += 20;
+
+	FMOD_MGR->Stop("S_Day_BGM.wav");
+	FMOD_MGR->Play("S_Night_BGM.wav", SoundType::MUSIC, true, 1.0f, {});
+	FMOD_MGR->Play("WaveStart.wav", SoundType::MUSIC, false, 0.5f, {});
 }
 
 void reality::WaveSystem::WaveFinish()
 {
+	wave_ui_.ShowWaveFinish();
+
+	FMOD_MGR->Stop("S_Night_BGM.wav");
+	FMOD_MGR->Play("S_Day_BGM.wav", SoundType::MUSIC, true, 1.0f, {});
+	FMOD_MGR->Play("WaveFinish.wav", SoundType::MUSIC, false, 0.5f, {});
 	wave_count_++;
 	RandomSpawnItem(30);
 }

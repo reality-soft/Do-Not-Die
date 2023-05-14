@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "NormalZombie.h"
 #include "BossZombie.h"
+#include "BaseEnemy.h"
 #include "FX_Flame.h"
 #include "FX_Explosion.h"
 #include "FbxMgr.h"
@@ -64,10 +65,11 @@ void InGameScene::OnInit()
 
 	QUADTREE->ImportGuideLines("DND_Blocking_1.mapdat", GuideType::eBlocking);
 	QUADTREE->ImportGuideLines("DND_NpcTrack_1.mapdat", GuideType::eNpcTrack);
+	QUADTREE->ImportGuideLines("DND_CarAttack_1.mapdat", GuideType::eNpcTrack);
+	QUADTREE->ImportGuideLines("DND_BossTrack_1.mapdat", GuideType::eNpcTrack);
 	QUADTREE->ImportGuideLines("DND_PlayerStart_1.mapdat", GuideType::eSpawnPoint);
 	QUADTREE->ImportGuideLines("DND_ItemSpawn_1.mapdat", GuideType::eSpawnPoint);
 	QUADTREE->ImportGuideLines("DND_RepairPart_1.mapdat", GuideType::eSpawnPoint);
-	QUADTREE->ImportGuideLines("DND_CarAttack_1.mapdat", GuideType::eNpcTrack);
 	QUADTREE->ImportGuideLines("DND_CarEvent_1.mapdat", GuideType::eSpawnPoint);
 	QUADTREE->ImportGuideLines("DND_FX_CorpseFire_1.mapdat", GuideType::eSpawnPoint);
 	QUADTREE->ImportGuideLines("DND_FX_CarFire_1.mapdat", GuideType::eSpawnPoint);
@@ -77,7 +79,7 @@ void InGameScene::OnInit()
 	QUADTREE->CreatePhysicsCS();
 	QUADTREE->InitCollisionMeshes();
 	QUADTREE->SetBlockingFields("DND_Blocking_1");
-	QUADTREE->view_collisions_ = true;
+	//QUADTREE->view_collisions_ = true;
 
 	XMVECTOR plyer_spawn = QUADTREE->GetGuideLines("DND_PlayerStart_1")->begin()->line_nodes.begin()->second;
 	player_actor->SetSpawnPoint(plyer_spawn);
@@ -86,10 +88,11 @@ void InGameScene::OnInit()
 	loading_progress = LOADING_ACTOR;
 	
 	environment_.CreateEnvironment();
-	environment_.SetWorldTime(10, 120);
+	environment_.SetWorldTime(120, 120);
+	//environment_.SetWorldTime(30, 30);
 	environment_.SetSkyColorByTime(RGB_TO_FLOAT(201, 205, 204), RGB_TO_FLOAT(11, 11, 19));
-	environment_.SetFogDistanceByTime(5000, 1000);
-	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.05, 0.05, 0.1, 1), 0.1f, 0.25f);
+	environment_.SetFogDistanceByTime(5000, 2000);
+	environment_.SetLightProperty(XMFLOAT4(1.0, 0.7, 0.5, 1), XMFLOAT4(0.1, 0.1, 0.15, 1), 0.05f, 0.25f);
 
 	// LOADING FINISH
 	loading_progress = LOADING_FINISHED;
@@ -104,12 +107,10 @@ void InGameScene::OnInit()
 #ifdef _DEBUG
 	GUI->AddWidget<PropertyWidget>("property");
 	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("FPS", &TIMER->fps);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("hit count", &player_actor->hit_count_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<int>("infection prob", &player_actor->infection_probability_);
+	GUI->FindWidget<PropertyWidget>("property")->AddProperty<float>("infection value", &player_actor->GetStatus("infection")->current_value_);
 #endif
-
-	//BossZombie Test
-	BossZombie* boss = GetActor<BossZombie>(AddActor<BossZombie>());
-	if (boss)
-		boss->ApplyMovement(player_actor->GetCurPosition() + XMVectorSet(0, -100, 0, 0));
 }
 
 void InGameScene::OnUpdate()
@@ -118,10 +119,14 @@ void InGameScene::OnUpdate()
 	{
 		sys_wave_.wave_count_++;
 	}
-
 	if (game_result_type != GameResultType::eNone)
 	{
 		GameResultProcess();
+	}
+
+	if (sys_wave_.boss_zombie_spawn)
+	{
+		ShowBossZombie();
 	}
 	
 	QUADTREE->Frame(&sys_camera);
@@ -141,6 +146,7 @@ void InGameScene::OnUpdate()
 	ingame_ui.SetGameTimer(sys_wave_.countdown_timer_);
 	ingame_ui.OnUpdate();
 	
+	
 	CursorStateUpdate();
 }
 
@@ -157,7 +163,7 @@ void InGameScene::OnRender()
 	sys_ui.OnUpdate(reg_scene_);
 
 #ifdef _DEBUG
-	GUI->RenderWidgets();
+	//GUI->RenderWidgets();
 #endif
 }
 
@@ -201,46 +207,84 @@ void InGameScene::SetCursorInvisible()
 
 void InGameScene::ShowCarCrashing()
 {
-	SequenceInfo seq_info;
-	seq_info.sequence_start = sys_camera.world_matrix.r[3];
-	seq_info.sequence_end = sys_wave_.GetCarPosition() - XMVector3Normalize(sys_wave_.GetCarPosition() - seq_info.sequence_start) * 500;
-	seq_info.target_start = sys_camera.GetCamera()->target_pos;
-	seq_info.target_end = sys_wave_.GetCarPosition();
-	seq_info.play_time = 5.0f;
-	seq_info.acceler = 1.f;
-	seq_info.decceler = 0.1f;
+	ingame_ui.GetUIComponent()->ui_list.clear();
 
-	if (sys_camera.PlaySequence(seq_info, -1) == true)
+	auto zoom_pos = sys_wave_.GetCarPosition() - XMVector3Normalize(sys_wave_.GetCarPosition() - sys_camera.world_matrix.r[3]) * 500;
+	auto zoom_target = sys_wave_.GetCarPosition();
+
+	static float timer = 0.0f;
+	timer += TM_DELTATIME;
+
+	sys_camera.ZoomToTarget(zoom_target, zoom_pos, 3.0f, 300.0f);
+
+	static bool end = false;
+
+	if (timer > 3.0f)
 	{
 		ingame_ui.ShowCarCrashed();
+		ingame_ui.SetOnOff(false);
 
-		static float time = 0.0f;
+		static float other_time = 0.0f;
 		static int index = 0;
-		time += TM_DELTATIME;
-		
-		if (time > 0.3 && index < sys_wave_.fx_car_fire_.line_nodes.size())
+		other_time += TM_DELTATIME;
+
+		if (other_time > 0.3 && index < sys_wave_.fx_car_fire_.line_nodes.size())
 		{
 			XMVECTOR spawn_pos = sys_wave_.fx_car_fire_.line_nodes.at(index++);
 			EFFECT_MGR->SpawnEffect<FX_Explosion>(spawn_pos);
-			time = 0.0f;
-		}			
+			other_time = 0.0f;
+		}
 	}
+}
+
+void InGameScene::ShowBossZombie()
+{
+	static bool show_end = false;
+
+	if (show_end)	
+		return;
+	
+
+	auto boss = SCENE_MGR->GetActor<BossZombie>(sys_wave_.boss_zombie_ent);
+	if (boss == nullptr)
+		return;
+
+	auto player = SCENE_MGR->GetPlayer<Player>(0);
+	if (player == nullptr)
+		return;
+
+	if (Distance(player->GetCurPosition(), boss->GetCurPosition()) > 4000.0f)
+		return;
+
+	sys_sound.PlayBackground("BossShowdown.wav", false, 0, 1.0f);
+
+	show_end = sys_camera.ZoomToTarget(boss->GetCurPosition(), (boss->GetCurPosition() + XMVectorSet(0, 100, 0, 0)) + (boss->GetFront() * 500), 2.0f, 3.0f);
+	player->controller_enable_ = show_end;
+
 }
 
 void InGameScene::GameResultProcess()
 {
+	SCENE_MGR->GetPlayer<Player>(0)->controller_enable_ = false;
+
 	switch (game_result_type)
 	{
 	case GameResultType::ePlayerDead:
 		ingame_ui.ShowPlayerDead();
+		ingame_ui.SetOnOff(false);
 		break;
 	case GameResultType::eCarCrashed:
 		ShowCarCrashing();
+		ingame_ui.SetOnOff(false);
 		break;
 	case GameResultType::ePlayerInfected:
+		ingame_ui.ShowPlayerInfected();
+		ingame_ui.SetOnOff(false);
 		break;
 	case GameResultType::eGameCleared:
+		bool bgm_faded = sys_sound.FadeOutDelete("S_Night_BGM.wav", 3.0f) || sys_sound.FadeOutDelete("S_Day_BGM.wav", 3.0f);
 		bool fade_out_finished = ingame_ui.FadeOut();
+		ingame_ui.SetOnOff(false);
 		if (fade_out_finished)
 			SCENE_MGR->ChangeScene(ENDING);
 		break;

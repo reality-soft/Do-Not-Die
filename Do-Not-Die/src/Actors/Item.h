@@ -7,6 +7,7 @@ enum class ItemType
 	eMedicalBox,	// heal bigger
 	eEnergyDrink,	// move faster
 	eDrug,			// stronger damage
+	eVaccine,		// reduce infection
 	eAR_Ammo,		// rifle ammo (30)
 	ePistol_Ammo,	// pistol ammo (8)
 	eGrenade,

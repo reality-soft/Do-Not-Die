@@ -40,6 +40,9 @@ public:
 	void PickClosestItem();
 	void SetCharacterMovementAnimation();
 
+	void IncreaseInfection();
+	virtual void TakeDamage(int damage) override;
+
 public:
 	bool IsAiming();
 	bool IsReloading();
@@ -50,12 +53,6 @@ public:
 	void SetPos(const XMVECTOR& position = { 0.f, 100.f, 0.f, 0.f });
 	int  GetKillScore() { return kill_score_; }
 	void AddKillScore() { kill_score_++; }
-
-public:
-	virtual float GetMaxHp() const override;
-	virtual void SetCurHp(int hp) override;
-	virtual void TakeDamage(int damage) override;
-	virtual float GetCurHp() const override;
 
 private:
 	void AddFlashLight();
@@ -102,11 +99,9 @@ public:
 	vector<shared_ptr<ItemBase>>&	GetInventory();
 	vector<float>&					GetInventoryTimer();
 
-	float drop_during_time_ = 0.0f;
 	float extract_during_time_ = 0.0f;
 	float repair_during_time_ = 0.0f;
 
-	const float drop_time_takes_ = 0.5f;
 	const float extract_time_takes_ = 5.0f;
 	const float repair_time_takes_ = 5.0f;
 
@@ -114,7 +109,7 @@ public:
 	bool can_repair_car_ = false;
 
 	bool is_reloading_ = false;
-	bool is_hit_ = false;
+	//bool is_hit_ = false;
 	bool roll_ = false;
 	bool is_rolling_ = false;
 	bool is_dead_ = false;
@@ -125,6 +120,11 @@ public:
 	XMVECTOR spawn_point;
 	bool controller_enable_ = true;
 	bool player_in_defense_ = false;
+
+	int infection_probability_ = 0;
+	int hit_count_ = 0;
+	bool is_infected_ = false;
+	bool is_zombie_ = false;
 
 private:
 	void UpdateTimer();

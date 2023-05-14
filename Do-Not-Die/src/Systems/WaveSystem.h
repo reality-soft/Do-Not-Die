@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine_include.h"
 #include "StaticShadows.h"
+#include "UI_Actor_Wave.h"
 
 namespace reality
 {
@@ -15,10 +16,13 @@ namespace reality
 		XMVECTOR GetCarPosition();
 
 		float countdown_timer_ = 0;
-		UINT wave_count_ = 0;
-		int car_health = 40;
+		UINT wave_count_ = 1;
+		int car_health = 60;
+		int car_health_max = 100;
 		int car_repair_count = 0;
 		GuideLine fx_car_fire_;
+		entt::entity boss_zombie_ent;
+		bool boss_zombie_spawn = false;
 
 	private:
 		void CreateExtractPoints(entt::registry& reg);
@@ -31,6 +35,7 @@ namespace reality
 		void DeleteExtractPoint(entt::entity ent);
 		void SpawnZombies(float interval);
 		void SpawnCarSmokes();
+		void SpawnBossZombie();
 
 		void WaveStart();
 		void WaveFinish();
@@ -42,11 +47,11 @@ namespace reality
 
 		shared_ptr<Environment> world_env_;
 		vector<GuideLine>* zomebie_tracks_;
+		GuideLine boss_track_;
 		GuideLine item_spawns_;
 		GuideLine repair_spawns_;
 		GuideLine car_event_;
 		GuideLine fx_corpse_fire_;
-		map<UINT, bool> item_table_;
 		set<entt::entity> repair_parts;
 
 		map<int, entt::entity> spawned_car_fired_;
@@ -58,6 +63,8 @@ namespace reality
 		"Zombie_SchoolGirl_Female_01.skmesh",
 		"Zombie_Bellboy_Male_01.skmesh",
 		};
+
+		UI_Actor_Wave wave_ui_;
 	};
 }
 

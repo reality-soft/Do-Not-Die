@@ -6,13 +6,14 @@ void MedicalBoxItem::OnCreate()
 	item_count_ = 0;
 	item_cooltime_ = 5.0f;
 
-	heal_amount = 30.0f;
+	heal_amount = 100.0f;
 }
 
 void MedicalBoxItem::UseItem()
 {
-	float added_hp = min(100, owner_->GetCurHp() + heal_amount);
-	owner_->SetCurHp(added_hp);
+	owner_->GetStatus("hp")->PermanentVariation(heal_amount);
+	//float added_hp = min(100, owner_->GetCurHp() + heal_amount);
+	//owner_->SetCurHp(added_hp);
 }
 
 void HealKitItem::OnCreate()
@@ -21,13 +22,14 @@ void HealKitItem::OnCreate()
 	item_count_ = 0;
 	item_cooltime_ = 3.0f;
 
-	heal_amount = 15.0f;
+	heal_amount = 50.0f;
 }
 
 void HealKitItem::UseItem()
 {
-	float added_hp = min(100, owner_->GetCurHp() + heal_amount);
-	owner_->SetCurHp(added_hp);
+	owner_->GetStatus("hp")->PermanentVariation(heal_amount);
+	//float added_hp = min(100, owner_->GetCurHp() + heal_amount);
+	//owner_->SetCurHp(added_hp);
 }
 
 void EnergyDrinkItem::OnCreate()
@@ -39,18 +41,35 @@ void EnergyDrinkItem::OnCreate()
 
 void EnergyDrinkItem::UseItem()
 {
-
+	owner_->GetStatus("max_speed")->TimeLimitedVariation(15, 150);
 }
 
 void DrugItem::OnCreate()
 {
 	item_icon_ = "Drug.png";
 	item_count_ = 0;
-	item_cooltime_ = 20.0f;
+	item_cooltime_ = 15.0f;
 }
 
 void DrugItem::UseItem()
 {
+	owner_->GetStatus("gunfire_damage")->TimeLimitedVariation(15, 30);
+	owner_->GetStatus("meele_damage")->TimeLimitedVariation(15, 30);
+}
+
+void VaccineItem::OnCreate()
+{
+	item_icon_ = "Vaccine.png";
+	item_count_ = 0;
+	item_cooltime_ = 15.0f;
+}
+
+void VaccineItem::UseItem()
+{
+	owner_->GetStatus("infection")->PermanentVariation(-100);
+	owner_->hit_count_ = 0;
+	owner_->infection_probability_ = 0;
+	owner_->is_infected_ = false;
 }
 
 void ARAmmoItem::OnCreate()

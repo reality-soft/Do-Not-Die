@@ -14,7 +14,11 @@ namespace reality
 	private:
 		Player* player_;
 	private:
+		bool  onoff_;
 		C_UI* ui_comp_;
+	public:
+		void  SetOnOff(bool onoff) { onoff_ = onoff; }
+		C_UI* GetUIComponent() { return ui_comp_; }
 	private:
 		// Weapon
 		shared_ptr<UI_Image>	ar_ui_;
@@ -38,6 +42,13 @@ namespace reality
 			shared_ptr<UI_Text>		inven_count_text_[4];
 			shared_ptr<UI_Image>	inven_cooltime_img_[4];
 			shared_ptr<UI_Image>	hp_img_;
+			shared_ptr<UI_Image>	infected_img_;
+			shared_ptr<UI_Text>		infected_text_;
+		// Buff
+		shared_ptr<UI_Image>	buff_slot1_;
+			shared_ptr<UI_Text>		buff_timer1_;
+		shared_ptr<UI_Image>	buff_slot2_;
+			shared_ptr<UI_Text>		buff_timer2_;
 		// Objective
 		shared_ptr<UI_Image>	objective_ui_;
 			shared_ptr<UI_Text>		wave_text_;
@@ -49,7 +60,7 @@ namespace reality
 			shared_ptr<UI_Text>		repair_text_;
 			shared_ptr<UI_Text>		kill_text_;
 		// Crosshair
-		shared_ptr<UI_Image>	crosshair_ui_;
+		shared_ptr<UI_Image>	crosshair_ui_[(int)EQUIPPED_WEAPON::NUM_OF_WEAPON_TYPE];
 		// Menu
 		shared_ptr<UI_Image>	menu_window_;
 			shared_ptr<UI_Image>	menu_title_;
@@ -65,12 +76,17 @@ namespace reality
 			shared_ptr<UI_Text>		interaction_text_;
 		// Addictive Window
 		shared_ptr<UI_Image>	addicted_ui_;
+		// Hitted Image
+		vector<float>			hitted_ui_timer_;
+		float					hit_ui_time_ = 3.0f;
+		shared_ptr<UI_Image>	hitted_ui_[5];
 		// Text Event
 		shared_ptr<UI_Text>		event_msg_text_;
 
 		// Game Over UI
 		shared_ptr<UI_Image>	player_dead_ui_;
 		shared_ptr<UI_Image>	car_is_crashed_ui_;
+		shared_ptr<UI_Image>	player_infected_ui_;
 
 		shared_ptr<UI_Button> game_over_exit_button_;
 
@@ -89,10 +105,11 @@ namespace reality
 	public:
 		void UpdateIngameUI();
 		void UpdateMenuUI();
-		void SetEventMsg(string msg);
+		void SetEventMsg(string msg, float x);
 		void ShowPlayerDead();
 		void ShowPlayerInfected();
 		void ShowCarCrashed();
+		void Hitted();
 	private:
 		void OpenMenu();
 		void CloseMenu();

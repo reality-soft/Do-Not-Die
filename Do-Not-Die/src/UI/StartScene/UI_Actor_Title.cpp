@@ -68,25 +68,18 @@ void UI_Actor_Title::CreateUI()
 	newgame_button_->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f }, 200.0f, 70.0f);
 	ui_comp_->ui_list.insert({ "1_New Game Button", newgame_button_ });
 
-	// Load Game Button
-	loadinggame_button = make_shared<UI_Button>();
-	loadinggame_button->InitButton("T_Button_LoadGame_Normal.png", "T_Button_LoadGame_Hover.png", "T_Button_LoadGame_Pushed.png");
-	loadinggame_button->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
-	loadinggame_button->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f + 70.0f * 1.0f }, 200.0f, 70.0f);
-	ui_comp_->ui_list.insert({ "1_Load Game Button", loadinggame_button });
-
 	// Option Button
 	option_button_ = make_shared<UI_Button>();
 	option_button_->InitButton("T_Button_Option_Normal.png", "T_Button_Option_Hover.png", "T_Button_Option_Pushed.png");
 	option_button_->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
-	option_button_->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f + 70.0f * 2.0f }, 200.0f, 70.0f);
+	option_button_->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f + 70.0f * 1.0f }, 200.0f, 70.0f);
 	ui_comp_->ui_list.insert({ "1_Option Button", option_button_ });
 
 	// Exit Button
 	exit_button_ = make_shared<UI_Button>();
 	exit_button_->InitButton("T_Button_Exit_Normal.png", "T_Button_Exit_Hover.png", "T_Button_Exit_Pushed.png");
 	exit_button_->SetButtonSound("S_UI_Button_Hover.wav", "S_UI_Button_Push.wav", "S_UI_Button_Select.wav");
-	exit_button_->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f + 70.0f * 3.0f }, 200.0f, 70.0f);
+	exit_button_->SetLocalRectByCenter({ button_x, win_size_1920_height * 3.0f / 5.0f + 70.0f * 2.0f }, 200.0f, 70.0f);
 	ui_comp_->ui_list.insert({ "1_Exit Button", exit_button_ });
 
 	// Option Window
@@ -99,12 +92,12 @@ void UI_Actor_Title::CreateUI()
 	fmod_img_->SetAlpha(0.0f); 
 	kgca_img_->SetAlpha(0.0f);
 	newgame_button_->SetAlpha(0.0f);
-	loadinggame_button->SetAlpha(0.0f);
+	//loadinggame_button->SetAlpha(0.0f);
 	option_button_->SetAlpha(0.0f);
 	exit_button_->SetAlpha(0.0f);
 
 	newgame_button_->Off();
-	loadinggame_button->Off();
+	//loadinggame_button->Off();
 	option_button_->Off();
 	exit_button_->Off();
 }
@@ -119,7 +112,7 @@ void reality::UI_Actor_Title::FadeInUI()
 		if (!executed)
 		{
 			newgame_button_->On();
-			loadinggame_button->On();
+			//loadinggame_button->On();
 			option_button_->On();
 			exit_button_->On();
 			executed = true;
@@ -135,7 +128,7 @@ void reality::UI_Actor_Title::FadeInUI()
 	fmod_img_->SetAlpha(alpha);
 	kgca_img_->SetAlpha(alpha);
 	newgame_button_->SetAlpha(alpha);
-	loadinggame_button->SetAlpha(alpha);
+	//loadinggame_button->SetAlpha(alpha);
 	option_button_->SetAlpha(alpha);
 	exit_button_->SetAlpha(alpha);
 }
@@ -154,12 +147,12 @@ void reality::UI_Actor_Title::DisappearUI()
 	title_img_->SetAlpha(alpha);
 	kgca_img_->SetAlpha(alpha);
 	newgame_button_->SetAlpha(alpha);
-	loadinggame_button->SetAlpha(alpha);
+	//loadinggame_button->SetAlpha(alpha);
 	option_button_->SetAlpha(alpha);
 	exit_button_->SetAlpha(alpha);
 
 	newgame_button_->Off();
-	loadinggame_button->Off();
+	//loadinggame_button->Off();
 	option_button_->Off();
 	exit_button_->Off();
 }
@@ -205,7 +198,7 @@ void UI_Actor_Title::UpdateUI()
 void UI_Actor_Title::OpenOptionWindow()
 {
 	newgame_button_->Off();
-	loadinggame_button->Off();
+	//loadinggame_button->Off();
 	option_button_->Off();
 	exit_button_->Off();
 
@@ -217,7 +210,7 @@ void UI_Actor_Title::OpenOptionWindow()
 void UI_Actor_Title::CloseOptionWindow()
 {
 	newgame_button_->On();
-	loadinggame_button->On();
+	//loadinggame_button->On();
 	option_button_->On();
 	exit_button_->On();
 

@@ -6,57 +6,54 @@ void AttackEvent_SingleRay::Process()
 	if (character == nullptr)
 		return;
 
-	entt::entity actor_hit;
-	float damage = character->GetCharacterDamage();
-
 	if (character->tag == "enemy")
-	{
-		auto enemy_actor = SCENE_MGR->GetActor<NormalZombie>(actor_id_);
-		enemy_actor->is_attacking_ = true;
+		EnemyProcess();
+	else if (character->tag == "player")
+		PlayerProcess();
+};
 
-		auto callback_car = QUADTREE->RaycastCarOnly(ray);
-		if (callback_car.success)
+void AttackEvent_SingleRay::EnemyProcess()
+{
+	auto enemy_actor = SCENE_MGR->GetActor<BaseEnemy>(actor_id_);
+	enemy_actor->is_attacking_ = true;
+
+	auto callback_actor = QUADTREE->RaycastActorTargeted(ray, SCENE_MGR->GetPlayer<Player>(0)->entity_id_);
+	if (callback_actor.success)
+	{
+		if (SCENE_MGR->GetActor<GameCharacter>(callback_actor.ent)->tag == "player")
 		{
-			*enemy_actor->targeting_car_health = max(0, *enemy_actor->targeting_car_health - 5);
+			hit_actor_ = callback_actor.ent;
+			EVENT->PushEvent<TakeDamageEvent>(enemy_actor->GetStatus("default_damage")->GetCurrentValue(), hit_actor_);
+			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_actor.point, callback_actor.normal);
+			auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+			ingame_scene->GetUIActor().Hitted();
+		}
+	}	
+}
+
+void AttackEvent_SingleRay::PlayerProcess()
+{
+	auto callback_total = QUADTREE->Raycast(ray, actor_id_);
+	if (callback_total.success)
+	{
+		if (callback_total.is_actor)
+		{
+			hit_actor_ = callback_total.ent;
+
+			NormalZombie* enemy_actor = SCENE_MGR->GetActor<NormalZombie>(hit_actor_);
+			if (enemy_actor)
+				enemy_actor->AddImpulse(GetRayDirection(ray), 300.0f);
+
+			EVENT->PushEvent<TakeDamageEvent>(SCENE_MGR->GetPlayer<Player>(0)->GetStatus("gunfire_damage")->GetCurrentValue(), hit_actor_);
+			EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_total.point, callback_total.normal);
 		}
 		else
 		{
-			auto callback_actor = QUADTREE->RaycastActorTargeted(ray, SCENE_MGR->GetPlayer<Player>(0)->entity_id_);
-			if (callback_actor.success)
-			{
-				if (SCENE_MGR->GetActor<GameCharacter>(callback_actor.ent)->tag == "player")
-				{
-					actor_hit = callback_actor.ent;
-					EVENT->PushEvent<TakeDamageEvent>(damage, actor_hit);
-					EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_actor.point, callback_actor.normal);
-				}
-			}
-		}
-
-	}
-	else if (character->tag == "player")
-	{
-		auto callback_total = QUADTREE->Raycast(ray, actor_id_);
-		if (callback_total.success)
-		{
-			if (callback_total.is_actor)
-			{
-				actor_hit = callback_total.ent;
-
-				NormalZombie* enemy_actor = SCENE_MGR->GetActor<NormalZombie>(actor_hit);
-				if (enemy_actor)
-					enemy_actor->AddImpulse(GetRayDirection(ray), 300.0f);
-
-				EVENT->PushEvent<TakeDamageEvent>(damage, actor_hit);
-				EFFECT_MGR->SpawnEffectFromNormal<FX_BloodImpact>(callback_total.point, callback_total.normal);
-			}
-			else
-			{
-				EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(callback_total.point, callback_total.normal);
-			}
+			EFFECT_MGR->SpawnEffectFromNormal<FX_ConcreteImpact>(callback_total.point, callback_total.normal);
 		}
 	}
-};
+}
+
 
 void AttackEvent_BoundSphere::Process()
 {
@@ -64,7 +61,7 @@ void AttackEvent_BoundSphere::Process()
 	if (character_actor == nullptr)
 		return;
 	
-	if (character_actor->tag == "enemy")
+	if (character_actor->tag == "enemy" || character_actor->tag == "boss enemy")
 		EnemyProcess();
 	else if (character_actor->tag == "player")
 		PlayerProcess();
@@ -72,10 +69,31 @@ void AttackEvent_BoundSphere::Process()
 	for (const auto& hit : hit_actors_)
 	{
 		EVENT->PushEvent<TakeDamageEvent>(damage_, hit);
-
 		
-		XMVECTOR hit_point = _XMVECTOR3(sphere_.center);
-		XMVECTOR hit_normal = -character_actor->GetFront();
+
+		auto hit_actor = SCENE_MGR->GetActor<GameCharacter>(hit);
+		if (hit_actor == nullptr)
+			return;
+
+		auto hit_capsule_comp = hit_actor->GetCapsuleComponent();
+		if (hit_capsule_comp == nullptr)
+			return;
+		
+		
+
+		RayShape ray;
+		ray.start = _XMFLOAT3(GetTipBaseAB(hit_capsule_comp->capsule)[0]);
+		ray.end = _XMFLOAT3(GetTipBaseAB(hit_capsule_comp->capsule)[1]);
+		XMVECTOR point = PointRaySegment(ray, _XMVECTOR3(sphere_.center));
+
+		XMVECTOR dir = (character_actor->GetCurPosition() - point);
+		dir.m128_f32[1] = 0.0f;
+		dir = XMVector3Normalize(dir);
+
+		point += dir * hit_capsule_comp->capsule.radius;
+
+		XMVECTOR hit_point = point;
+		XMVECTOR hit_normal = dir;
 		EFFECT_MGR->SpawnEffectFromNormal<FX_MeleeImpact>(hit_point, hit_normal);
 
 		auto general_zombie = SCENE_MGR->GetActor<NormalZombie>(hit);
@@ -90,14 +108,19 @@ void AttackEvent_BoundSphere::Process()
 
 void AttackEvent_BoundSphere::EnemyProcess()
 {
-	NormalZombie* enemy_actor = SCENE_MGR->GetActor<NormalZombie>(actor_id_);
+	BaseEnemy* enemy_actor = SCENE_MGR->GetActor<BaseEnemy>(actor_id_);
 	Player* player_actor = SCENE_MGR->GetPlayer<Player>(0);
 	if (enemy_actor == nullptr || player_actor == nullptr)
+		return;
+
+	if (player_actor->GetCapsuleComponent()->hit_enable == false)
 		return;
 
 	if (CapsuleToSphere(player_actor->GetCapsuleComponent()->capsule, sphere_) == CollideType::INTERSECT)
 	{
 		hit_actors_.push_back(player_actor->entity_id_);
+		auto ingame_scene = (InGameScene*)SCENE_MGR->GetScene(INGAME).get();
+		ingame_scene->GetUIActor().Hitted();
 	}
 }
 
@@ -111,13 +134,38 @@ void AttackEvent_BoundSphere::PlayerProcess()
 	for (const auto& ent : capsule_view)
 	{
 		auto actor = SCENE_MGR->GetActor<Character>(ent);
-		if (actor == nullptr || actor->tag != "enemy")
+		if (actor == nullptr)
 			continue;
 
-		const auto& capsule = player_actor->reg_scene_->get<C_CapsuleCollision>(ent).capsule;
-		if (CapsuleToSphere(capsule, sphere_) == CollideType::INTERSECT)
+		if (actor->tag == "enemy" || actor->tag == "boss enemy")
 		{
-			hit_actors_.push_back(ent);
+			const auto& capsule = player_actor->reg_scene_->get<C_CapsuleCollision>(ent).capsule;
+			if (CapsuleToSphere(capsule, sphere_) == CollideType::INTERSECT)
+			{
+				hit_actors_.push_back(ent);
+			}
 		}
+	}
+}
+
+void AttackEvent_AboutCar::Process()
+{
+	BaseEnemy* enemy = SCENE_MGR->GetActor<BaseEnemy>(actor_id_);
+	if (enemy == nullptr)
+		return;
+
+	auto c_capsule = enemy->GetCapsuleComponent();
+	if (c_capsule == nullptr)
+		return;
+
+	XMVECTOR point_b = GetTipBaseAB(c_capsule->capsule)[3];
+	RayShape ray_about_car(point_b, point_b + enemy->GetFront() * 100);
+	auto callback_car = QUADTREE->RaycastCarOnly(ray_about_car);
+
+	if (callback_car.success)
+	{
+		EVENT->PushEvent<SoundGenerateEvent>(enemy->entity_id_, SFX, "CarAttackSound.wav", 0.5f, false);
+		float damage = enemy->GetStatus("car_damage")->GetCurrentValue();
+		*enemy->targeting_car_health = max(0, *enemy->targeting_car_health - damage);
 	}
 }

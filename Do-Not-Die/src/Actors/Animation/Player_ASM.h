@@ -62,7 +62,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -74,7 +74,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -86,7 +86,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -271,7 +271,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -283,7 +283,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -295,7 +295,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -491,7 +491,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -503,7 +503,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -515,7 +515,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::GRENADE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -594,7 +594,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::AUTO_RIFLE) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -606,7 +606,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::HAND_GUN) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -618,7 +618,7 @@ public:
 						entt::entity owner_id = animation_state_machine->GetOwnerId();
 						Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 						if (player->cur_equipped_weapon_ == EQUIPPED_WEAPON::MELEE_WEAPON) {
-							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "S_WEP_Holster.wav", 1.0f, false);
+							EVENT->PushEvent<SoundGenerateEvent>(player->entity_id_, SFX, "Holstering.mp3", 0.5f, false);
 							return true;
 						}
 						else {
@@ -1178,7 +1178,8 @@ public:
 		NONE, 
 		DODGE_ROLL,
 		DIE,
-		DEAD
+		DEAD,
+		ZOMBIE
 	};
 
 	PlayerFullBodyAnimationStateMachine(entt::entity owner_id, string skeletal_mesh_id, int range, string bone_name = "") : AnimationStateMachine(owner_id, skeletal_mesh_id, range, bone_name) {};
@@ -1188,6 +1189,7 @@ public:
 		states_.insert({ DODGE_ROLL, make_shared<DodgeRoll>() });
 		states_.insert({ DIE, make_shared<Die>() });
 		states_.insert({ DEAD, make_shared<Dead>() });
+		states_.insert({ ZOMBIE, make_shared<Zombie>() });
 
 		// Dodge Roll
 		{
@@ -1250,6 +1252,20 @@ public:
 			});
 		}
 
+		{
+			transitions_.insert({ NONE, Transition(ZOMBIE,[this](const AnimationStateMachine* animation_state_machine) {
+				entt::entity owner_id = animation_state_machine->GetOwnerId();
+				Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+				if (player->is_zombie_) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
+			});
+		}
+
 		cur_state_ = states_[NONE];
 	}
 
@@ -1278,15 +1294,14 @@ public:
 		virtual void Enter(AnimationStateMachine* animation_state_machine) override
 		{
 			entt::entity owner_id = animation_state_machine->GetOwnerId();
+			EVENT->PushEvent<SoundGenerateEvent>(owner_id, SFX, "RollSound.wav", 0.5f, false);
 
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			player->is_rolling_ = true;
+			player->controller_enable_ = false;
 
 			C_Movement* movement_component = player->GetMovementComponent();
-
-			movement_component->velocity.m128_f32[0] = 0.0f;
-			movement_component->velocity.m128_f32[2] = 0.0f;
-			movement_component->acceleration = 300.0f;
+			player->GetStatus("max_speed")->PermanentVariation(100);
 
 			for (int i = 0;i < 3;i++) {
 				roll_direction_[i] = movement_component->accelaration_vector[i];
@@ -1327,6 +1342,9 @@ public:
 		{
 			entt::entity owner_id = animation_state_machine->GetOwnerId();
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+
+			player->GetStatus("max_speed")->PermanentVariation(-100);
+			player->controller_enable_ = true;
 			player->is_rolling_ = false;
 			player->roll_ = false;
 		}
@@ -1336,12 +1354,10 @@ public:
 			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
 			C_Movement* movement_component = player->GetMovementComponent();
 
-			movement_component->velocity = XMVectorZero();
-
 			for (int i = 0;i < 3;i++) {
 				movement_component->accelaration_vector[i] = roll_direction_[i];
 			}
-			movement_component->acceleration = 30000.0f;
+			movement_component->acceleration = 500.0f;
 		}
 	};
 
@@ -1374,6 +1390,42 @@ public:
 		}
 		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
 		{
+		}
+	};
+
+	class Zombie : public AnimationState {
+	public:
+		Zombie() : AnimationState(ZOMBIE) {}
+	public:
+		virtual void Enter(AnimationStateMachine* animation_state_machine) override
+		{
+			animation_state_machine->SetAnimation("player_zombie_walk.anim", 0.5f, true);
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+			player->reg_scene_->try_get<C_StaticMesh>(owner_id)->static_mesh_id = "";
+
+		}
+		virtual void Exit(AnimationStateMachine* animation_state_machine) override
+		{
+		}
+		virtual void OnUpdate(AnimationStateMachine* animation_state_machine) override
+		{
+			entt::entity owner_id = animation_state_machine->GetOwnerId();
+			Player* player = SCENE_MGR->GetActor<Player>(owner_id);
+
+			static float move_time = RandomFloatInRange(3.0f, 7.0f);
+			static float rotation_angle = RandomFloatInRange(0.0f, 180.0f);
+			player->GetMovementComponent()->accelaration_vector[2] = 1;
+			player->GetMovementComponent()->max_speed = 20.0f;
+			XMMATRIX rotation_matrix = XMMatrixRotationY(rotation_angle);
+			player->transform_tree_.root_node->Rotate(*player->reg_scene_, owner_id, player->GetCurPosition(), rotation_matrix);
+			if (move_time <= 0.0f) {
+				move_time = RandomFloatInRange(3.0f, 7.0f);
+				rotation_angle = RandomFloatInRange(0.0f, 180.0f);
+				player->rotation_ = XMMatrixRotationY(rotation_angle);
+			}
+
+			move_time -= TM_DELTATIME;
 		}
 	};
 };

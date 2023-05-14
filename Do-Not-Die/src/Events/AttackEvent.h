@@ -14,6 +14,7 @@ public:
 private:
 	RayShape ray;
 	entt::entity actor_id_;
+	entt::entity hit_actor_;
 };
 
 class AttackEvent_BoundSphere : public Event
@@ -30,4 +31,14 @@ private:
 	SphereShape sphere_;
 	entt::entity actor_id_;
 	vector<entt::entity> hit_actors_;
+};
+
+class AttackEvent_AboutCar : public Event
+{
+public:
+	AttackEvent_AboutCar(entt::entity actor_id) : actor_id_(actor_id) {};
+	virtual void Process() override;
+
+private:
+	entt::entity actor_id_;
 };
